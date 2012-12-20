@@ -1,0 +1,6 @@
+<rewards>
+	<description>Decreasing prizes for podium</description>
+	<position is="1" planets="50%"/>
+	<position is="2" planets="30%"/>
+	<position is="3" planets="20%"/>
+</rewards>

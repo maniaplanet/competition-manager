@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+	<start>
+		<ref name="elt-rewards"/>
+	</start>
+
+	<define name="elt-rewards">
+		<element name="rewards">
+			<element name="description">
+				<data type="string"/>
+			</element>
+			<oneOrMore>
+				<choice>
+					<ref name="elt-position"/>
+					<ref name="elt-registrations"/>
+				</choice>
+			</oneOrMore>
+		</element>
+	</define>
+
+	<define name="elt-position">
+		<element name="position">
+			<choice>
+				<attribute name="is">
+					<data type="positiveInteger"/>
+				</attribute>
+				<group>
+					<attribute name="from">
+						<choice>
+							<ref name="percentage"/>
+							<data type="positiveInteger"/>
+						</choice>
+					</attribute>
+					<optional>
+						<attribute name="to">
+							<choice>
+								<ref name="percentage"/>
+								<data type="positiveInteger"/>
+							</choice>
+						</attribute>
+					</optional>
+				</group>
+				<attribute name="to">
+					<choice>
+						<ref name="percentage"/>
+						<data type="positiveInteger"/>
+					</choice>
+				</attribute>
+			</choice>
+			<attribute name="planets">
+				<ref name="percentage"/>
+			</attribute>
+		</element>
+	</define>
+
+	<define name="elt-registrations">
+		<element name="registrations">
+			<choice>
+				<group>
+					<attribute name="atLeast">
+						<data type="positiveInteger"/>
+					</attribute>
+					<optional>
+						<attribute name="atMost">
+							<data type="positiveInteger"/>
+						</attribute>
+					</optional>
+				</group>
+				<attribute name="atMost">
+					<data type="positiveInteger"/>
+				</attribute>
+			</choice>
+			<oneOrMore>
+				<choice>
+					<ref name="elt-position"/>
+					<ref name="elt-registrations"/>
+				</choice>
+			</oneOrMore>
+		</element>
+	</define>
+	
+	<define name="percentage">
+		<data type="string">
+			<param name="pattern">(100|[1-9]?\d)%</param>
+		</data>
+	</define>
+</grammar>

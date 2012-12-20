@@ -1,0 +1,14 @@
+<scoring>
+	<description>Formula One points system</description>
+	<points>25</points>
+	<points>18</points>
+	<points>15</points>
+	<points>12</points>
+	<points>10</points>
+	<points>8</points>
+	<points>6</points>
+	<points>4</points>
+	<points>2</points>
+	<points>1</points>
+	<points>0</points>
+</scoring>

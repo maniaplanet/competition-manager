@@ -1,0 +1,6 @@
+<format>
+	<description>A simple elimination tree</description>
+	<stages>
+		<eliminationTree/>
+	</stages>
+</format>

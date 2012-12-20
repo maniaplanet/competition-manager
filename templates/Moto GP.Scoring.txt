@@ -1,0 +1,19 @@
+<scoring>
+	<description>Moto GP points system</description>
+	<points>25</points>
+	<points>20</points>
+	<points>16</points>
+	<points>13</points>
+	<points>11</points>
+	<points>10</points>
+	<points>9</points>
+	<points>8</points>
+	<points>7</points>
+	<points>6</points>
+	<points>5</points>
+	<points>4</points>
+	<points>3</points>
+	<points>2</points>
+	<points>1</points>
+	<points>0</points>
+</scoring>

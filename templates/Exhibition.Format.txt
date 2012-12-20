@@ -1,0 +1,6 @@
+<format>
+	<description>A simple match</description>
+	<stages>
+		<singleMatch/>
+	</stages>
+</format>

@@ -1,0 +1,4 @@
+<rewards>
+	<description>Winner takes all the planets</description>
+	<position is="1" planets="100%"/>
+</rewards>

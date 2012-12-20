@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+	<start>
+		<element name="format">
+			<element name="description">
+				<data type="string"/>
+			</element>
+
+			<ref name="elt-stages"/>
+		</element>
+	</start>
+
+	<define name="elt-stages">
+		<element name="stages">
+			<zeroOrMore>
+				<choice>
+					<element name="openStage"><empty/></element>
+					<element name="singleMatch"><empty/></element>
+					<element name="championship"><empty/></element>
+					<element name="groupedChampionship"><empty/></element>
+				</choice>
+			</zeroOrMore>
+
+			<choice>
+				<element name="openStage"><empty/></element>
+				<element name="singleMatch"><empty/></element>
+				<element name="championship"><empty/></element>
+				<element name="eliminationTree"><empty/></element>
+			</choice>
+		</element>
+	</define>
+</grammar>

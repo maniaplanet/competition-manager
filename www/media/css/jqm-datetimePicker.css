@@ -1,0 +1,110 @@
+/* 
+    Document   : jqm-datetimePicker
+    Created on : 29 oct. 2012, 15:52:20
+    Author     : Nadeo
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+.datetimepicker {
+	width: 280px;
+	border: 1px solid #444;
+	background: #222;
+	padding: 6px;
+}
+
+.datetimepicker .ui-title {
+	margin: .6em 20% .8em;
+}
+
+.datetimepicker-calendar {
+	padding: 5px;
+	border-bottom: 1px solid #AAA;
+}
+
+.datetimepicker-calendar-day {
+	display: inline-block;
+	width: 36px;
+	height: 30px;
+	line-height: 30px;
+	font-size: 12px;
+	font-weight: bold;
+	vertical-align: middle;
+	text-align: center;
+	zoom: 1;
+}
+
+.datetimepicker-active:hover {
+	cursor: pointer;
+}
+
+.datetimepicker-inactive {
+	border: 1px solid transparent;
+	color: #666;
+}
+
+.datetimepicker-calendar-header .datetimepicker-calendar-day {
+	height: 16px;
+	line-height: 16px;
+	border: 1px solid transparent;
+}
+
+.datetimepicker-clock {
+	text-align: center;
+	border-bottom: 1px solid #AAA;
+}
+
+.datetimepicker-clock.ui-grid-a {
+	padding: 0 40px;
+}
+
+.datetimepicker-clock.ui-grid-b {
+	padding: 0 10px;
+}
+
+.datetimepicker-clock-highlight {
+	position: relative;
+	top: 53px;
+	border: 1px solid #eee;
+	height: 36px;
+	width: auto!important;
+	margin: 0 -5px!important;
+	pointer-events: none;
+}
+
+.datetimepicker-clock-roller {
+	padding: 0 3px;
+}
+
+.datetimepicker-clock-roller ul {
+	height: 60px;
+	list-style: none;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+
+.datetimepicker-clock-roller li {
+	height: 30px;
+	border-width: 0 0 1px 0;
+	line-height: 30px;
+	font-size: 14px;
+	font-weight: bold;
+	vertical-align: middle;
+	text-align: center;
+	zoom: 1;
+}
+
+.datetimepicker-clock-roller li.datetimepicker-selected,
+.datetimepicker-clock-roller li.datetimepicker-current {
+	border-width: 1px 0;
+}
+
+.datetimepicker-buttons {
+	text-align: center;
+	padding: 2px 5px;
+}
+
+.datetimepicker-buttons > div {
+	width: 45%;
+}

@@ -1,0 +1,5 @@
+<scoring>
+	<description>Only the first get a point</description>
+	<points>1</points>
+	<points>0</points>
+</scoring>

@@ -1,0 +1,4 @@
+<rewards>
+	<description>People finishing in first half of ranking share planets equally</description>
+	<position to="50%" planets="100%"/>
+</rewards>

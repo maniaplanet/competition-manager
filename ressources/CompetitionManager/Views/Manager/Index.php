@@ -21,7 +21,9 @@ $r = ManiaLib\Application\Request::getInstance();
 				<?php foreach($currentCompetitions as $competition):
 					$r->set('competition', $competition->competitionId); ?>
 					<li>
-						<a href="<?php echo HTML::encode($r->createLinkArgList('/edit', 'c')); ?>" data-ajax="false"><?php echo ManiaLib\Utils\StyleParser::toHtml($competition->name); ?></a>
+						<!--<a href="<?php echo HTML::encode($r->createLinkArgList('/edit', 'c')); ?>" data-ajax="false">-->
+							<?php echo ManiaLib\Utils\StyleParser::toHtml($competition->name); ?>
+						<!--</a>-->
 					</li>
 				<?php endforeach; ?>
 				</ul>
@@ -36,7 +38,9 @@ $r = ManiaLib\Application\Request::getInstance();
 				<?php foreach($upcomingCompetitions as $competition):
 					$r->set('competition', $competition->competitionId); ?>
 					<li>
-						<a href="<?php echo HTML::encode($r->createLinkArgList('/edit', 'c')); ?>" data-ajax="false"><?php echo ManiaLib\Utils\StyleParser::toHtml($competition->name); ?></a>
+						<!--<a href="<?php echo HTML::encode($r->createLinkArgList('/edit', 'c')); ?>" data-ajax="false">-->
+							<?php echo ManiaLib\Utils\StyleParser::toHtml($competition->name); ?>
+						<!--</a>-->
 					</li>
 				<?php endforeach; ?>
 				</ul>
@@ -51,7 +55,9 @@ $r = ManiaLib\Application\Request::getInstance();
 				<?php foreach($finishedCompetitions as $competition):
 					$r->set('competition', $competition->competitionId); ?>
 					<li>
-						<a href="<?php echo HTML::encode($r->createLinkArgList('/edit', 'c')); ?>" data-ajax="false"><?php echo ManiaLib\Utils\StyleParser::toHtml($competition->name); ?></a>
+						<!--<a href="<?php echo HTML::encode($r->createLinkArgList('/edit', 'c')); ?>" data-ajax="false">-->
+							<?php echo ManiaLib\Utils\StyleParser::toHtml($competition->name); ?>
+						<!--</a>-->
 					</li>
 				<?php endforeach; ?>
 				</ul>

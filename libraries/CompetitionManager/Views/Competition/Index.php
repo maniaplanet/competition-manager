@@ -131,12 +131,13 @@ class Index extends \ManiaLib\Application\View
 				break;
 			
 			case self::CLOSED_PLAYER:
+				$buttons = array();
+				if($this->response->nextUserEvent->match)
+					$buttons[] = array($this->response->nextUserEvent->match->name, $this->response->nextUserEvent->link);
 				$card = $this->progress(
 						_('Currently: ').$this->response->competition->getCurrentStage()->getName(),
 						$this->response->nextUserEvent->message,
-						array(
-							array($this->response->nextUserEvent->match->name, $this->response->nextUserEvent->link)
-						)
+						$buttons
 					);
 				$frame->add($card);
 				if($this->response->nextForUser)

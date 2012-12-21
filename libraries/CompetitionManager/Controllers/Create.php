@@ -172,7 +172,7 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 			$header->rightText = _('Back to competition preparation');
 			$header->rightLink = $this->request->createLinkArgList('..');
 		}
-		else if($this->stageIndex == 1 || $this->competition->isScheduled())
+		else if($this->competition->isScheduled())
 		{
 			$this->request->set('s', $this->stageIndex - 1);
 			$header->rightText = _('Back to previous stage schedule');
@@ -273,7 +273,7 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 	
 	function setMaps()
 	{
-		$this->stage->maps = explode('|', $this->request->getPost('maps', ''));
+		$this->stage->maps = array_filter(explode('|', $this->request->getPost('maps', '')));
 		if(!$this->stage->maps)
 		{
 			$this->session->set('error', _('You have to select at least one map.'));

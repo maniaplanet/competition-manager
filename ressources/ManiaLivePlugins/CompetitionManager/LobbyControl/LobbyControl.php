@@ -379,7 +379,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 	private function closeServer()
 	{
 		static $warn = 0;
-		switch(!$warn++)
+		switch($warn++)
 		{
 			case 0:
 				$this->db->execute('UPDATE Matches SET state=%d WHERE matchId=%d', State::OVER, $this->lobby->matchId);

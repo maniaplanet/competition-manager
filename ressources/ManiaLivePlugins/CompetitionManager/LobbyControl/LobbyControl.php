@@ -211,16 +211,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 				$this->quitters[$participant->login] = 0;
 			else if(++$this->quitters[$participant->login] == 3)
 			{
-				$this->db->execute(
-						'DELETE FROM MatchParticipants WHERE matchId=%d AND participantId=%d',
-						$this->lobby->matchId,
-						$participant->participantId
-					);
-				$this->db->execute(
-						'DELETE FROM StageParticipants WHERE stageId=%d AND participantId=%d',
-						$this->lobby->stageId,
-						$participant->participantId
-					);
+				$this->unregisterParticipant($participant);
 				unset($this->quitters[$participant->login]);
 				unset($this->lobby->participants[$key]);
 			}
@@ -247,6 +238,36 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 					break;
 			}
 		}
+	}
+	
+	private function unregisterParticipant($participant)
+	{
+		$this->db->execute(
+				'DELETE FROM MatchParticipants WHERE matchId=%d AND participantId=%d',
+				$this->lobby->matchId,
+				$participant->participantId
+			);
+		$this->db->execute(
+				'DELETE FROM StageParticipants WHERE stageId=%d AND participantId=%d',
+				$this->lobby->stageId,
+				$participant->participantId
+			);
+		$due = $this->db->execute(
+				'SELECT SUM(IF(type & 0x80, -amount, amount)) '.
+				'FROM Transactions '.
+				'WHERE competitionId=%d AND login=%s AND type IN (0, 0x81) remoteId IS NOT NULL', // FIXME constants
+				$this->lobby->stage->competitionId,
+				$this->db->quote($participant->login)
+			)->fetchSingleValue(0);
+		if($due > 0)
+			$this->db->execute(
+					'INSERT INTO Transactions(competitionId, login, amount, type, message) VALUES (%d, %s, %d, %d, %s)',
+					$this->lobby->stage->competitionId,
+					$this->db->quote($participant->login),
+					$due,
+					0x81, // FIXME constant
+					$this->db->quote(sprintf('Refund of registration in $<%s$> (reason: left before start)', $this->lobby->stage->competition->name))
+				);
 	}
 	
 	private function closeRegistrations()

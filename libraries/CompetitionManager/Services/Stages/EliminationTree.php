@@ -38,7 +38,7 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 			$info[] = _('Loser\'s bracket').($this->parameters['withSmallFinal'] ? _(' for the 3rd place') : _(' qualifying for the Grand final'));
 		else
 			$info[] = _('Single elimination tree').($this->parameters['withSmallFinal'] ? _(' with a 3rd place match') : '');
-		$info[] = $this->parameters['slotsPerMatch'] == 2 ? sprintf(_('%d on %1$d matches'), $this->rules->getTeamSize()) : sprintf(_('%d players per match'), $this->parameters['slotsPerMatch']);
+		$info[] = $this->parameters['slotsPerMatch'] == 2 ? sprintf(_('%d on %1$d matches'), $this->rules->getTeamSize() ?: 1) : sprintf(_('%d players per match'), $this->parameters['slotsPerMatch']);
 		$info[] = _('Rules:');
 		$info[] = $this->rules->getInfo();
 		return $info;

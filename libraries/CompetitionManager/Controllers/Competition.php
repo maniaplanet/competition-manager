@@ -184,7 +184,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		$config = \CompetitionManager\Config::getInstance();
 		if($this->competition->registrationCost && $this->session->login != $config->paymentLogin && $config->arePaymentsConfigured())
 		{
-			if(!IncomeLogger::$expected || IncomeLogger::$expected->competitionId != $this->competition->competitionId)
+			if(!Filters\IncomeLogger::$expected || Filters\IncomeLogger::$expected->competitionId != $this->competition->competitionId)
 			{
 				$transaction = new \CompetitionManager\Services\Transaction();
 				$transaction->competitionId = $this->competition->competitionId;
@@ -202,10 +202,10 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 				else
 					Filters\NextPageMessage::error(_('Transaction cannot be created, please try again later.'));
 			}
-			else if(IncomeLogger::$isPaid)
+			else if(Filters\IncomeLogger::$isPaid)
 				$this->doRegister($external, $team);
 			else
-				$this->billRegister(IncomeLogger::$expected, $external, $team);
+				$this->billRegister(Filters\IncomeLogger::$expected, $external, $team);
 		}
 		else
 			$this->doRegister($external, $team);
@@ -429,7 +429,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	
 	private function billRegister($transaction, $external=false, $team=null)
 	{
-		$this->session->set(IncomeLogger::EXPECTED_KEY, $transaction);
+		$this->session->set(Filters\IncomeLogger::EXPECTED_KEY, $transaction);
 		$queryVars = array(
 			'transaction' => $transaction->remoteId,
 			\ManiaLib\Application\Dispatcher::PATH_INFO_OVERRIDE_PARAM => '/competition/register',
@@ -463,7 +463,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 			Filters\NextPageMessage::success(_('You have been successfully registered!'));
 		}
 		
-		if($this->competition->registrationCost && (IncomeLogger::$isPaid || $this->session->login == \CompetitionManager\Config::getInstance()->paymentLogin))
+		if($this->competition->registrationCost && (Filters\IncomeLogger::$isPaid || $this->session->login == \CompetitionManager\Config::getInstance()->paymentLogin))
 		{
 			$service = new CompetitionService();
 			$service->alterPlanetsPool($this->competition->competitionId, $this->competition->registrationCost);

@@ -11,11 +11,10 @@ namespace CompetitionManager\Services;
 
 class Transaction extends AbstractObject
 {
-	const REGISTRATION        = 0x00;
-	const SPONSOR             = 0x01;
+	const REGISTRATION        = 0x01;
+	const SPONSOR             = 0x02;
 	const REWARD              = 0x80;
-	const REGISTRATION_REFUND = 0x81;
-	const SPONSOR_REFUND      = 0x82;
+	const REFUND              = 0x80;
 	
 	/** @var int */
 	public $transactionId;
@@ -37,7 +36,7 @@ class Transaction extends AbstractObject
 	 */
 	function isIncome()
 	{
-		return !($this->type & 0x80);
+		return !($this->type & self::REFUND);
 	}
 	
 	/**
@@ -46,18 +45,6 @@ class Transaction extends AbstractObject
 	function isPaid()
 	{
 		return (bool) $this->remoteId;
-	}
-	
-	/**
-	 * @return int
-	 */
-	function getRefundType()
-	{
-		switch($this->type)
-		{
-			case self::REGISTRATION: return self::REGISTRATION_REFUND;
-			case self::SPONSOR: return self::SPONSOR_REFUND;
-		}
 	}
 }
 

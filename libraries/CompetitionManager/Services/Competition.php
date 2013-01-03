@@ -197,7 +197,7 @@ class Competition extends AbstractObject
 				$refunds[$transaction->login] = array();
 			if($transaction->isPaid())
 			{
-				$type = $transaction->isIncome() ? $transaction->getRefundType() : $transaction->type;
+				$type = $transaction->type | Transaction::REFUND;
 				$amount = $transaction->isIncome() ? $transaction->amount : -$transaction->amount;
 
 				if(!isset($transaction[$transaction->login][$type]))
@@ -213,17 +213,17 @@ class Competition extends AbstractObject
 			{
 				if($amount > 0)
 				{
-					$refund = new \CompetitionManager\Services\Transaction();
+					$refund = new Transaction();
 					$refund->competitionId = $this->competitionId;
 					$refund->login = $login;
 					$refund->amount = $amount;
 					$refund->type = $type;
-					switch($refund->type)
+					switch($refund->type & ~Transaction::REFUND)
 					{
-						case \CompetitionManager\Services\Transaction::REGISTRATION_REFUND:
+						case Transaction::REGISTRATION:
 							$refund->message = sprintf('Refund of registration in $<%s$> (reason: competition cancelled)', $this->name);
 							break;
-						case \CompetitionManager\Services\Transaction::SPONSOR_REFUND:
+						case Transaction::SPONSOR:
 							$refund->message = sprintf('Refund of sponsoring $<%s$> (reason: competition cancelled)', $this->name);
 							break;
 					}

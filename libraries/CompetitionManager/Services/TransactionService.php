@@ -28,9 +28,10 @@ class TransactionService extends \DedicatedManager\Services\AbstractService
 	function getCompetitionBalance($competitionId)
 	{
 		return $this->db()->execute(
-				'SELECT SUM(IF(type & 0x80, -amount, amount)) '.
+				'SELECT SUM(IF(type & %d, -amount, amount)) '.
 				'FROM Transactions '.
 				'WHERE competitionId=%d AND remoteId IS NOT NULL',
+				 Transaction::REFUND,
 				$competitionId
 			)->fetchSingleValue();
 	}

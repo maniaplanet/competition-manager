@@ -93,50 +93,54 @@ $r = ManiaLib\Application\Request::getInstance();
 						</li>
 					</ul>
 				</fieldset>
-				<?php foreach($availableModes as $mode): ?>
-					<?php $mode = $stage->rules && $stage->rules->getId() == $mode->getId() ? $stage->rules : $mode; ?>
+			<?php foreach($availableModes as $mode): ?>
+				<?php $mode = $stage->rules && $stage->rules->getId() == $mode->getId() ? $stage->rules : $mode; ?>
 				<fieldset id="settings-<?php echo $mode->getId(); ?>" data-role="collapsible" data-collapsed="false" data-theme="b">
 					<legend><?php echo $mode->getName(); ?></legend>
 					<ul data-role="listview">
-					<?php foreach($mode->getSettings() as $setting => $details): ?>
-						<?php $id = 'setting-'.$mode->getId().'-'.$setting; ?>
-						<li data-role="fieldcontain">
-						<?php if($details[0] == 'scoring'): ?>
-							<fieldset data-role="controlgroup">
-								<legend>
+					<?php if($mode->getSettings()): ?>
+						<?php foreach($mode->getSettings() as $setting => $details): ?>
+							<?php $id = 'setting-'.$mode->getId().'-'.$setting; ?>
+							<li data-role="fieldcontain">
+							<?php if($details[0] == 'scoring'): ?>
+								<fieldset data-role="controlgroup">
+									<legend>
+										<strong><?php echo ucfirst(preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $setting)); ?></strong><br/>
+										<i><?php echo $details[1]; ?></i>
+									</legend>
+									<input type="radio" name="<?php echo $setting; ?>[<?php echo $mode->getId(); ?>]" id="<?php echo $id; ?>-none"
+										   value="" <?php echo !$mode->$setting ? 'checked="checked"' : ''; ?>/>
+									<label for="<?php echo $id; ?>-none"><?php echo _('* Default'); ?></label>
+								<?php foreach($scoringSystems as $name => $system): ?>
+									<input type="radio" name="<?php echo $setting; ?>[<?php echo $mode->getId(); ?>]" id="<?php echo $id; ?>-<?php echo md5($name); ?>"
+										   value="<?php echo $name; ?>" <?php echo $system == $mode->$setting ? 'checked="checked"' : ''; ?>/>
+									<label for="<?php echo $id; ?>-<?php echo md5($name); ?>"><?php echo $name; ?></label>
+								<?php endforeach; ?>
+								</fieldset>
+							<?php elseif($details[0] == 'bool'): ?>
+								<label for="<?php echo $id; ?>">
 									<strong><?php echo ucfirst(preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $setting)); ?></strong><br/>
 									<i><?php echo $details[1]; ?></i>
-								</legend>
-								<input type="radio" name="<?php echo $setting; ?>[<?php echo $mode->getId(); ?>]" id="<?php echo $id; ?>-none"
-									   value="" <?php echo !$mode->$setting ? 'checked="checked"' : ''; ?>/>
-								<label for="<?php echo $id; ?>-none"><?php echo _('* Default'); ?></label>
-							<?php foreach($scoringSystems as $name => $system): ?>
-								<input type="radio" name="<?php echo $setting; ?>[<?php echo $mode->getId(); ?>]" id="<?php echo $id; ?>-<?php echo md5($name); ?>"
-									   value="<?php echo $name; ?>" <?php echo $system == $mode->$setting ? 'checked="checked"' : ''; ?>/>
-								<label for="<?php echo $id; ?>-<?php echo md5($name); ?>"><?php echo $name; ?></label>
-							<?php endforeach; ?>
-							</fieldset>
-						<?php elseif($details[0] == 'bool'): ?>
-							<label for="<?php echo $id; ?>">
-								<strong><?php echo ucfirst(preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $setting)); ?></strong><br/>
-								<i><?php echo $details[1]; ?></i>
-							</label>
-							<select id="<?php echo $id; ?>" name="<?php echo $setting; ?>[<?php echo $mode->getId(); ?>]" data-role="slider">
-								<option value="0" <?php echo !$mode->$setting ? 'selected="selected"' : ''; ?>><?php echo _('No'); ?></option>
-								<option value="1" <?php echo $mode->$setting ? 'selected="selected"' : ''; ?>><?php echo _('Yes'); ?></option>
-							</select>
-						<?php else: ?>
-							<label for="setting-<?php echo $mode->getId(); ?>-<?php echo $setting; ?>">
-								<strong><?php echo ucfirst(preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $setting)).($details[0] ? ' ('.$details[0].')' : ''); ?></strong><br/>
-								<i><?php echo $details[1]; ?></i>
-							</label>
-							<input type="text" name="<?php echo $setting; ?>[<?php echo $mode->getId(); ?>]" id="<?php echo $id; ?>" value="<?php echo $mode->$setting; ?>"/>
-						<?php endif; ?>
-						</li>
-					<?php endforeach; ?>
+								</label>
+								<select id="<?php echo $id; ?>" name="<?php echo $setting; ?>[<?php echo $mode->getId(); ?>]" data-role="slider">
+									<option value="0" <?php echo !$mode->$setting ? 'selected="selected"' : ''; ?>><?php echo _('No'); ?></option>
+									<option value="1" <?php echo $mode->$setting ? 'selected="selected"' : ''; ?>><?php echo _('Yes'); ?></option>
+								</select>
+							<?php else: ?>
+								<label for="setting-<?php echo $mode->getId(); ?>-<?php echo $setting; ?>">
+									<strong><?php echo ucfirst(preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $setting)).($details[0] ? ' ('.$details[0].')' : ''); ?></strong><br/>
+									<i><?php echo $details[1]; ?></i>
+								</label>
+								<input type="text" name="<?php echo $setting; ?>[<?php echo $mode->getId(); ?>]" id="<?php echo $id; ?>" value="<?php echo $mode->$setting; ?>"/>
+							<?php endif; ?>
+							</li>
+						<?php endforeach; ?>
+					<?php else: ?>
+						<li>No rules to set in this mode</li>
+					<?php endif; ?>
 					</ul>
 				</fieldset>
-				<?php endforeach; ?>
+			<?php endforeach; ?>
 				<div class="ui-grid-a">
 					<div class="ui-block-a">
 						<input type="reset" id="reset" value="<?php echo _('Restore'); ?>"/>

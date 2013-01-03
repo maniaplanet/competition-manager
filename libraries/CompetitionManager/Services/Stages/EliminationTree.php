@@ -285,21 +285,34 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 		
 		$playerService = new \CompetitionManager\Services\ParticipantService();
 		$matchService = new \CompetitionManager\Services\MatchService();
+		$maxQualified = $this->parameters['slotsPerMatch'] >> 1;
+		
 		// Final or Grand final case
 		if($bracket == self::WINNERS_BRACKET && $round == count($this->matches[$bracket]) - 1 && $offset == 0)
 		{
 			foreach($match->participants as $participantId => $participant)
+			{
 				$playerService->updateStageInfo($this->stageId, $participantId, $participant->rank, count($this->matches[$bracket]) * 2, null);
+				if($participant->rank && $participant->rank <= $maxQualified)
+					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
+				else
+					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
+			}
 		}
 		// Small final case
 		else if($this->parameters['withSmallFinal'] && $round == count($this->matches[$bracket]) - 1)
 		{
 			foreach($match->participants as $participantId => $participant)
+			{
 				$playerService->updateStageInfo($this->stageId, $participantId, $participant->rank + $this->parameters['slotsPerMatch'], count($this->matches[$bracket]), null);
+				if($participant->rank && $participant->rank <= $maxQualified)
+					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
+				else
+					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
+			}
 		}
 		else
 		{
-			$maxQualified = $this->parameters['slotsPerMatch'] >> 1;
 			$qualified = array();
 			$falling = array();
 			foreach($match->participants as $participantId => $participant)
@@ -309,7 +322,7 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
 					$playerService->updateStageInfo($this->stageId, $participantId, 0, null, null);
 				}
-				else if(count($qualified) < $maxQualified)
+				else if($participant->rank <= $maxQualified)
 				{
 					$qualified[] = $participantId;
 					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::YES);

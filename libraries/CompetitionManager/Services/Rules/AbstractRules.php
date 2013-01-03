@@ -12,7 +12,7 @@ namespace CompetitionManager\Services\Rules;
 abstract class AbstractRules
 {
 	private $id;
-	private $settings;
+	private $settings = array();
 	/** @var int */
 	public $gameMode;
 	/** @var int|null */
@@ -49,12 +49,15 @@ abstract class AbstractRules
 //				case 'SMStormElite@nadeolabs':
 //				case 'SMStormEliteExperimental@nadeolabs':
 //				case 'SMStormHeroes@nadeolabs':
-				case 'SMStormJoust@nadeolabs':
 					return array(
 						new Melee(),
 						new Royal(),
 						new BattleWaves(),
 						new LobbySMTimeAttack()
+					);
+				case 'SMStormJoust@nadeolabs':
+					return array(
+						new LobbyJoust()
 					);
 			}
 		}

@@ -13,6 +13,7 @@ use ManiaLive\DedicatedApi\Callback\Event as ServerEvent;
 use ManiaLive\Gui\CustomUI;
 use ManiaLive\Gui\Group;
 use ManiaLivePlugins\CompetitionManager\Constants\State;
+use ManiaLivePlugins\CompetitionManager\Constants\Transaction;
 use ManiaLivePlugins\CompetitionManager\Services\Match;
 use ManiaLivePlugins\CompetitionManager\Services\Participant;
 use ManiaLivePlugins\CompetitionManager\Services\Player;
@@ -253,11 +254,13 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 				$participant->participantId
 			);
 		$due = $this->db->execute(
-				'SELECT SUM(IF(type & 0x80, -amount, amount)) '.
+				'SELECT SUM(IF(type & %d, -amount, amount)) '.
 				'FROM Transactions '.
-				'WHERE competitionId=%d AND login=%s AND type IN (0, 0x81) remoteId IS NOT NULL', // FIXME constants
+				'WHERE competitionId=%d AND login=%s AND type&~%1$d=%d AND remoteId IS NOT NULL',
+				Transaction::REFUND,
 				$this->lobby->stage->competitionId,
-				$this->db->quote($participant->login)
+				$this->db->quote($participant->login),
+				Transaction::REGISTRATION
 			)->fetchSingleValue(0);
 		if($due > 0)
 			$this->db->execute(
@@ -265,7 +268,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 					$this->lobby->stage->competitionId,
 					$this->db->quote($participant->login),
 					$due,
-					0x81, // FIXME constant
+					Transaction::REGISTRATION | Transaction::REFUND,
 					$this->db->quote(sprintf('Refund of registration in $<%s$> (reason: left before start)', $this->lobby->stage->competition->name))
 				);
 	}

@@ -553,7 +553,13 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 			}
 		}
 		else
-			$this->connection->stopServer();
+		{
+			$this->connection->cleanGuestList(true);
+			$this->connection->saveGuestList('guestlist-trash.txt', true);
+			$this->connection->loadGuestList('guestlist-trash.txt', true);
+			$this->connection->stopServer(true);
+			$this->connection->executeMulticall();
+		}
 	}
 	
 	private function getMissing()

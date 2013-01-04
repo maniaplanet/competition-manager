@@ -70,6 +70,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	{
 		$this->response->competition = $this->competition;
 		$this->response->stage = $this->stage;
+		$this->response->userParticipation = $this->getUserParticipation();
 		
 		// Prepare custom images
 		$menuConfig = \ManiaLib\Gui\Cards\Navigation\Config::getInstance();

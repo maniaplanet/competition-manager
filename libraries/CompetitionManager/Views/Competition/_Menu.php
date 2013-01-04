@@ -43,35 +43,32 @@ class _Menu extends \ManiaLib\Application\View
 		if($currentAction == 'index')
 			$menu->lastItem->setSelected();
 		
-		$menu->addItem(Menu::BUTTONS_BOTTOM);
-		$menu->lastItem->icon->setVisibility(false);
-		$menu->lastItem->text->setText('Rules');
-		$menu->lastItem->setManialink($this->request->createLinkArgList('../rules', 'c', 'external'));
-		if($currentAction == 'rules')
-			$menu->lastItem->setSelected();
-		
 		foreach($competition->stages as $stage)
 		{
 			if($stage instanceof Stages\Registrations && $stage->state >= State::OVER)
 				continue;
-			
-			$menu->addItem();
-			$menu->lastItem->icon->setVisibility(false);
-			if($this->response->competition->state != State::CANCELLED)
+			else if($stage instanceof Stages\Lobby && $stage->state >= State::OVER)
 			{
-				if($stage instanceof Stages\Lobby && $stage->state >= State::OVER)
+				if(!$this->response->userParticipation)
+					continue;
+				
+				$menu->addItem(Menu::BUTTONS_BOTTOM);
+				$menu->lastItem->icon->setVisibility(false);
+				$stage->fetchMatches();
+				$stage->matches[0]->fetchServer();
+				if($stage->matches[0]->server && $stage->matches[0]->server->isReady())
 				{
-					$stage->fetchMatches();
-					$stage->matches[0]->fetchServer();
-					if($stage->matches[0]->server->isReady())
-					{
-						$menu->lastItem->text->setText(_('Join lobby'));
-						$menu->lastItem->setManialink($stage->matches[0]->server->getLink('qjoin'));
-					}
-					else
-						$menu->lastItem->text->setText('$888'._('Lobby down...'));
+					$menu->lastItem->text->setText(_('Join lobby'));
+					$menu->lastItem->setManialink($stage->matches[0]->server->getLink('qjoin'));
 				}
 				else
+					$menu->lastItem->text->setText('$888$i'._('Lobby down...'));
+			}
+			else
+			{
+				$menu->addItem();
+				$menu->lastItem->icon->setVisibility(false);
+				if($this->response->competition->state != State::CANCELLED)
 				{
 					$this->request->set('s', $stage->stageId);
 					$menu->lastItem->text->setText('$<'.$stage->getName().'$>');
@@ -80,9 +77,10 @@ class _Menu extends \ManiaLib\Application\View
 					if($currentAction == $stage->getAction() && $this->request->get('s') == $stage->stageId)
 						$menu->lastItem->setSelected();
 				}
+				else
+					$menu->lastItem->text->setText('$888'.$stage->getName());
 			}
-			else
-				$menu->lastItem->text->setText('$888'.$stage->getName());
+			
 		}
 		
 		$menu->addItem();
@@ -96,6 +94,13 @@ class _Menu extends \ManiaLib\Application\View
 		}
 		else
 			$menu->lastItem->text->setText('$888Results');
+		
+		$menu->addItem(Menu::BUTTONS_BOTTOM);
+		$menu->lastItem->icon->setVisibility(false);
+		$menu->lastItem->text->setText('Rules');
+		$menu->lastItem->setManialink($this->request->createLinkArgList('../rules', 'c', 'external'));
+		if($currentAction == 'rules')
+			$menu->lastItem->setSelected();
 		
 		if($this->response->external)
 			$menu->quitButton->setAction(0);

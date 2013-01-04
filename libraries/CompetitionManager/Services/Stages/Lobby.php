@@ -21,8 +21,6 @@ class Lobby extends \CompetitionManager\Services\Stage
 	
 	function getName()
 	{
-		if($this->state <= \CompetitionManager\Constants\State::STARTED)
-			return _('Lobby');
 		return _('Registrations');
 	}
 	

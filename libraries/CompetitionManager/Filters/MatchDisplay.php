@@ -57,8 +57,7 @@ class MatchDisplay extends \ManiaLib\Application\AdvancedFilter
 		$offset = $length = 0;
 		if($nbSlots > 16)
 		{
-			$this->multipage = new \ManiaLib\Utils\MultipageList(16);
-			$this->multipage->setSize($nbSlots);
+			$this->multipage = new \CompetitionManager\Utils\MultipageList($nbSlots, 16);
 			list($offset, $length) = $this->multipage->getLimit();
 		}
 		if($obj instanceof \CompetitionManager\Services\Stage)
@@ -147,9 +146,8 @@ class MatchDisplay extends \ManiaLib\Application\AdvancedFilter
 				$this->card->addEmpty('');
 		}
 		
-		// FIXME
-//		if($this->multipage)
-//			$this->card->addPageNavigator($this->multipage->pageNavigator);
+		if($this->multipage)
+			$this->card->addPageNavigator($this->multipage->createNavigator());
 		
 		$this->response->matchCard = $this->card;
 	}

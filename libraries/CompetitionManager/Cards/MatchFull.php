@@ -197,6 +197,7 @@ class MatchFull extends Frame
 		parent::onResize($oldX, $oldY);
 		$this->shadow->setSize($this->sizeX+11, $this->sizeY+11);
 		$this->background->setSize($this->sizeX, $this->sizeY);
+		$this->content->setSize($this->sizeX, $this->sizeY-Constants\UI::TITLE_HEIGHT);
 	}
 	
 	function preFilter()

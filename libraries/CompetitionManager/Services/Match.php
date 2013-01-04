@@ -121,7 +121,7 @@ class Match extends \CompetitionManager\Services\AbstractObject
 		else
 			$options->nextMaxPlayers = 255;
 		$options->allowMapDownload = false;
-		$options->autoSaveReplays = true;
+		$options->autoSaveReplays = !($stage instanceof Stages\Lobby);
 		$options->callVoteRatio = -1;
 		$options->disableHorns = true;
 		$options->hideServer = true;

@@ -140,7 +140,7 @@ class Index extends \ManiaLib\Application\View
 						$buttons
 					);
 				$frame->add($card);
-				if($this->response->nextForUser)
+				if($this->response->nextUserEvent->match)
 					break;
 				
 			case self::CLOSED_VISITOR:

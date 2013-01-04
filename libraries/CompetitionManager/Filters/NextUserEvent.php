@@ -57,7 +57,7 @@ class NextUserEvent extends \ManiaLib\Application\AdvancedFilter
 				/* @var $lobby \CompetitionManager\Services\Match */
 				$lobby = reset($stage->matches);
 				$lobby->fetchServer();
-				if($lobby->server)
+				if($lobby->server->isReady())
 				{
 					$this->response->nextUserEvent->message = _('If you are not already on the lobby, join it to keep your slot!');
 					$this->response->nextUserEvent->link = $lobby->server->getLink('qjoin');

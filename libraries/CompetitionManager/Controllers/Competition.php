@@ -156,20 +156,9 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 				$this->response->displayState = Index::CLOSED_VISITOR;
 			
 			$service = new \CompetitionManager\Services\MatchService();
-			if($participant)
-				$this->response->nextForUser = $service->getNextForParticipant($participant->participantId, $this->competition->competitionId);
-			else
-				$this->response->nextForUser = null;
-			
-			$this->response->runningMatches = array_diff_key(
-					$service->getRunningInCompetition($this->competition->competitionId),
-					$this->response->nextForUser ? array($this->response->nextForUser->matchId => 0) : array()
-				);
+			$this->response->runningMatches = $service->getRunningInCompetition($this->competition->competitionId);
 			if(!$this->response->runningMatches)
-				$this->response->nextMatches = array_diff_key(
-						$service->getRunningInCompetition($this->competition->competitionId),
-						$this->response->nextForUser ? array($this->response->nextForUser->matchId => 0) : array()
-					);
+				$this->response->nextMatches = $service->getNextInCompetition($this->competition->competitionId);
 		}
 	}
 	

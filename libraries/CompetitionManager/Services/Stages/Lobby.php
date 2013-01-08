@@ -21,6 +21,8 @@ class Lobby extends \CompetitionManager\Services\Stage
 	
 	function getName()
 	{
+		if($this->state < \CompetitionManager\Constants\State::STARTED)
+			return _('Lobby');
 		return _('Registrations');
 	}
 	
@@ -73,6 +75,27 @@ class Lobby extends \CompetitionManager\Services\Stage
 		$service->assignParticipants(reset($this->matches), array($participantId), null);
 		$service = new \CompetitionManager\Services\ParticipantService();
 		$service->updateStageInfo($this->stageId, $participantId, rand(1, $this->maxSlots), null, null);
+		$participant = $service->get($participantId);
+		
+		$this->fetchMatches();
+		reset($this->matches)->fetchServer();
+		if( ($server = reset($this->matches)->server))
+		{
+			try
+			{
+				$server->openConnection();
+				
+				if($participant instanceof \CompetitionManager\Services\Player)
+					$server->connection->addGuest($participant->login);
+				else
+				{
+					// TODO
+				}
+			}
+			catch(\Exception $e) {}
+			
+			$server->closeConnection();
+		}
 	}
 	
 	function onRun() { /* Done in ManiaLive plugin */ }

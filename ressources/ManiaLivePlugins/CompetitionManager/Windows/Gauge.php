@@ -29,7 +29,7 @@ class Gauge extends \ManiaLive\Gui\Window
 	{
 		$this->setSize(120, 15);
 		$this->setHalign('center');
-		$this->setPosition(0, 65);
+		$this->setPosition(0, -50);
 		
 		$lobby = \ManiaLivePlugins\CompetitionManager\Services\Match::getInstance();
 		$this->min = $lobby->stage->minSlots;

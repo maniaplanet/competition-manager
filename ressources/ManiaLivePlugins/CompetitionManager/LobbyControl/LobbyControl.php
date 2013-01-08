@@ -28,10 +28,8 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 	private $lobby;
 	/** @var int[string] */
 	private $quitters = array();
-	/** @var int[string] */
-	private $intruders = array();
-	/** @var int[] */
-	private $matchIds = array();
+	/** @var string[int] */
+	private $matches = array();
 	
 	/** @var \DateTime */
 	private $nextTick;
@@ -80,38 +78,17 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 		$gauge = Windows\Gauge::Create();
 		$gauge->setLevel(count($this->lobby->participants));
 		$gauge->show();
-		if(!$this->isLobbyOver())
-		{
-			$register = Windows\Confirm::Create(Group::Create('intruders'));
-			$register->set('Register', null, $this->lobby->stage->competition->getManialink('register'));
-			$register->blink();
-			$register->show();
-		}
 	}
 	
 	function onPlayerConnect($login, $isSpectator)
 	{
-		if(isset($this->lobby->participants[$login]))
-		{
-			if(isset($this->quitters[$login]))
-				unset($this->quitters[$login]);
-		}
-		else
-		{
-			$this->intruders[$login] = 0;
-			Group::Create('intruders')->add($login, true);
-		}
+		if(isset($this->quitters[$login]))
+			unset($this->quitters[$login]);
 	}
 	
 	function onPlayerDisconnect($login)
 	{
-		if(isset($this->lobby->participants[$login]))
-			$this->quitters[$login] = 0;
-		else if(isset($this->intruders[$login]))
-		{
-			unset($this->intruders[$login]);
-			Group::Create('intruders')->remove($login);
-		}
+		$this->quitters[$login] = 0;
 	}
 	
 	function onTick()
@@ -162,11 +139,6 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 					$waitTicks = 0;
 					$this->connection->chatSendServerMessage(self::PREFIX.'Some players leaved... competition is postponed...');
 				}
-				
-				if(count($this->lobby->participants) == $this->lobby->stage->maxSlots)
-					$this->pauseRegistrations();
-				else
-					$this->resumeRegistrations();
 			}
 			
 			$this->nextTick->add($this->tickInterval);
@@ -203,11 +175,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 		foreach($this->lobby->participants as $key => $participant)
 		{
 			if($this->storage->getPlayerObject($participant->login))
-			{
-				unset($this->intruders[$participant->login]);
 				unset($this->quitters[$participant->login]);
-				Group::Create('intruders')->remove($participant->login);
-			}
 			else if(!isset($this->quitters[$participant->login]))
 				$this->quitters[$participant->login] = 0;
 			else if(++$this->quitters[$participant->login] == 3)
@@ -215,28 +183,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 				$this->unregisterParticipant($participant);
 				unset($this->quitters[$participant->login]);
 				unset($this->lobby->participants[$key]);
-			}
-		}
-		
-		if($this->registrationsPaused)
-			return;
-		
-		foreach($this->intruders as $login => &$times)
-		{
-			switch(++$times)
-			{
-				case 1:
-					$this->connection->chatSendServerMessage(self::PREFIX.'Welcome! If you did not register yet, please consider doing it to enter the competition.', $login);
-					break;
-				case 3:
-					$this->connection->chatSendServerMessage(self::PREFIX.'Reminder: you need to register.', $login);
-					break;
-				case 5:
-					$this->connection->chatSendServerMessage(self::PREFIX.'This is the last reminder: you cannot stay without being registered.', $login);
-					break;
-				case 7:
-					$this->connection->kick($login, 'Please register before coming back');
-					break;
+				unset($this->lobby->stage->participants[$key]);
 			}
 		}
 	}
@@ -278,37 +225,8 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 		$this->db->execute('UPDATE Stages SET state=%d WHERE stageId=%d', State::OVER, $this->lobby->stageId);
 		$this->disableDedicatedEvents();
 		$this->connection->chatSendServerMessage(self::PREFIX.'Competition is starting now!');
-		Windows\Confirm::Erase(Group::Get('intruders'));
 		Windows\CountDown::EraseAll();
 		Windows\Gauge::EraseAll();
-	}
-	
-	private function pauseRegistrations()
-	{
-		if(!$this->registrationsPaused)
-		{
-			$this->registrationsPaused = true;
-			Windows\Confirm::Create(Group::Get('intruders'))->hide();
-			if($this->intruders)
-				$this->connection->chatSendServerMessage(
-						self::PREFIX.'All slots have been taken but some participants are not on the lobby. If they are not coming back soon, you may be able to register.',
-						array_keys($this->intruders)
-					);
-		}
-	}
-	
-	private function resumeRegistrations()
-	{
-		if($this->registrationsPaused)
-		{
-			$this->registrationsPaused = false;
-			Windows\Confirm::Create(Group::Get('intruders'))->show();
-			if($this->intruders)
-			{
-				$this->connection->chatSendServerMessage(self::PREFIX.'Some slots has been released, you can try again to register.', array_keys($this->intruders));
-				$this->intruders = array_fill_keys(array_keys($this->intruders), 1);
-			}
-		}
 	}
 	
 	private function syncMatches()
@@ -320,22 +238,25 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 				State::OVER
 			)->fetchArrayOfSingleValues();
 		
-		foreach(array_diff($overIds, $this->matchIds) as $overId)
+		foreach(array_diff($overIds, array_keys($this->matches)) as $overId)
 			Group::Erase('match-'.$overId);
-		$this->matchIds = array_diff($this->matchIds, $overIds);
+		$this->matches = array_diff_key($this->matches, array_fill_keys($overIds, null));
 		
 		// Handle new matches
-		$startedIds = $this->db->execute(
-				'SELECT M.matchId '.
+		$startedRaw = $this->db->execute(
+				'SELECT M.matchId, M.name '.
 				'FROM Matches M '.
 					'INNER JOIN Stages St USING(stageId) '.
 					'INNER JOIN Servers Se USING(matchId) '.
 				'WHERE St.competitionId=%d AND M.state=%d AND DATE_ADD(Se.startTime, INTERVAL 2 MINUTE) < NOW()',
 				$this->lobby->stage->competitionId,
 				State::STARTED
-			)->fetchArrayOfSingleValues();
+			)->fetchArrayOfRow();
+		$startedIds = array();
+		foreach($startedRaw as $started)
+			$startedIds[$started[0]] = $started[1];
 		
-		foreach(array_diff($startedIds, $this->matchIds, array($this->lobby->matchId)) as $startedId)
+		foreach(array_diff_key($startedIds, $this->matches, array($this->lobby->matchId => null)) as $startedId => $name)
 		{
 			$result = $this->db->execute(
 					'SELECT Pa.participantId, Pl.*, T.* '.
@@ -358,13 +279,12 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 			}
 		}
 		
-		$this->matchIds = array_diff($startedIds, array($this->lobby->matchId));
+		$this->matches = array_diff_key($startedIds, array($this->lobby->matchId => null));
 	}
 	
 	private function prepareJumps()
 	{
-		$logins = array();
-		foreach($this->matchIds as $matchId)
+		foreach($this->matches as $matchId => $name)
 		{
 			$result = $this->db->execute('SELECT * FROM Servers WHERE matchId=%d LIMIT 1', $matchId);
 			if(!$result->recordAvailable())
@@ -372,21 +292,20 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 			$server = Server::fromRecordSet($result);
 			
 			$group = Group::Get('match-'.$matchId);
-			$logins = array_merge($logins, array_intersect($group->toArray(), array_merge(array_keys($this->storage->players), array_keys($this->storage->spectators))));
+			$message = Windows\BigMessage::Create($group);
+			$message->set(sprintf('$bbbTransfer to $<$fff» %s «$> in', $name));
+			$message->show();
+			$countdown = Windows\AudioCountDown::Create($group);
+			$countdown->start(5);
+			$countdown->show();
 			$jumper = Windows\ForceManialink::Create($group);
 			$jumper->set($server->getLink());
-		}
-		
-		$logins = array_unique($logins);
-		if($logins)
-		{
-			$this->connection->chatSendServerMessage(
-					self::PREFIX.'Your next match is ready, you will be transfered soon to the server. If something goes wrong, come back to the lobby.',
-					$logins
-				);
-			$this->tickInterval = new \DateInterval('PT5S');
+			
 			$this->jumpsPrepared = true;
 		}
+		
+		if($this->jumpsPrepared)
+			$this->tickInterval = new \DateInterval('PT5S');
 		else
 			$this->tickInterval = new \DateInterval('PT20S');
 	}

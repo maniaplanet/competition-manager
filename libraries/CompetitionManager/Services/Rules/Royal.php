@@ -16,8 +16,14 @@ class Royal extends Script
 	public $pointsLimit = 200;
 	/** @setting s How long it takes to activate the pole */
 	public $offzoneActivationTime = 4;
+	/** @setting s How long before offzone is automatically activated */
+	public $offzoneAutoStartTime = 90;
 	/** @setting s How long the offzone takes to shrink to its minimum */
 	public $offzoneShrinkTime = 50;
+	/** @setting s How long before end round once offzone is shrunk */
+	public $timeLimit = 60;
+	/** @setting bool Eliminated players respawn until offzone is activated */
+	public $earlyRespawn = true;
 	/** @setting s Interval between spawn waves */
 	public $spawnWaveInterval = 5;
 	
@@ -33,7 +39,7 @@ class Royal extends Script
 	
 	function getTitle()
 	{
-		return 'SMStorm';
+		return 'SMStormRoyal@nadeolabs';
 	}
 }
 

@@ -112,14 +112,7 @@ class Match extends \CompetitionManager\Services\AbstractObject
 
 		$options = new \DedicatedManager\Services\ServerOptions();
 		$options->name = $this->name;
-		if($stage->previousId)
-			$options->nextMaxPlayers = 0;
-		else if($stage instanceof Stages\Lobby)
-			$options->nextMaxPlayers = 2 * $stage->maxSlots;
-		else if($stage->maxSlots)
-			$options->nextMaxPlayers = $stage->maxSlots;
-		else
-			$options->nextMaxPlayers = 255;
+		$options->nextMaxPlayers = (int) !$stage->previousId;
 		$options->allowMapDownload = false;
 		$options->autoSaveReplays = !($stage instanceof Stages\Lobby);
 		$options->callVoteRatio = -1;

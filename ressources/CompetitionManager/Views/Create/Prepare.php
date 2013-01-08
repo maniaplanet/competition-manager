@@ -52,6 +52,8 @@ $r = ManiaLib\Application\Request::getInstance();
 										class="solo-compliant team-not-compliant">ShootMania Storm</option>
 							</optgroup>
 							<optgroup label="<?php echo _('Custom titles'); ?>">
+								<option value="SMStormRoyal@nadeolabs" <?php echo $competition->title == 'SMStormRoyal@nadeolabs' ? 'selected="selected"' : ''; ?>
+										class="solo-compliant">ShootMania Storm Royal</option>
 								<option value="SMStormJoust@nadeolabs" <?php echo $competition->title == 'SMStormJoust@nadeolabs' ? 'selected="selected"' : ''; ?>
 										class="solo-compliant">ShootMania Storm Joust</option>
 								<option value="SMStormElite@nadeolabs" <?php echo $competition->title == 'SMStormElite@nadeolabs' ? 'selected="selected"' : ''; ?>

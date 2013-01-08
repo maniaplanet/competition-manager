@@ -51,14 +51,13 @@ abstract class AbstractRules
 //				case 'SMStormHeroes@nadeolabs':
 					return array(
 						new Melee(),
-						new Royal(),
 						new BattleWaves(),
 						new LobbySMTimeAttack()
 					);
+				case 'SMStormRoyal@nadeolabs':
+					return array(new Royal());
 				case 'SMStormJoust@nadeolabs':
-					return array(
-						new LobbyJoust()
-					);
+					return array(new LobbyJoust());
 			}
 		}
 		else if($isOpen)
@@ -86,10 +85,11 @@ abstract class AbstractRules
 				case 'SMStorm':
 					return array(
 						new Melee(),
-						new Royal(),
 //						new CumulativeSMTimeAttack(),
 //						new SMTimeAttackDuel()
 					);
+				case 'SMStormRoyal@nadeolabs':
+					return array(new Royal());
 				case 'SMStormJoust@nadeolabs':
 					return array(new Joust());
 			}

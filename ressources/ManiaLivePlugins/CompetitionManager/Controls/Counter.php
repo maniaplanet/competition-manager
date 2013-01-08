@@ -36,7 +36,6 @@ class Counter extends \ManiaLive\Gui\Control
 		$this->label->setScale(.3);
 		$this->label->setAlign('center', 'center');
 		$this->label->setPosition(5, -1.75);
-		$this->label->setManialink('');
 		$this->addComponent($this->label);
 		
 		$this->counter = new Label(15);
@@ -44,7 +43,6 @@ class Counter extends \ManiaLive\Gui\Control
 		$this->counter->setScale(.6);
 		$this->counter->setAlign('center', 'center');
 		$this->counter->setPosition(5, -6.25);
-		$this->counter->setManialink('');
 		$this->addComponent($this->counter);
 	}
 	

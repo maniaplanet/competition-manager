@@ -203,6 +203,8 @@ abstract class WebServicesProxy
 				return 'Heroes';
 			case 'SMStormJoust@nadeolabs':
 				return 'Joust';
+			case 'SMStormRoyal@nadeolabs':
+				return 'Royal';
 		}
 	}
 	

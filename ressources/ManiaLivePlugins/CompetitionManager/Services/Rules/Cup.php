@@ -22,15 +22,13 @@ class Cup extends AbstractRules
 	
 	function configure(\DedicatedApi\Connection $dedicated)
 	{
-		$gameInfos = $dedicated->getCurrentGameInfo();
-		$gameInfos->finishTimeout = (int) $this->finishTimeLimit;
-		$gameInfos->cupRoundsPerMap = (int) $this->roundsLimit;
-		$gameInfos->cupPointsLimit = (int) $this->pointsLimit;
-		$gameInfos->disableRespawn = (bool) $this->disableRespawn;
-		$dedicated->setGameInfos($gameInfos);
-		
+		$dedicated->setFinishTimeout((int) $this->finishTimeLimit, true);
+		$dedicated->setCupRoundsPerMap((int) $this->roundsLimit, true);
+		$dedicated->setCupPointsLimit((int) $this->pointsLimit, true);
 		if($this->scoringSystem)
-			$dedicated->setRoundCustomPoints($this->scoringSystem->points);
+			$dedicated->setRoundCustomPoints($this->scoringSystem->points, false, true);
+		$dedicated->setDisableRespawn((bool) $this->disableRespawn, true);
+		$dedicated->executeMulticall();
 	}
 	
 	function _json_wakeup()

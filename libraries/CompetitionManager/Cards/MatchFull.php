@@ -168,6 +168,8 @@ class MatchFull extends Frame
 		else
 			$ui->setRank($participant->rank);
 		$ui->setScore($participant->formatScore(null), $participant->scoreDetails && $participant->scoreDetails->isTime);
+		if($participant instanceof \CompetitionManager\Services\Team)
+			$ui->setTeamLink($participant->teamId);
 		$ui->setVisibilities($showRank, $showScore);
 		$ui->setCustomization($isUser, $participant->qualified);
 		

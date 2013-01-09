@@ -12,12 +12,15 @@ namespace CompetitionManager\Cards;
 use ManiaLib\Gui\Elements\Frame;
 use ManiaLib\Gui\Layouts\Line;
 use CompetitionManager\Constants;
+use ManiaLib\ManiaScript;
 
 class Participant extends Frame
 {
 	const RANK_TOOLTIP = 0;
 	const BG_COLOR = 1;
-	const BG_COLOR_USER = 2;
+	const BG_COLOR_FOCUS = 2;
+	const BG_COLOR_USER = 3;
+	const BG_COLOR_USER_FOCUS = 4;
 	
 	/** @var HighlightedLabel */
 	private $name;
@@ -72,6 +75,13 @@ class Participant extends Frame
 			$this->score->setSizeX(2*$this->sizeY);
 	}
 	
+	function setTeamLink($teamId)
+	{
+		$this->name->highlight->setManialink('team?'.$teamId);
+		$this->name->highlight->setId(uniqid('team:'.$teamId.':'));
+		$this->name->highlight->setScriptEvents();
+	}
+	
 	function setVisibilities($showRank, $showScore)
 	{
 		$this->rank->setVisibility($showRank);
@@ -103,22 +113,30 @@ class Participant extends Frame
 			Constants\Qualified::NO => array(
 				self::RANK_TOOLTIP => '$f80Not qualified',
 				self::BG_COLOR => '8005',
-				self::BG_COLOR_USER => '8009'
+				self::BG_COLOR_FOCUS => 'b335',
+				self::BG_COLOR_USER => '8009',
+				self::BG_COLOR_USER_FOCUS => 'a339'
 			),
 			Constants\Qualified::YES => array(
 				self::RANK_TOOLTIP => '$080Qualified',
 				self::BG_COLOR => '0805',
-				self::BG_COLOR_USER => '0809'
+				self::BG_COLOR_FOCUS => '3b35',
+				self::BG_COLOR_USER => '0809',
+				self::BG_COLOR_USER_FOCUS => '3a39'
 			),
 			Constants\Qualified::UNKNOWN => array(
 				self::RANK_TOOLTIP => null,
 				self::BG_COLOR => 'aaa5',
-				self::BG_COLOR_USER => 'aaa9'
+				self::BG_COLOR_FOCUS => 'ddd5',
+				self::BG_COLOR_USER => 'aaa9',
+				self::BG_COLOR_USER_FOCUS => 'ddd9'
 			),
 			Constants\Qualified::LEAVED => array(
 				self::RANK_TOOLTIP => '$666Did not show',
 				self::BG_COLOR => '2225',
-				self::BG_COLOR_USER => '2229'
+				self::BG_COLOR_FOCUS => '5555',
+				self::BG_COLOR_USER => '2229',
+				self::BG_COLOR_USER_FOCUS => '5559'
 			)
 		);
 		
@@ -130,9 +148,15 @@ class Participant extends Frame
 			\ManiaLib\ManiaScript\UI::tooltip($tooltipId, $customizations[$this->qualified][self::RANK_TOOLTIP]);
 		}
 		
+		if($this->name->highlight->getId())
+			ManiaScript\UI::tooltip($this->name->highlight->getId(), _('Go to official page'));
+		
 		$this->rank->highlight->setBgcolor($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER : self::BG_COLOR]);
+		$this->rank->highlight->setBgcolorFocus($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER_FOCUS : self::BG_COLOR_FOCUS]);
 		$this->name->highlight->setBgcolor($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER : self::BG_COLOR]);
+		$this->name->highlight->setBgcolorFocus($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER_FOCUS : self::BG_COLOR_FOCUS]);
 		$this->score->highlight->setBgcolor($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER : self::BG_COLOR]);
+		$this->score->highlight->setBgcolorFocus($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER_FOCUS : self::BG_COLOR_FOCUS]);
 	}
 	
 	private function getNameWidth()

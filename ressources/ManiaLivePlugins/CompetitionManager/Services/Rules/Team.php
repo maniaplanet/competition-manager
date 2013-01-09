@@ -23,13 +23,12 @@ class Team extends AbstractRules
 	
 	function configure(\DedicatedApi\Connection $dedicated)
 	{
-		$gameInfos = $dedicated->getCurrentGameInfo();
-		$gameInfos->finishTimeout = (int) $this->finishTimeLimit;
-		$gameInfos->teamUseNewRules = true;
-		$gameInfos->teamPointsLimit = $gameInfos->teamPointsLimitNewRules = (int) $this->roundsLimit;
-		$gameInfos->teamMaxPoints = (int) 2*$this->slotsPerTeam;
-		$gameInfos->disableRespawn = (bool) $this->disableRespawn;
-		$dedicated->setGameInfos($gameInfos);
+		$dedicated->setFinishTimeout((int) $this->finishTimeLimit, true);
+		$dedicated->setUseNewRulesTeam(true, true);
+		$dedicated->setTeamPointsLimit((int) $this->roundsLimit, true);
+		$dedicated->setMaxPointsTeam((int) 2*$this->slotsPerTeam, true);
+		$dedicated->setDisableRespawn((bool) $this->disableRespawn, true);
+		$dedicated->executeMulticall();
 	}
 	
 	function getTeamSize()

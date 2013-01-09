@@ -15,6 +15,11 @@ class CumulativeTMTimeAttack extends TMTimeAttack
 	
 	private $mapsDone = 0;
 	
+	function configure(\DedicatedApi\Connection $dedicated)
+	{
+		$dedicated->setTimeAttackLimit((int) $this->timeLimit);
+	}
+	
 	function onEndMatch($rankings, $winnerTeamOrMap)
 	{
 		$match = \ManiaLivePlugins\CompetitionManager\Services\Match::getInstance();

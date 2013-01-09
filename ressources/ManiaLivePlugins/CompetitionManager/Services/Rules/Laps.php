@@ -19,12 +19,11 @@ class Laps extends AbstractRules
 	
 	function configure(\DedicatedApi\Connection $dedicated)
 	{
-		$gameInfos = $dedicated->getCurrentGameInfo();
-		$gameInfos->finishTimeout = (int) $this->finishTimeLimit;
-		$gameInfos->lapsTimeLimit = (int) $this->timeLimit;
-		$gameInfos->lapsNbLaps = (int) $this->lapsLimit;
-		$gameInfos->disableRespawn = (bool) $this->disableRespawn;
-		$dedicated->setGameInfos($gameInfos);
+		$dedicated->setNbLaps((int) $this->lapsLimit, true);
+		$dedicated->setLapsTimeLimit((int) $this->timeLimit, true);
+		$dedicated->setFinishTimeout((int) $this->finishTimeLimit, true);
+		$dedicated->setDisableRespawn((bool) $this->disableRespawn, true);
+		$dedicated->executeMulticall();
 	}
 	
 	function onEndMatch($rankings, $winnerTeamOrMap)

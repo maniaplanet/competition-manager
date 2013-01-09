@@ -23,13 +23,11 @@ class CumulativeRounds extends Rounds
 	
 	function configure(\DedicatedApi\Connection $dedicated)
 	{
-		$gameInfos = $dedicated->getCurrentGameInfo();
-		$gameInfos->finishTimeout = (int) $this->finishTimeLimit;
-		$gameInfos->disableRespawn = (bool) $this->disableRespawn;
-		$dedicated->setGameInfos($gameInfos);
-		
+		$dedicated->setFinishTimeout((int) $this->finishTimeLimit, true);
 		if($this->scoringSystem)
-			$dedicated->setRoundCustomPoints($this->scoringSystem->points);
+			$dedicated->setRoundCustomPoints($this->scoringSystem->points, false, true);
+		$dedicated->setDisableRespawn((bool) $this->disableRespawn, true);
+		$dedicated->executeMulticall();
 	}
 	
 	function getNeededEvents()

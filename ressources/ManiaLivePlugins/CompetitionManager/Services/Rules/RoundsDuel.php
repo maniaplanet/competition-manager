@@ -18,11 +18,10 @@ class RoundsDuel extends Rounds
 	
 	function configure(\DedicatedApi\Connection $dedicated)
 	{
-		$gameInfos = $dedicated->getCurrentGameInfo();
-		$gameInfos->roundsUseNewRules = true;
-		$gameInfos->roundsPointsLimit = $gameInfos->roundsPointsLimitNewRules = (int) $this->roundsLimit;
-		$gameInfos->disableRespawn = (bool) $this->disableRespawn;
-		$dedicated->setGameInfos($gameInfos);
+		$dedicated->setUseNewRulesRound(true, true);
+		$dedicated->setRoundPointsLimit((int) $this->roundsLimit, true);
+		$dedicated->setDisableRespawn((bool) $this->disableRespawn, true);
+		$dedicated->executeMulticall();
 	}
 	
 	function onEndMatch($rankings, $winnerTeamOrMap)

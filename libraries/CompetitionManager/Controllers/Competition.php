@@ -32,7 +32,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	
 	protected function onConstruct()
 	{
-		//$this->addFilter(new UserAgentAdapt(Filters\UserAgentAdapt::MANIAPLANET));
+		//$this->addFilter(new Filters\UserAgentAdapt(Filters\UserAgentAdapt::MANIAPLANET));
 		$this->addFilter(new \ManiaLib\WebServices\ManiaConnectFilter());
 		$this->addFilter(new Filters\NextPageMessage());
 		$this->addFilter(new Filters\IncomeLogger());

@@ -13,7 +13,7 @@ class AsynchronousSMTimeAttack extends SMTimeAttack
 {
 	public $maxTries = 0;
 
-	public function configure($dedicatedConnection)
+	function configure(\DedicatedApi\Connection $dedicated)
 	{
 		
 	}

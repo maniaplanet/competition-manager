@@ -43,14 +43,13 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 	function onInit()
 	{
 		$this->setVersion('1.0');
+		$this->lobby = Match::getInstance();
+		$this->nextTick = $this->lobby->availabilityTime;
+		$this->tickInterval = new \DateInterval('PT20S');
 	}
 	
 	function onLoad()
 	{
-		$this->lobby = Match::getInstance();
-		$this->nextTick = new \DateTime();
-		$this->tickInterval = new \DateInterval('PT20S');
-		
 		// FIXME last API doesn't handle well TM at the moment...
 		if(!($this->lobby->rules instanceof \ManiaLivePlugins\CompetitionManager\Services\Rules\Script))
 			$this->connection->setApiVersion('2011-10-06');

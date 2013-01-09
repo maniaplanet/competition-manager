@@ -16,6 +16,8 @@ class RoundsDuel extends Rounds
 	public $roundsLimit = 5;
 	/** @setting none Maps needed to win the match */
 	public $mapsLimit = 2;
+	/** @setting bool Allow or forbid respawn */
+	public $disableRespawn = false;
 	
 	function getName()
 	{

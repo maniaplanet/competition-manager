@@ -14,6 +14,16 @@ class RoundsDuel extends Rounds
 	public $maxSlots = 2;
 	public $roundsLimit = 5;
 	public $mapsLimit = 2;
+	public $disableRespawn = false;
+	
+	function configure(\DedicatedApi\Connection $dedicated)
+	{
+		$gameInfos = $dedicated->getCurrentGameInfo();
+		$gameInfos->roundsUseNewRules = true;
+		$gameInfos->roundsPointsLimit = $gameInfos->roundsPointsLimitNewRules = (int) $this->roundsLimit;
+		$gameInfos->disableRespawn = (bool) $this->disableRespawn;
+		$dedicated->setGameInfos($gameInfos);
+	}
 	
 	function onEndMatch($rankings, $winnerTeamOrMap)
 	{

@@ -33,7 +33,7 @@ class CountDown extends \ManiaLive\Gui\Window implements TickListener
 	{
 		$this->setSize(20, 10);
 		$this->setHalign('right');
-		$this->setPosition(125-Constants\UI::PIXEL, 81);
+		$this->setPosition(125-Constants\UI::PIXEL, -(55+Constants\UI::PIXEL));
 		
 		$ui = new Quad(20, 10);
 		$ui->setBgcolor('0008');

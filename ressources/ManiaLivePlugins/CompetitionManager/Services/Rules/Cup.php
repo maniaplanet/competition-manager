@@ -14,12 +14,21 @@ use DedicatedApi\Structures\GameInfos;
 class Cup extends AbstractRules
 {
 	public $gameMode = GameInfos::GAMEMODE_CUP;
+	public $finishTimeLimit = 1;
 	public $roundsLimit = 5;
 	public $pointsLimit = 110;
 	public $scoringSystem = null;
+	public $disableRespawn = false;
 	
 	function configure(\DedicatedApi\Connection $dedicated)
 	{
+		$gameInfos = $dedicated->getCurrentGameInfo();
+		$gameInfos->finishTimeout = (int) $this->finishTimeLimit;
+		$gameInfos->cupRoundsPerMap = (int) $this->roundsLimit;
+		$gameInfos->cupPointsLimit = (int) $this->pointsLimit;
+		$gameInfos->disableRespawn = (bool) $this->disableRespawn;
+		$dedicated->setGameInfos($gameInfos);
+		
 		if($this->scoringSystem)
 			$dedicated->setRoundCustomPoints($this->scoringSystem->points);
 	}

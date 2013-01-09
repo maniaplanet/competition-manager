@@ -49,7 +49,7 @@ class _Menu extends \ManiaLib\Application\View
 				continue;
 			else if($stage instanceof Stages\Lobby && $stage->state >= State::OVER)
 			{
-				if(!$this->response->userParticipation)
+				if(!$this->response->userParticipation || $competition->state >= State::OVER)
 					continue;
 				
 				$menu->addItem(Menu::BUTTONS_BOTTOM);

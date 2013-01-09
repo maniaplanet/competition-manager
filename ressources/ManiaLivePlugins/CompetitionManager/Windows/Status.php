@@ -10,6 +10,7 @@
 namespace ManiaLivePlugins\CompetitionManager\Windows;
 
 use ManiaLivePlugins\CompetitionManager\Controls\HighlightedLabel;
+use ManiaLivePlugins\CompetitionManager\Constants;
 
 class Status extends \ManiaLive\Gui\Window
 {
@@ -20,7 +21,7 @@ class Status extends \ManiaLive\Gui\Window
 	{
 		$this->setSize(35, 10);
 		$this->setHalign('right');
-		$this->setPosition(160, 81);
+		$this->setPosition(160, -(55+Constants\UI::PIXEL));
 		
 		$this->status = new HighlightedLabel(35, 10);
 		$this->status->label->setHalign('center');

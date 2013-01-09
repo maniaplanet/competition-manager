@@ -11,13 +11,15 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
 class LobbyRounds extends Rounds
 {
-	public $pointsLimit = 5;
+	public $pointsLimit = 100;
 	public $scoringSystem = null;
 	
 	function configure(\DedicatedApi\Connection $dedicated)
 	{
+		$dedicated->setRoundPointsLimit((int) $this->pointsLimit, true);
 		if($this->scoringSystem)
-			$dedicated->setRoundCustomPoints($this->scoringSystem->points);
+			$dedicated->setRoundCustomPoints($this->scoringSystem->points, false, true);
+		$dedicated->executeMulticall();
 	}
 	
 	function getNeededEvents()

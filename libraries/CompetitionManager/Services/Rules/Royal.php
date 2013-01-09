@@ -34,7 +34,9 @@ class Royal extends Script
 	
 	function getInfo()
 	{
-		return _('Free for all, survive, hit and capture the pole to score points, first to "points limit" wins the match');
+		$info[] = _('Royal mode');
+		$info[] = sprintf(_('First to %d points wins the match'), $this->pointsLimit);
+		return $info;
 	}
 	
 	function getTitle()

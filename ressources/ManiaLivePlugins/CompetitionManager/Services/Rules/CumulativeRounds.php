@@ -13,14 +13,21 @@ use ManiaLive\DedicatedApi\Callback\Event;
 
 class CumulativeRounds extends Rounds
 {
+	public $finishTimeLimit = 1;
 	public $roundsLimit = 5;
 	public $scoringSystem = null;
+	public $disableRespawn = false;
 	
 	private $roundsDone = 0;
 	private $mapsDone = 0;
 	
 	function configure(\DedicatedApi\Connection $dedicated)
 	{
+		$gameInfos = $dedicated->getCurrentGameInfo();
+		$gameInfos->finishTimeout = (int) $this->finishTimeLimit;
+		$gameInfos->disableRespawn = (bool) $this->disableRespawn;
+		$dedicated->setGameInfos($gameInfos);
+		
 		if($this->scoringSystem)
 			$dedicated->setRoundCustomPoints($this->scoringSystem->points);
 	}

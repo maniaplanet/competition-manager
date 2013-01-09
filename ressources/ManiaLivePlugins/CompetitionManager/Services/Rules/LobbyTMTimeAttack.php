@@ -13,6 +13,11 @@ class LobbyTMTimeAttack extends TMTimeAttack
 {
 	public $timeLimit = 300000;
 	
+	function configure(\DedicatedApi\Connection $dedicated)
+	{
+		$dedicated->setTimeAttackLimit((int) $this->timeLimit);
+	}
+	
 	function getNeededEvents()
 	{
 		return 0;

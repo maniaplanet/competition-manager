@@ -16,12 +16,16 @@ use ManiaLib\Gui\Elements\Icons128x32_1;
 class Cup extends AbstractRules
 {
 	public $gameMode = GameInfos::GAMEMODE_CUP;
+	/** @setting ms Time limit after the first cross the line (0 to disable, 1 for automatic) */
+	public $finishTimeLimit = 1;
 	/** @setting /map How many rounds to play per map */
 	public $roundsLimit = 5;
 	/** @setting none Points needed to become finalist */
 	public $pointsLimit = 110;
 	/** @setting scoring Points to give depending on ranking at the end of each round */
 	public $scoringSystem = null;
+	/** @setting bool Allow or forbid respawn */
+	public $disableRespawn = false;
 	
 	function getName()
 	{

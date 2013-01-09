@@ -16,8 +16,21 @@ class Team extends AbstractRules
 	public $gameMode = GameInfos::GAMEMODE_TEAM;
 	public $maxSlots = 2;
 	public $slotsPerTeam = 3;
+	public $finishTimeLimit = 1;
 	public $roundsLimit = 7;
 	public $mapsLimit = 2;
+	public $disableRespawn = false;
+	
+	function configure(\DedicatedApi\Connection $dedicated)
+	{
+		$gameInfos = $dedicated->getCurrentGameInfo();
+		$gameInfos->finishTimeout = (int) $this->finishTimeLimit;
+		$gameInfos->teamUseNewRules = true;
+		$gameInfos->teamPointsLimit = $gameInfos->teamPointsLimitNewRules = (int) $this->roundsLimit;
+		$gameInfos->teamMaxPoints = (int) 2*$this->slotsPerTeam;
+		$gameInfos->disableRespawn = (bool) $this->disableRespawn;
+		$dedicated->setGameInfos($gameInfos);
+	}
 	
 	function getTeamSize()
 	{

@@ -19,10 +19,14 @@ class Team extends AbstractRules
 	public $maxSlots = 2;
 	/** @setting none Max players per team */
 	public $slotsPerTeam = 3;
+	/** @setting ms Time limit after the first cross the line (0 to disable, 1 for automatic) */
+	public $finishTimeLimit = 1;
 	/** @setting none Rounds needed to win the map */
 	public $roundsLimit = 7;
 	/** @setting none Maps needed to win the match */
 	public $mapsLimit = 2;
+	/** @setting bool Allow or forbid respawn */
+	public $disableRespawn = false;
 	
 	function getName()
 	{

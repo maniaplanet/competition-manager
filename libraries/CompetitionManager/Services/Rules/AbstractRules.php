@@ -80,6 +80,7 @@ abstract class AbstractRules
 //						new TMTimeAttackDuel(),
 //						new CumulativeRounds(),
 //						new RoundsDuel(),
+//						new Laps(),
 //						new Cup()
 //					);
 				case 'SMStorm':

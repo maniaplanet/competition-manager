@@ -57,7 +57,7 @@ class NextUserEvent extends \ManiaLib\Application\AdvancedFilter
 				/* @var $lobby \CompetitionManager\Services\Match */
 				$lobby = reset($stage->matches);
 				$lobby->fetchServer();
-				if($lobby->server->isReady())
+				if($lobby->server && $lobby->server->isReady())
 				{
 					$this->response->nextUserEvent->message = _('If you are not already on the lobby, join it to keep your slot!');
 					$this->response->nextUserEvent->link = $lobby->server->getLink('qjoin');
@@ -151,14 +151,15 @@ class _NextUserEventView extends \ManiaLib\Application\View
 		$ui = new Cards\HighlightedLabel(Constants\UI::EVENT_WIDTH, Constants\UI::EVENT_HEIGHT);
 		$ui->setRelativeAlign('center', 'center');
 		$ui->setAlign('center', 'center');
-		$ui->label->setRelativeHalign('center');
-		$ui->label->setHalign('center');
-		$ui->label->setTextColor('8f0');
-		$ui->label->setText($this->response->nextUserEvent->message);
 		$ui->highlight->setBgcolor('0008');
 		$ui->highlight->setBgcolorFocus('1148');
 		if($this->response->nextUserEvent->link)
 			$ui->highlight->setManialink($this->response->nextUserEvent->link);
+		$ui->label->setRelativeHalign('center');
+		$ui->label->setHalign('center');
+		$ui->label->setTextColor('8f0');
+		$ui->label->setText($this->response->nextUserEvent->message);
+		$ui->setLabelMargin(1);
 		$frame->add($ui);
 		
 		$frame->save();

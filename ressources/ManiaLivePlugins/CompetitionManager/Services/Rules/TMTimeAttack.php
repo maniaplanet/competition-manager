@@ -10,7 +10,6 @@
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
 use DedicatedApi\Structures\GameInfos;
-use ManiaLive\DedicatedApi\Callback\Event;
 
 abstract class TMTimeAttack extends AbstractRules
 {

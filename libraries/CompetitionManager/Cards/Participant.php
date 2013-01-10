@@ -145,18 +145,16 @@ class Participant extends Frame
 			$tooltipId = 'participation:'.uniqid().':rank';
 			$this->rank->setId($tooltipId);
 			$this->rank->setScriptEvents();
-			\ManiaLib\ManiaScript\UI::tooltip($tooltipId, $customizations[$this->qualified][self::RANK_TOOLTIP]);
+			ManiaScript\UI::tooltip($tooltipId, $customizations[$this->qualified][self::RANK_TOOLTIP]);
 		}
 		
 		if($this->name->highlight->getId())
 			ManiaScript\UI::tooltip($this->name->highlight->getId(), _('Go to official page'));
 		
 		$this->rank->highlight->setBgcolor($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER : self::BG_COLOR]);
-		$this->rank->highlight->setBgcolorFocus($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER_FOCUS : self::BG_COLOR_FOCUS]);
 		$this->name->highlight->setBgcolor($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER : self::BG_COLOR]);
 		$this->name->highlight->setBgcolorFocus($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER_FOCUS : self::BG_COLOR_FOCUS]);
 		$this->score->highlight->setBgcolor($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER : self::BG_COLOR]);
-		$this->score->highlight->setBgcolorFocus($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER_FOCUS : self::BG_COLOR_FOCUS]);
 	}
 	
 	private function getNameWidth()

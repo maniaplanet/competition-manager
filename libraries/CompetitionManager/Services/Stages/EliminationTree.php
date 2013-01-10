@@ -283,7 +283,7 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 		list($bracket, $round, $offset) = $this->findMatch($match->matchId);
 		$match->fetchParticipants();
 		
-		$playerService = new \CompetitionManager\Services\ParticipantService();
+		$participantService = new \CompetitionManager\Services\ParticipantService();
 		$matchService = new \CompetitionManager\Services\MatchService();
 		$maxQualified = $this->parameters['slotsPerMatch'] >> 1;
 		
@@ -292,11 +292,11 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 		{
 			foreach($match->participants as $participantId => $participant)
 			{
-				$playerService->updateStageInfo($this->stageId, $participantId, $participant->rank, count($this->matches[$bracket]) * 2, null);
+				$participantService->updateStageInfo($this->stageId, $participantId, $participant->rank, count($this->matches[$bracket]) * 2, null);
 				if($participant->rank && $participant->rank <= $maxQualified)
-					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
+					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
 				else
-					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
+					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
 			}
 		}
 		// Small final case
@@ -304,11 +304,11 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 		{
 			foreach($match->participants as $participantId => $participant)
 			{
-				$playerService->updateStageInfo($this->stageId, $participantId, $participant->rank + $this->parameters['slotsPerMatch'], count($this->matches[$bracket]), null);
+				$participantService->updateStageInfo($this->stageId, $participantId, $participant->rank + $this->parameters['slotsPerMatch'], count($this->matches[$bracket]), null);
 				if($participant->rank && $participant->rank <= $maxQualified)
-					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
+					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
 				else
-					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
+					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
 			}
 		}
 		else
@@ -319,13 +319,13 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 			{
 				if($participant->rank == null)
 				{
-					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
-					$playerService->updateStageInfo($this->stageId, $participantId, 0, null, null);
+					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
+					$participantService->updateStageInfo($this->stageId, $participantId, 0, null, null);
 				}
 				else if($participant->rank <= $maxQualified)
 				{
 					$qualified[] = $participantId;
-					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
+					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
 				}
 				else
 				{
@@ -336,8 +336,8 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 					if($isRescued)
 						$falling[] = $participantId;
 					else
-						$playerService->updateStageInfo($this->stageId, $participantId, 0, $round+1, null);
-					$playerService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
+						$participantService->updateStageInfo($this->stageId, $participantId, 0, $round+1, null);
+					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
 				}
 			}
 			
@@ -412,7 +412,12 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 			$match = $service->get($matchId);
 			$match->fetchParticipants();
 			if(count($match->participants) == 1 || ($skippable && count($match->participants) <= $this->parameters['slotsPerMatch'] >> 1))
+			{
+				$participantService = new \CompetitionManager\Services\ParticipantService();
+				foreach($match->participants as $participant)
+					$participantService->updateMatchInfo($matchId, $participant->participantId, 1, null, $participant->scoreDetails);
 				$this->onMatchOver($match);
+			}
 			else
 			{
 				$service->setState($matchId, State::READY);

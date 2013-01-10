@@ -41,6 +41,25 @@ class Competition extends AbstractObject
 		);
 		return \ManiaLivePlugins\CompetitionManager\Config::getInstance()->manialink.'?'.http_build_query($params);
 	}
+	
+	/**
+	 * @return Server
+	 */
+	function getLobby()
+	{
+		if(!$this->lobbyId)
+			return null;
+		
+		$result = self::db()->execute('SELECT * FROM Servers WHERE matchId=%d LIMIT 1', $this->lobbyId);
+		try
+		{
+			return Server::fromRecordSet($result);
+		}
+		catch(\Exception $e)
+		{
+			return null;
+		}
+	}
 }
 
 ?>

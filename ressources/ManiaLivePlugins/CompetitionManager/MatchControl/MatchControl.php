@@ -94,7 +94,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 	{
 		$this->forfeitAction = ActionHandler::getInstance()->createAction(array($this, 'confirmForfeit'));
 		CustomUI::HideForAll(CustomUI::CHALLENGE_INFO);
-		Windows\Header::Create()->show();
+		Windows\Progress::Create()->show();
 		Windows\Status::Create()->show();
 		$this->updateStatus();
 	}
@@ -537,14 +537,14 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 		{
 			if(!$hasBeenWarned)
 			{
-				if($this->match->stage->getLobby())
+				if($this->match->stage->competition->getLobby())
 					$this->connection->chatSendServerMessage(self::PREFIX.'You will be transfered back to the lobby in a few seconds.');
 				$hasBeenWarned = true;
 			}
 			else
 			{
 				$jumper = Windows\ForceManialink::Create();
-				if(($server = $this->match->stage->getLobby()))
+				if(($server = $this->match->stage->competition->getLobby()))
 					$jumper->set($server->getLink());
 				else
 					$jumper->set($this->match->getManialink(false));

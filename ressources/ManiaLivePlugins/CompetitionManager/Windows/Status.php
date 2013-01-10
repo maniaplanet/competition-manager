@@ -19,13 +19,13 @@ class Status extends \ManiaLive\Gui\Window
 	
 	protected function onConstruct()
 	{
-		$this->setSize(35, 10);
+		$this->setSize(40, 10);
 		$this->setHalign('right');
 		$this->setPosition(160, -(55+Constants\UI::PIXEL));
 		
-		$this->status = new HighlightedLabel(35, 10);
+		$this->status = new HighlightedLabel(40, 10);
 		$this->status->label->setHalign('center');
-		$this->status->label->setPosX(17.5);
+		$this->status->label->setPosX(20);
 		$this->status->label->setTextSize(2);
 		$this->status->setLabelMargin(2);
 		$this->addComponent($this->status);

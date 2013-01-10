@@ -21,7 +21,7 @@ class GroupedChampionship extends Championship
 	
 	function getName()
 	{
-		return 'Grouped Championship';
+		return _('Groups');
 	}
 	
 	function getInfo()

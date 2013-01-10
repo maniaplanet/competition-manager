@@ -12,20 +12,18 @@ namespace ManiaLivePlugins\CompetitionManager\LobbyControl;
 use ManiaLive\DedicatedApi\Callback\Event as ServerEvent;
 use ManiaLive\Gui\CustomUI;
 use ManiaLive\Gui\Group;
-use ManiaLivePlugins\CompetitionManager\Constants\State;
-use ManiaLivePlugins\CompetitionManager\Constants\Transaction;
-use ManiaLivePlugins\CompetitionManager\Services\Match;
-use ManiaLivePlugins\CompetitionManager\Services\Participant;
-use ManiaLivePlugins\CompetitionManager\Services\Player;
-use ManiaLivePlugins\CompetitionManager\Services\Server;
+use ManiaLivePlugins\CompetitionManager\Constants;
+use ManiaLivePlugins\CompetitionManager\Services;
 use ManiaLivePlugins\CompetitionManager\Windows;
 
 class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 {
 	const PREFIX = 'Lobby$08fInfo$000»$8f0 ';
 	
-	/** @var Match */
+	/** @var Services\Match */
 	private $lobby;
+	/** @var Services\Stage */
+	private $currentStage;
 	/** @var int[string] */
 	private $quitters = array();
 	/** @var string[int] */
@@ -43,7 +41,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 	function onInit()
 	{
 		$this->setVersion('1.0');
-		$this->lobby = Match::getInstance();
+		$this->lobby = Services\Match::getInstance();
 		$this->nextTick = $this->lobby->availabilityTime;
 		$this->tickInterval = new \DateInterval('PT20S');
 	}
@@ -71,12 +69,9 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 	function onReady()
 	{
 		CustomUI::HideForAll(CustomUI::CHALLENGE_INFO);
-		Windows\Header::Create()->show();
+		Windows\Progress::Create()->show();
 		Windows\Status::Create()->show();
 		$this->updateStatus();
-		$gauge = Windows\Gauge::Create();
-		$gauge->setLevel(count($this->lobby->participants));
-		$gauge->show();
 	}
 	
 	function onPlayerConnect($login, $isSpectator)
@@ -117,7 +112,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 				$this->syncParticipants();
 				$gauge = Windows\Gauge::Create();
 				$gauge->setLevel($count);
-				$gauge->redraw();
+				$gauge->show();
 				
 				if($count >= $this->lobby->stage->minSlots)
 				{
@@ -155,16 +150,30 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 				'SELECT state FROM Competitions WHERE competitionId=%d',
 				$this->lobby->stage->competitionId
 			)->fetchSingleValue();
+		$result = $this->db->execute(
+				'SELECT * FROM Stages WHERE competitionId=%d AND state=%d',
+				$this->lobby->stage->competitionId,
+				Constants\State::STARTED
+			);
+		if($result->recordAvailable())
+		{
+			$stage = Services\Stage::fromRecordSet($result);
+			if(!$this->currentStage || $this->currentStage->stageId != $stage->stageId)
+			{
+				$this->currentStage = $stage;
+				Windows\Progress::Create()->update($this->currentStage);
+			}
+		}
 	}
 	
 	private function isLobbyOver()
 	{
-		return $this->lobby->stage->state >= State::OVER;
+		return $this->lobby->stage->state >= Constants\State::OVER;
 	}
 	
 	private function isCompetitionOver()
 	{
-		return $this->lobby->stage->competition->state >= State::OVER;
+		return $this->lobby->stage->competition->state >= Constants\State::OVER;
 	}
 	
 	private function syncParticipants()
@@ -203,10 +212,10 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 				'SELECT SUM(IF(type & %d, -amount, amount)) '.
 				'FROM Transactions '.
 				'WHERE competitionId=%d AND login=%s AND type&~%1$d=%d AND remoteId IS NOT NULL',
-				Transaction::REFUND,
+				Constants\Transaction::REFUND,
 				$this->lobby->stage->competitionId,
 				$this->db->quote($participant->login),
-				Transaction::REGISTRATION
+				Constants\Transaction::REGISTRATION
 			)->fetchSingleValue(0);
 		if($due > 0)
 			$this->db->execute(
@@ -214,14 +223,14 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 					$this->lobby->stage->competitionId,
 					$this->db->quote($participant->login),
 					$due,
-					Transaction::REGISTRATION | Transaction::REFUND,
+					Constants\Transaction::REGISTRATION | Constants\Transaction::REFUND,
 					$this->db->quote(sprintf('Refund of registration in $<%s$> (reason: left before start)', $this->lobby->stage->competition->name))
 				);
 	}
 	
 	private function closeRegistrations()
 	{
-		$this->db->execute('UPDATE Stages SET state=%d WHERE stageId=%d', State::OVER, $this->lobby->stageId);
+		$this->db->execute('UPDATE Stages SET state=%d WHERE stageId=%d', Constants\State::OVER, $this->lobby->stageId);
 		$this->disableDedicatedEvents();
 		$this->connection->chatSendServerMessage(self::PREFIX.'Competition is starting now!');
 		Windows\CountDown::EraseAll();
@@ -234,7 +243,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 		$overIds = $this->db->execute(
 				'SELECT M.matchId FROM Matches M INNER JOIN Stages USING(stageId) WHERE competitionId=%d AND M.state>%d',
 				$this->lobby->stage->competitionId,
-				State::OVER
+				Constants\State::OVER
 			)->fetchArrayOfSingleValues();
 		
 		foreach(array_diff($overIds, array_keys($this->matches)) as $overId)
@@ -249,7 +258,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 					'INNER JOIN Servers Se USING(matchId) '.
 				'WHERE St.competitionId=%d AND M.state=%d AND DATE_ADD(Se.startTime, INTERVAL 2 MINUTE) < NOW()',
 				$this->lobby->stage->competitionId,
-				State::STARTED
+				Constants\State::STARTED
 			)->fetchArrayOfRow();
 		$startedIds = array();
 		foreach($startedRaw as $started)
@@ -267,9 +276,9 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 					$startedId);
 			
 			$group = Group::Create('match-'.$startedId);
-			foreach(Participant::arrayFromRecordSet($result) as $participant)
+			foreach(Services\Participant::arrayFromRecordSet($result) as $participant)
 			{
-				if($participant instanceof Player)
+				if($participant instanceof Services\Player)
 					$group->add($participant->login);
 				else
 				{
@@ -288,7 +297,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 			$result = $this->db->execute('SELECT * FROM Servers WHERE matchId=%d LIMIT 1', $matchId);
 			if(!$result->recordAvailable())
 				continue;
-			$server = Server::fromRecordSet($result);
+			$server = Services\Server::fromRecordSet($result);
 			
 			$group = Group::Get('match-'.$matchId);
 			$message = Windows\BigMessage::Create($group);
@@ -324,7 +333,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 		switch($warn++)
 		{
 			case 0:
-				$this->db->execute('UPDATE Matches SET state=%d WHERE matchId=%d', State::OVER, $this->lobby->matchId);
+				$this->db->execute('UPDATE Matches SET state=%d WHERE matchId=%d', Constants\State::OVER, $this->lobby->matchId);
 				$this->connection->chatSendServerMessage(self::PREFIX.'Competition is over, lobby will be closed soon. Thanks for participating!');
 				$this->tickInterval = new \DateInterval('PT30S');
 				break;

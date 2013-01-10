@@ -9,6 +9,8 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services;
 
+use ManiaLivePlugins\CompetitionManager\Constants\StageType;
+
 class Stage extends AbstractObject
 {
 	/** @var int */
@@ -57,6 +59,38 @@ class Stage extends AbstractObject
 		$this->competition = Competition::fromRecordSet($result);
 	}
 	
+	function getName()
+	{
+		switch($this->type)
+		{
+			case StageType::REGISTRATIONS:
+			case StageType::LOBBY:
+				return 'Registrations';
+			case StageType::OPEN_STAGE:
+				if($this->nextId)
+				{
+					if($this->previousId)
+						return 'Qualifiers';
+					else
+						return 'Open Qualifiers';
+				}
+				return 'Open Match';
+			case StageType::SINGLE_MATCH:
+				return 'Match';
+			case StageType::ELIMINATION_TREE:
+				return 'Brackets';
+			case StageType::CHAMPIONSHIP:
+				return 'Championship';
+			case StageType::GROUPED_CHAMPIONSHIP:
+				return 'Groups';
+		}
+	}
+	
+	function getManialink($external=true)
+	{
+		return $this->competition->getManialink(null, $external, array('c' => null, 's' => $this->stageId));
+	}
+	
 	function updateParticipantList()
 	{
 		$result = self::db()->execute(
@@ -72,25 +106,6 @@ class Stage extends AbstractObject
 		
 		$newValues = Participant::assocFromRecordSet($result, $this->stage->competition->isTeam ? 'teamId' : 'login');
 		$this->participants = array_intersect_key($this->participants, $newValues) + $newValues;
-	}
-	
-	/**
-	 * @return Server
-	 */
-	function getLobby()
-	{
-		if(!$this->competition->lobbyId)
-			return null;
-		
-		$result = self::db()->execute('SELECT * FROM Servers WHERE matchId=%d LIMIT 1', $this->competition->lobbyId);
-		try
-		{
-			return Server::fromRecordSet($result);
-		}
-		catch(\Exception $e)
-		{
-			return null;
-		}
 	}
 }
 

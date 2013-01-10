@@ -15,7 +15,7 @@ use ManiaLib\Gui\Elements\Icons128x32_1;
 
 class Laps extends AbstractRules
 {
-	public $gamemode = GameInfos::GAMEMODE_LAPS;
+	public $gameMode = GameInfos::GAMEMODE_LAPS;
 	/** @setting none Laps number (0 to use map default) */
 	public $lapsLimit = 0;
 	/** @setting ms Time limit to complete the number of laps (0 means no limit) */

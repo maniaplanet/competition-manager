@@ -46,8 +46,8 @@ $r = ManiaLib\Application\Request::getInstance();
 						</label>
 						<select id="title" name="title" data-native-menu="false">
 							<optgroup label="<?php echo _('Official titles'); ?>">
-<!--								<option value="TMCanyon" <?php echo $competition->title == 'TMCanyon' ? 'selected="selected"' : ''; ?>
-										class="solo-compliant team-compliant openqualifiers-compliant">TrackMania Canyon</option>-->
+								<option value="TMCanyon" <?php echo $competition->title == 'TMCanyon' ? 'selected="selected"' : ''; ?>
+										class="solo-compliant team-not-compliant openqualifiers-not-compliant">TrackMania Canyon</option>
 								<option value="SMStorm" <?php echo $competition->title == 'SMStorm' ? 'selected="selected"' : ''; ?>
 										class="solo-compliant team-not-compliant">ShootMania Storm</option>
 							</optgroup>

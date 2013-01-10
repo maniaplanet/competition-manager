@@ -53,40 +53,34 @@ class Brackets extends \ManiaLib\Application\View
 			
 			foreach($roundMatches as $offset => $match)
 			{
+				$match->fetchParticipants();
+				
 				$card = new \CompetitionManager\Cards\Match();
 				$card->setPosY($yIndexes[$offset]);
 				$card->setValign('center');
-				if($match->state == Constants\State::CANCELLED)
-				{
-					$card->setCancelled();
-					$card->setName('$i'.$match->name);
-				}
+				foreach($match->participants as $participant)
+					$card->addParticipant($participant, false, $match->state >= Constants\State::STARTED, false);
+				if($match->state > Constants\State::UNKNOWN)
+					$emptyLabels = 'BYE';
 				else
+					$emptyLabels = $this->response->stage->getEmptyLabels(EliminationTree::WINNERS_BRACKET, $this->response->baseRound+$round, $this->response->baseOffset+$offset);
+				for($i=count($match->participants); $i<$this->response->stage->parameters['slotsPerMatch']; ++$i)
 				{
-					$match->fetchParticipants();
-					foreach($match->participants as $participant)
-						$card->addParticipant($participant, false, $match->state >= Constants\State::STARTED, false);
-					if($match->state > Constants\State::UNKNOWN)
-						$emptyLabels = 'BYE';
-					else
-						$emptyLabels = $this->response->stage->getEmptyLabels(EliminationTree::WINNERS_BRACKET, $this->response->baseRound+$round, $this->response->baseOffset+$offset);
-					for($i=count($match->participants); $i<$this->response->stage->parameters['slotsPerMatch']; ++$i)
+					if($emptyLabels)
 					{
-						if($emptyLabels)
-						{
-							if(is_array($emptyLabels))
-								$card->addEmpty(array_shift($emptyLabels));
-							else
-								$card->addEmpty($emptyLabels);
-						}
+						if(is_array($emptyLabels))
+							$card->addEmpty(array_shift($emptyLabels));
 						else
-							$card->addEmpty('');
+							$card->addEmpty($emptyLabels);
 					}
-					
-					$card->setName($match->name);
-					$this->request->set('m', $match->matchId);
-					$card->setManialink($this->request->createLink());
+					else
+						$card->addEmpty('');
 				}
+
+				$card->setName($match->name);
+				$this->request->set('m', $match->matchId);
+				$card->setManialink($this->request->createLink());
+				
 				$roundFrame->add($card);
 			}
 			

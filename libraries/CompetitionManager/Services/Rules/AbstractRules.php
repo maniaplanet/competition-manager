@@ -40,11 +40,11 @@ abstract class AbstractRules
 		{
 			switch($title)
 			{
-//				case 'TMCanyon':
-//					return array(
-//						new LobbyTMTimeAttack(),
-//						new LobbyRounds()
-//					);
+				case 'TMCanyon':
+					return array(
+						new LobbyTMTimeAttack(),
+						new LobbyRounds()
+					);
 				case 'SMStorm':
 //				case 'SMStormElite@nadeolabs':
 //				case 'SMStormEliteExperimental@nadeolabs':
@@ -74,15 +74,15 @@ abstract class AbstractRules
 		{
 			switch($title)
 			{
-//				case 'TMCanyon':
-//					return array(
+				case 'TMCanyon':
+					return array(
 //						new CumulativeTMTimeAttack(),
 //						new TMTimeAttackDuel(),
 //						new CumulativeRounds(),
 //						new RoundsDuel(),
-//						new Laps(),
+						new Laps(),
 //						new Cup()
-//					);
+					);
 				case 'SMStorm':
 					return array(
 						new Melee(),

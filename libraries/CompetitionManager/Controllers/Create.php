@@ -12,6 +12,7 @@ namespace CompetitionManager\Controllers;
 use DedicatedApi\Structures\GameInfos;
 use CompetitionManager\Filters\UserAgentAdapt;
 use CompetitionManager\Constants\State;
+use CompetitionManager\Services\Rules;
 use CompetitionManager\Services\Stages;
 use CompetitionManager\Services\TemplateService;
 
@@ -263,7 +264,7 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 			$type = array('Race');
 
 		$service = new \DedicatedManager\Services\MapService();
-		$this->response->files = $service->getList('', true, false, $type, $environment);
+		$this->response->files = $service->getList('', true, $this->stage->rules instanceof Rules\Laps, $type, $environment);
 
 		$header = \CompetitionManager\Helpers\Header::getInstance();
 		$header->rightText = _('Back to stage rules');

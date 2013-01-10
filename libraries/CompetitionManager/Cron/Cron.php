@@ -30,9 +30,10 @@ abstract class Cron extends \ManiaLib\Utils\Singleton
 		}
 	}
 
-	final protected function debug($message)
+	final protected function debug($message, $log=false)
 	{
-		Logger::log(str_repeat('    ', $this->sectionCount).$message, $this->logName);
+		if($log)
+			Logger::log(str_repeat('    ', $this->sectionCount).$message, $this->logName);
 		echo str_repeat('    ', $this->sectionCount).$message.PHP_EOL;
 	}
 
@@ -41,23 +42,23 @@ abstract class Cron extends \ManiaLib\Utils\Singleton
 		while($this->sectionCount)
 			$this->endSection();
 		
-		$this->foot('EXCEPTION! EXCEPTION! EXCEPTION!', '*');
-		$this->debug(get_class($e));
-		$this->debug($e->getMessage().' ('.$e->getCode().')');
-		$this->debug('File: '.$e->getFile());
-		$this->debug('Line: '.$e->getLine());
-		$this->debug($e->getTraceAsString());
-		$this->debug('');
+		$this->foot('EXCEPTION! EXCEPTION! EXCEPTION!', '*', true);
+		$this->debug(get_class($e), true);
+		$this->debug($e->getMessage().' ('.$e->getCode().')', true);
+		$this->debug('File: '.$e->getFile(), true);
+		$this->debug('Line: '.$e->getLine(), true);
+		$this->debug($e->getTraceAsString(), true);
+		$this->debug('', true);
 	}
 	
-	final protected function head($str, $c='-')
+	final protected function head($str, $c='-', $log=false)
 	{
 		$this->separator($c);
 		$this->debug($c.$c.str_pad(' '.$str, 60).$c.$c);
 		$this->separator($c);
 	}
 	
-	final protected function foot($str, $c='-')
+	final protected function foot($str, $c='-', $log=false)
 	{
 		$this->debug('');
 		$this->debug(str_pad($c.$c.' '.$str.' ', 64, $c));

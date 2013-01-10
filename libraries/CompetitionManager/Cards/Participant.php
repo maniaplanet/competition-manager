@@ -143,8 +143,8 @@ class Participant extends Frame
 		if($this->rank->isVisible() && $customizations[$this->qualified][self::RANK_TOOLTIP])
 		{
 			$tooltipId = 'participation:'.uniqid().':rank';
-			$this->rank->setId($tooltipId);
-			$this->rank->setScriptEvents();
+			$this->rank->highlight->setId($tooltipId);
+			$this->rank->highlight->setScriptEvents();
 			ManiaScript\UI::tooltip($tooltipId, $customizations[$this->qualified][self::RANK_TOOLTIP]);
 		}
 		

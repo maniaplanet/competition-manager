@@ -287,29 +287,28 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 		$matchService = new \CompetitionManager\Services\MatchService();
 		$maxQualified = $this->parameters['slotsPerMatch'] >> 1;
 		
+		// Update qualification state
+		foreach($match->participants as $participantId => $participant)
+		{
+			if($participant->rank == null)
+				$participantService->setMatchQualification($match->matchId, $participantId, Qualified::LEAVED);
+			else if($participant->rank <= $maxQualified)
+				$participantService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
+			else
+				$participantService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
+		}
+		
 		// Final or Grand final case
 		if($bracket == self::WINNERS_BRACKET && $round == count($this->matches[$bracket]) - 1 && $offset == 0)
 		{
 			foreach($match->participants as $participantId => $participant)
-			{
 				$participantService->updateStageInfo($this->stageId, $participantId, $participant->rank, count($this->matches[$bracket]) * 2, null);
-				if($participant->rank && $participant->rank <= $maxQualified)
-					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
-				else
-					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
-			}
 		}
 		// Small final case
 		else if($this->parameters['withSmallFinal'] && $round == count($this->matches[$bracket]) - 1)
 		{
 			foreach($match->participants as $participantId => $participant)
-			{
 				$participantService->updateStageInfo($this->stageId, $participantId, $participant->rank + $this->parameters['slotsPerMatch'], count($this->matches[$bracket]), null);
-				if($participant->rank && $participant->rank <= $maxQualified)
-					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
-				else
-					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
-			}
 		}
 		else
 		{
@@ -318,15 +317,9 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 			foreach($match->participants as $participantId => $participant)
 			{
 				if($participant->rank == null)
-				{
-					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
 					$participantService->updateStageInfo($this->stageId, $participantId, 0, null, null);
-				}
 				else if($participant->rank <= $maxQualified)
-				{
 					$qualified[] = $participantId;
-					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
-				}
 				else
 				{
 					$isRescued =
@@ -337,7 +330,6 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 						$falling[] = $participantId;
 					else
 						$participantService->updateStageInfo($this->stageId, $participantId, 0, $round+1, null);
-					$participantService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
 				}
 			}
 			

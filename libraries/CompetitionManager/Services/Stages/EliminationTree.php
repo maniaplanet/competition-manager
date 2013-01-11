@@ -17,6 +17,7 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 {
 	const WINNERS_BRACKET = 0;
 	const LOSERS_BRACKET = 1;
+	const GRAND_FINAL = 2;
 	
 	function __construct()
 	{
@@ -105,7 +106,12 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 		$previousMatches = array();
 		$nbQualified = $this->parameters['slotsPerMatch']>>1;
 		
-		if($bracket == self::WINNERS_BRACKET)
+		if($bracket == self::GRAND_FINAL)
+		{
+			$previousMatches[] = array(@reset(end($this->matches[self::WINNERS_BRACKET])), 0);
+			$previousMatches[] = array(@reset(end($this->matches[self::LOSERS_BRACKET])), 0);
+		}
+		else if($bracket == self::WINNERS_BRACKET)
 		{
 			if($round == 0)
 			{
@@ -120,11 +126,16 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 				return $emptyLabels;
 			}
 			
-			$previousMatches[] = array($this->matches[self::WINNERS_BRACKET][$round-1][$offset<<1], 0);
-			if($this->getWBRoundsCount() - $round - ($this->parameters['withLosersBracket'] && !$this->parameters['withSmallFinal']) == 0)
-				$previousMatches[] = array(@reset(end($this->matches[self::LOSERS_BRACKET])), 0);
+			if($round == count($this->matches[self::WINNERS_BRACKET])-1 && $offset == 1)
+			{
+				$previousMatches[] = array($this->matches[self::WINNERS_BRACKET][$round-1][0], $nbQualified);
+				$previousMatches[] = array($this->matches[self::WINNERS_BRACKET][$round-1][1], $nbQualified);
+			}
 			else
+			{
+				$previousMatches[] = array($this->matches[self::WINNERS_BRACKET][$round-1][$offset<<1], 0);
 				$previousMatches[] = array($this->matches[self::WINNERS_BRACKET][$round-1][$offset<<1^1], 0);
+			}
 		}
 		else if($round == 0)
 		{
@@ -148,7 +159,7 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 		reset($previousMatches);
 		while(list($match, $offset) = current($previousMatches))
 		{
-			if($match->state == State::UNKNOWN)
+			if($match->state < State::OVER)
 			{
 				for($i=1; $i<=$nbQualified; ++$i)
 					$emptyLabels[] = '#'.($i+$offset).' of '.$match->name;
@@ -169,7 +180,10 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 			$matchesToCreate = 1 << ($roundMaxWB - !$this->parameters['withSmallFinal']);
 			for($roundWB = $roundLB = 0; $roundWB <= $roundMaxWB; ++$roundWB)
 			{
-				$this->matches[self::WINNERS_BRACKET][] = $this->createMatches($service, $this->roundName($roundWB), $roundWB, $matchesToCreate);
+				if($roundWB == $roundMaxWB)
+					$this->matches[self::GRAND_FINAL][] = $this->createMatches($service, $this->roundName($roundWB), $roundWB, $matchesToCreate);
+				else
+					$this->matches[self::WINNERS_BRACKET][] = $this->createMatches($service, $this->roundName($roundWB), $roundWB, $matchesToCreate);
 				if($roundWB == 0)
 				{
 					$matchesToCreate >>= 1;
@@ -239,6 +253,13 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 					$matchService->delete($matchId);
 			}
 		}
+		if(count($this->matches[self::WINNERS_BRACKET]) == 1)
+		{
+			unset($this->matches[self::GRAND_FINAL]);
+			unset($this->matches[self::LOSERS_BRACKET]);
+			$this->parameters['withLosersBracket'] = false;
+			$this->parameters['withSmallFinal'] = false;
+		}
 		$stageService->update($this);
 		
 		// Splitting up participants
@@ -299,10 +320,16 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 		}
 		
 		// Final or Grand final case
-		if($bracket == self::WINNERS_BRACKET && $round == count($this->matches[$bracket]) - 1 && $offset == 0)
+		if($bracket == self::GRAND_FINAL
+				|| ($bracket == self::WINNERS_BRACKET
+					&& $round == count($this->matches[$bracket]) - 1
+					&& $offset == 0
+					&& (!$this->parameters['withLosersBracket'] || $this->parameters['withSmallFinal'])
+				)
+			)
 		{
 			foreach($match->participants as $participantId => $participant)
-				$participantService->updateStageInfo($this->stageId, $participantId, $participant->rank, count($this->matches[$bracket]) * 2, null);
+				$participantService->updateStageInfo($this->stageId, $participantId, $participant->rank, count($this->matches[self::WINNERS_BRACKET]) * 2, null);
 		}
 		// Small final case
 		else if($this->parameters['withSmallFinal'] && $round == count($this->matches[$bracket]) - 1)
@@ -335,9 +362,9 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 			
 			if($bracket == self::WINNERS_BRACKET)
 			{
-				$isWBFinal = $round == count($this->matches[$bracket]) - 2 && $this->parameters['withLosersBracket'] && !$this->parameters['withSmallFinal'];
+				$isWBFinal = $round == count($this->matches[$bracket]) - 1 && $this->parameters['withLosersBracket'] && !$this->parameters['withSmallFinal'];
 				$this->continueBracket($matchService, $qualified,
-						$this->matches[self::WINNERS_BRACKET][$round+1][$offset>>1],
+						$isWBFinal ? $this->matches[self::GRAND_FINAL][0][0] : $this->matches[self::WINNERS_BRACKET][$round+1][$offset>>1],
 						$isWBFinal ? $this->matches[self::LOSERS_BRACKET][($round<<1)-1][0] : $this->matches[self::WINNERS_BRACKET][$round][$offset^1],
 						$round != count($this->matches[$bracket]) - 2
 					);
@@ -367,10 +394,10 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 			}
 			else // Losers bracket
 			{
-				// LB final special case (up back to winners bracket)
+				// LB final special case (go to grand final)
 				if($round == count($this->matches[$bracket]) - 1)
 					$this->continueBracket($matchService, $qualified,
-							$this->matches[self::WINNERS_BRACKET][($round>>1)+2][0],
+							$this->matches[self::GRAND_FINAL][0][0],
 							$this->matches[self::WINNERS_BRACKET][($round>>1)+1][0],
 							false
 						);
@@ -403,7 +430,7 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 		{
 			$match = $service->get($matchId);
 			$match->fetchParticipants();
-			if(count($match->participants) == 1 || ($skippable && count($match->participants) <= $this->parameters['slotsPerMatch'] >> 1))
+			if(count($match->participants) < 2 || ($skippable && count($match->participants) <= $this->parameters['slotsPerMatch'] >> 1))
 			{
 				$participantService = new \CompetitionManager\Services\ParticipantService();
 				foreach($match->participants as $participant)

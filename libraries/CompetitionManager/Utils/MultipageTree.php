@@ -15,6 +15,7 @@ class MultipageTree
 {
 	private $tree;
 	private $columns;
+	private $isLB;
 	private $round;
 	private $offset;
 	private $maxOffset;
@@ -22,10 +23,11 @@ class MultipageTree
 	
 	private $prefix;
 	
-	function __construct($tree, $columns, $prefix='')
+	function __construct($tree, $columns, $isLB, $prefix='')
 	{
 		$this->tree = $tree;
 		$this->columns = $columns-1;
+		$this->isLB = $isLB;
 		$this->prefix = $prefix ? $prefix.'-' : '';
 		
 		$request = \ManiaLib\Application\Request::getInstance();
@@ -36,7 +38,7 @@ class MultipageTree
 		else if($this->round > $this->maxRound)
 			$this->round = $this->maxRound;
 		
-		$this->maxOffset = (count($this->tree[$this->round]) >> $this->columns) - 1;
+		$this->maxOffset = count($this->tree[$this->round+$this->columns]) - 1;
 		$this->offset = (int) $request->get($this->prefix.'offset', 0);
 		if($this->offset < 0)
 			$this->offset = 0;
@@ -46,9 +48,12 @@ class MultipageTree
 	
 	function getSubTree()
 	{
-		for($i=0, $slice=1<<$this->columns; $slice>0; ++$i, $slice>>=1)
-			$subTree[] = array_slice($this->tree[$this->round + $i], $this->offset * $slice, $slice);
+		if($this->round == $this->maxRound)
+			return array_slice($this->tree, -$this->columns-1);
 		
+		$subTree = array();
+		for($i=$this->columns, $slice=1; $i>=0; --$i, $slice<<=(!$this->isLB || $this->round+$i % 2))
+			array_unshift($subTree, array_slice($this->tree[$this->round + $i], $this->offset * $slice, $slice));
 		return $subTree;
 	}
 	
@@ -64,22 +69,33 @@ class MultipageTree
 		$request = \ManiaLib\Application\Request::getInstance();
 		if($this->round < $this->maxRound)
 		{
+			$isClassicCase = !$this->isLB || $this->round % 2 == 0;
 			$request->set($this->prefix.'round', $this->round + 1);
-			$request->set($this->prefix.'offset', $this->offset >> 1);
+			$request->set($this->prefix.'offset', $this->offset >> $isClassicCase);
 			$treeNavigator->arrowNext->setManialink($request->createLink());
-			$treeNavigator->arrowNextTooltip = '$<$000'._('To ').'$>'.$this->tree[$this->round+$this->columns+1][$this->offset>>1]->name;
+			$treeNavigator->arrowNextTooltip = '$<$000'._('To ').'$>'.$this->tree[$this->round+$this->columns+1][$this->offset>>$isClassicCase]->name;
 		}
 		if($this->round > 0)
 		{
 			$request->set($this->prefix.'round', $this->round - 1);
-			$request->set($this->prefix.'offset', $this->offset * 2);
-			$treeNavigator->arrowPreviousUp->setManialink($request->createLink());
-			$treeNavigator->arrowPreviousUpTooltip = '$<$000'._('To ').'$>'.$this->tree[$this->round+$this->columns-1][$this->offset<<1]->name.'$000'._(' bracket');
-			$request->set($this->prefix.'offset', $this->offset * 2 + 1);
-			$treeNavigator->arrowPreviousDown->setManialink($request->createLink());
-			$treeNavigator->arrowPreviousDownTooltip = '$<$000'._('To ').'$>'.$this->tree[$this->round+$this->columns-1][$this->offset<<1^1]->name.'$000'._(' bracket');
+			if($this->isLB && $this->round % 2 == 0)
+			{
+				$request->set($this->prefix.'offset', $this->offset);
+				$treeNavigator->arrowPreviousUp->setManialink($request->createLink());
+				$treeNavigator->arrowPreviousUp->setRelativeValign('center');
+				$treeNavigator->arrowPreviousUpTooltip = '$<$000'._('To ').'$>'.$this->tree[$this->round+$this->columns-1][$this->offset<<1]->name.'$000'._(' bracket');
+			}
+			else
+			{
+				$request->set($this->prefix.'offset', $this->offset * 2);
+				$treeNavigator->arrowPreviousUp->setManialink($request->createLink());
+				$treeNavigator->arrowPreviousUpTooltip = '$<$000'._('To ').'$>'.$this->tree[$this->round+$this->columns-1][$this->offset<<1]->name.'$000'._(' bracket');
+				$request->set($this->prefix.'offset', $this->offset * 2 + 1);
+				$treeNavigator->arrowPreviousDown->setManialink($request->createLink());
+				$treeNavigator->arrowPreviousDownTooltip = '$<$000'._('To ').'$>'.$this->tree[$this->round+$this->columns-1][$this->offset<<1^1]->name.'$000'._(' bracket');
+			}
 		}
-		if($this->offset < $this->maxOffset)
+		if($this->offset < $this->maxOffset && $this->round != $this->maxRound)
 		{
 			$request->set($this->prefix.'round', $this->round);
 			$request->set($this->prefix.'offset', $this->offset + 1);

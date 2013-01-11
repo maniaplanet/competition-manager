@@ -23,6 +23,8 @@ class Match extends Frame
 	private $background;
 	/** @var Frame */
 	private $content;
+	/** @var int */
+	private $lines = 0;
 	
 	function __construct()
 	{
@@ -57,6 +59,13 @@ class Match extends Frame
 	 */
 	function addParticipant($participant, $showRank=false, $showScore=false, $isUser=false)
 	{
+		if(++$this->lines > 6)
+		{
+			if($this->lines == 7)
+				$this->addEllipsis();
+			return;
+		}
+		
 		$ui = new Participant($this->sizeX, 5);
 		$ui->setName($participant->name);
 		$ui->setRank($participant->rank);
@@ -70,8 +79,23 @@ class Match extends Frame
 	
 	function addEmpty($label)
 	{
+		if(++$this->lines > 6)
+		{
+			if($this->lines == 7)
+				$this->addEllipsis();
+			return;
+		}
+		
 		$ui = new EmptySlot($this->sizeX, 5);
 		$ui->setLabel($label);
+		$this->content->add($ui);
+		$this->setSizeY($this->sizeY + 5 + Constants\UI::PIXEL);
+	}
+	
+	private function addEllipsis()
+	{
+		$ui = new EmptySlot($this->sizeX, 5);
+		$ui->setLabel('...');
 		$this->content->add($ui);
 		$this->setSizeY($this->sizeY + 5 + Constants\UI::PIXEL);
 	}

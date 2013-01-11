@@ -198,13 +198,14 @@ class StageService extends \DedicatedManager\Services\AbstractService
 	function update(Stage $stage)
 	{
 		$this->db()->execute(
-				'UPDATE Stages SET maxSlots=%d, minSlots=%d ,startTime=%s, endTime=%s, matches=%s, rules=%s WHERE stageId=%d',
+				'UPDATE Stages SET maxSlots=%d, minSlots=%d ,startTime=%s, endTime=%s, matches=%s, rules=%s, parameters=%s WHERE stageId=%d',
 				$stage->maxSlots,
 				$stage->minSlots,
 				$stage->startTime ? $this->db()->quote(is_string($stage->startTime) ? $stage->startTime : $stage->startTime->format('Y-m-d H:i:s')) : 'NULL',
 				$stage->endTime ? $this->db()->quote(is_string($stage->endTime) ? $stage->endTime : $stage->endTime->format('Y-m-d H:i:s')) : 'NULL',
 				$this->db()->quote(JSON::serialize($stage->matches)),
 				$this->db()->quote(JSON::serialize($stage->rules)),
+				$this->db()->quote(JSON::serialize($stage->parameters)),
 				$stage->stageId);
 	}
 	

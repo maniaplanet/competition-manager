@@ -134,12 +134,8 @@ class CompetitionHandling extends Cron
 		if( ($matches = $matchService->getNextToAssign()) )
 		{
 			$serverService = new \CompetitionManager\Services\ServerService();
-			while($account = $serverService->getAvailableAccount())
+			while($match = array_shift($matches) && $account = $serverService->getAvailableAccount())
 			{
-				$match = array_shift($matches);
-				if(!$match)
-					break;
-				
 				try
 				{
 					$match->startServer($account);

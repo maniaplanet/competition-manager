@@ -303,7 +303,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 		if(!$isStarted)
 		{
 			$this->connection->chatSendServerMessage(self::PREFIX.'Match is starting!');
-			$this->connection->restartMap();
+			$this->connection->nextMap();
 			$isStarted = true;
 		}
 		else

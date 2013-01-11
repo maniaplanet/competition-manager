@@ -12,6 +12,7 @@ namespace CompetitionManager\Services\ScoreDetails;
 class BasicDetails
 {
 	public $isTime = false;
+	public $show = true;
 }
 
 ?>

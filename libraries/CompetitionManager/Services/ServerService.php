@@ -83,7 +83,7 @@ class ServerService extends \DedicatedManager\Services\ServerService
 	 */
 	function getAvailableAccount()
 	{
-		$result = $this->db()->execute('SELECT * FROM DedicatedAccounts WHERE rpcHost IS NULL LIMIT 1');
+		$result = $this->db()->execute('SELECT * FROM DedicatedAccounts WHERE rpcHost IS NULL ORDER BY RAND() LIMIT 1');
 		return DedicatedAccount::fromRecordSet($result, false);
 	}
 	

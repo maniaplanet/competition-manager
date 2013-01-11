@@ -21,16 +21,34 @@ class Brackets extends \ManiaLib\Application\View
 	{
 		$this->renderSubView('_Menu');
 		
-		if(count($this->response->stage->matches[EliminationTree::WINNERS_BRACKET]) == 1)
+		if(count($this->response->stage->matches[$this->response->bracket]) == 1)
+			return $this->displaySingle();
+		else
+			$this->displayBracket();
+		
+		if($this->response->matchCard)
 		{
-			$ui = $this->response->matchCard;
+			$ui = new Bgs1(240, 180);
+			$ui->setSubStyle(Bgs1::BgDialogBlur);
 			$ui->setAlign('center', 'center');
-			$ui->setPosition(40, 0, 2);
+			$ui->setPosition(40, 0, 1);
+			$ui->setScriptEvents();
 			$ui->save();
-			return;
+			
+			$this->displaySingle();
 		}
-		
-		
+	}
+	
+	private function displaySingle()
+	{
+		$ui = $this->response->matchCard;
+		$ui->setAlign('center', 'center');
+		$ui->setPosition(40, 0, 2);
+		$ui->save();
+	}
+	
+	private function displayBracket()
+	{
 		$nbCols = count($this->response->matches);
 		$additionnalSpace = ((4 - $nbCols) * 55) / $nbCols;
 		
@@ -50,52 +68,20 @@ class Brackets extends \ManiaLib\Application\View
 			$roundFrame = new Frame(Constants\UI::MATCH_WIDTH, 170);
 			$roundFrame->setLayout($layout);
 			$bracketFrame->add($roundFrame);
+			$cards = array();
 			
 			foreach($roundMatches as $offset => $match)
 			{
 				$match->fetchParticipants();
-				
-				$card = new \CompetitionManager\Cards\Match();
-				$card->setPosY($yIndexes[$offset]);
-				$card->setValign('center');
-				foreach($match->participants as $participant)
-					$card->addParticipant($participant, false, $match->state >= Constants\State::STARTED, false);
-				if($match->state > Constants\State::UNKNOWN)
-					$emptyLabels = 'BYE';
-				else
-					$emptyLabels = $this->response->stage->getEmptyLabels(EliminationTree::WINNERS_BRACKET, $this->response->baseRound+$round, $this->response->baseOffset+$offset);
-				for($i=count($match->participants); $i<$this->response->stage->parameters['slotsPerMatch']; ++$i)
-				{
-					if($emptyLabels)
-					{
-						if(is_array($emptyLabels))
-							$card->addEmpty(array_shift($emptyLabels));
-						else
-							$card->addEmpty($emptyLabels);
-					}
-					else
-						$card->addEmpty('');
-				}
-
-				$card->setName($match->name);
-				$this->request->set('m', $match->matchId);
-				$card->setManialink($this->request->createLink());
-				
-				$roundFrame->add($card);
+				$roundFrame->add($cards[] = $this->createMatchCard($match, $round, $offset, $yIndexes[$offset]));
 			}
 			
-			$nextYIndexes = array();
-			for($i = 0; $i < count($yIndexes)>>1; ++$i)
-				$nextYIndexes[] = ($yIndexes[2*$i] + $yIndexes[2*$i+1]) / 2;
-			$yIndexes = $nextYIndexes;
-			
-			$this->response->baseOffset >>= 1;
+			$yIndexes = $this->prepareNextRound($round, $yIndexes);
 		}
-		
-		$this->request->restore('m');
 		
 		if($this->response->multipageTree)
 		{
+			$card = reset($cards);
 			$treeNavigator = $this->response->multipageTree->createNavigator();
 			$treeNavigator->setSize($card->getSizeX(), $card->getSizeY());
 			$treeNavigator->setPosition($card->getPosX(), $card->getPosY());
@@ -103,21 +89,54 @@ class Brackets extends \ManiaLib\Application\View
 		}
 		
 		$bracketFrame->save();
-		
-		if($this->response->matchCard)
+	}
+	
+	private function createMatchCard($match, $round, $offset, $posY)
+	{
+		$card = new \CompetitionManager\Cards\Match();
+		$card->setPosY($posY);
+		$card->setValign('center');
+		foreach($match->participants as $participant)
+			$card->addParticipant($participant, false, $match->state >= Constants\State::STARTED && $participant->hasScore(), false);
+		if($match->state > Constants\State::UNKNOWN)
+			$emptyLabels = 'BYE';
+		else
+			$emptyLabels = $this->response->stage->getEmptyLabels(EliminationTree::WINNERS_BRACKET, $this->response->baseRound+$round, $this->response->baseOffset+$offset);
+		for($i=count($match->participants); $i<$this->response->stage->parameters['slotsPerMatch']; ++$i)
 		{
-			$ui = new Bgs1(240, 180);
-			$ui->setSubStyle(Bgs1::BgDialogBlur);
-			$ui->setAlign('center', 'center');
-			$ui->setPosition(40, 0, 1);
-			$ui->setScriptEvents();
-			$ui->save();
-			
-			$ui = $this->response->matchCard;
-			$ui->setAlign('center', 'center');
-			$ui->setPosition(40, 0, 2);
-			$ui->save();
+			if($emptyLabels)
+			{
+				if(is_array($emptyLabels))
+					$card->addEmpty(array_shift($emptyLabels));
+				else
+					$card->addEmpty($emptyLabels);
+			}
+			else
+				$card->addEmpty('');
 		}
+
+		$card->setName($match->name);
+		$this->request->set('m', $match->matchId);
+		$card->setManialink($this->request->createLink());
+		$this->request->restore('m');
+		
+		return $card;
+	}
+	
+	private function prepareNextRound($round, $yIndexes)
+	{
+		if($this->response->bracket == EliminationTree::WINNERS_BRACKET || ($this->response->baseRound+$round) % 2)
+		{
+			$this->response->baseOffset >>= 1;
+
+			$nextYIndexes = array();
+			for($i = 0; $i < count($yIndexes)>>1; ++$i)
+				$nextYIndexes[] = ($yIndexes[2*$i] + $yIndexes[2*$i+1]) / 2;
+			$nextYIndexes[] = end($nextYIndexes)*1.6;
+			return $nextYIndexes;
+		}
+		else
+			return $yIndexes;
 	}
 }
 

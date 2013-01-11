@@ -54,6 +54,11 @@ abstract class Participant extends AbstractObject
 			$this->scoreDetails = JSON::unserialize($this->scoreDetails);
 	}
 	
+	function hasScore()
+	{
+		return !$this->scoreDetails || $this->scoreDetails->show;
+	}
+	
 	function formatScore($detailsStyle='$888$i')
 	{
 		if(!$this->scoreDetails)

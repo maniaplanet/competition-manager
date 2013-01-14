@@ -11,11 +11,24 @@ namespace CompetitionManager\Services\Schedules;
 
 class Simple extends AbstractSchedule
 {
+	/** @var \DateTime */
 	public $startTime;
 	
 	function getTimesLimit()
 	{
 		return array($this->startTime, $this->startTime);
+	}
+	
+	function _json_sleep()
+	{
+		if(is_object($this->startTime))
+			$this->startTime = $this->startTime->format('Y-m-d H:i:s');
+	}
+	
+	function _json_wakeup()
+	{
+		if($this->startTime)
+			$this->startTime = new \DateTime($this->startTime);
 	}
 }
 

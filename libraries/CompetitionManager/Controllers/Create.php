@@ -264,7 +264,7 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 			$type = array('Race');
 
 		$service = new \DedicatedManager\Services\MapService();
-		$this->response->files = $service->getList('', true, $this->stage->rules instanceof Rules\Laps, $type, $environment);
+		$this->response->files = $service->getList('', true, $this->stage->rules->gameMode == GameInfos::GAMEMODE_LAPS, $type, $environment);
 
 		$header = \CompetitionManager\Helpers\Header::getInstance();
 		$header->rightText = _('Back to stage rules');

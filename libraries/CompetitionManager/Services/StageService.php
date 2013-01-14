@@ -163,8 +163,8 @@ class StageService extends \DedicatedManager\Services\AbstractService
 	function create(Stage $stage)
 	{
 		$this->db()->execute(
-				'INSERT INTO Stages(competitionId, type, previousId, nextId, minSlots, maxSlots, startTime, endTime, rules, matches, parameters) '.
-				'VALUES (%d, %d, %s, %s, %d, %d, %s, %s, %s, %s, %s)',
+				'INSERT INTO Stages(competitionId, type, previousId, nextId, minSlots, maxSlots, startTime, endTime, rules, schedule, matches, parameters) '.
+				'VALUES (%d, %d, %s, %s, %d, %d, %s, %s, %s, %s, %s, %s)',
 				$stage->competitionId,
 				$stage->type,
 				$stage->previousId ?: 'NULL',
@@ -174,6 +174,7 @@ class StageService extends \DedicatedManager\Services\AbstractService
 				$stage->startTime ? $this->db()->quote($stage->startTime) : 'NULL',
 				$stage->endTime ? $this->db()->quote($stage->endTime) : 'NULL',
 				$this->db()->quote(JSON::serialize($stage->rules)),
+				$this->db()->quote(JSON::serialize($stage->schedule)),
 				$this->db()->quote(JSON::serialize(null)),
 				$this->db()->quote(JSON::serialize($stage->parameters)));
 		
@@ -198,13 +199,14 @@ class StageService extends \DedicatedManager\Services\AbstractService
 	function update(Stage $stage)
 	{
 		$this->db()->execute(
-				'UPDATE Stages SET maxSlots=%d, minSlots=%d ,startTime=%s, endTime=%s, matches=%s, rules=%s, parameters=%s WHERE stageId=%d',
+				'UPDATE Stages SET maxSlots=%d, minSlots=%d ,startTime=%s, endTime=%s, rules=%s, schedule=%s, matches=%s, parameters=%s WHERE stageId=%d',
 				$stage->maxSlots,
 				$stage->minSlots,
 				$stage->startTime ? $this->db()->quote(is_string($stage->startTime) ? $stage->startTime : $stage->startTime->format('Y-m-d H:i:s')) : 'NULL',
 				$stage->endTime ? $this->db()->quote(is_string($stage->endTime) ? $stage->endTime : $stage->endTime->format('Y-m-d H:i:s')) : 'NULL',
-				$this->db()->quote(JSON::serialize($stage->matches)),
 				$this->db()->quote(JSON::serialize($stage->rules)),
+				$this->db()->quote(JSON::serialize($stage->schedule)),
+				$this->db()->quote(JSON::serialize($stage->matches)),
 				$this->db()->quote(JSON::serialize($stage->parameters)),
 				$stage->stageId);
 	}

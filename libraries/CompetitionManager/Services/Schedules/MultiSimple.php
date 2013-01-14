@@ -11,11 +11,26 @@ namespace CompetitionManager\Services\Schedules;
 
 class MultiSimple extends AbstractSchedule
 {
+	/** @var \DateTime[] */
 	public $startTimes = array();
 	
 	function getTimesLimit()
 	{
 		return array(reset($this->startTimes), end($this->startTimes));
+	}
+	
+	function _json_sleep()
+	{
+		foreach($this->startTimes as &$time)
+			if(is_object($time))
+				$time = $time->format('Y-m-d H:i:s');
+	}
+	
+	function _json_wakeup()
+	{
+		foreach($this->startTimes as &$time)
+			if($time)
+				$time = new \DateTime($time);
 	}
 }
 

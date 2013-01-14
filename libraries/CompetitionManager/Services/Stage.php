@@ -36,6 +36,8 @@ abstract class Stage extends AbstractObject
 	public $endTime;
 	/** @var Rules\AbstractRules */
 	public $rules;
+	/** @var AbstractSchedule */
+	public $schedule;
 	/** @var mixed[] */
 	public $matches;
 	/** @var mixed[] */
@@ -45,9 +47,6 @@ abstract class Stage extends AbstractObject
 	public $participants = array();
 	/** @var Map[] */
 	public $maps = array();
-	
-	/** @var AbstractSchedule */
-	public $schedule;
 	
 	/** @var bool */
 	private $participantsFetched = false;
@@ -90,6 +89,7 @@ abstract class Stage extends AbstractObject
 	protected function onFetchObject()
 	{
 		$this->rules = JSON::unserialize($this->rules);
+		$this->schedule = JSON::unserialize($this->schedule);
 		$this->matches = JSON::unserialize($this->matches);
 		$this->parameters = JSON::unserialize($this->parameters);
 		if($this->startTime)

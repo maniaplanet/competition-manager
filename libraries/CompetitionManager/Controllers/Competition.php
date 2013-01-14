@@ -324,7 +324,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		
 	}
 	
-	function groupedChampionship($group=null)
+	function groups($group=null)
 	{
 		
 	}

@@ -9,7 +9,7 @@
 
 namespace CompetitionManager\Views\Competition;
 
-class GroupedChampionship extends \ManiaLib\Application\View
+class Groups extends \ManiaLib\Application\View
 {
 	function display()
 	{

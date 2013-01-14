@@ -76,7 +76,7 @@ class MatchDisplay extends \ManiaLib\Application\AdvancedFilter
 		$this->card->setCloseLink(null);
 		$this->card->setState($obj->state);
 		
-		$this->showScores = $obj->state >= State::STARTED && reset($this->participants)->hasScore();
+		$this->showScores = $obj->state >= State::STARTED && $this->participants && reset($this->participants)->hasScore();
 	}
 	
 	function autoTime($obj)

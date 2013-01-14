@@ -194,7 +194,7 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 		$errors = array();
 		$this->stage->minSlots = $this->request->getPost('minSlots', 0);
 		$this->stage->maxSlots = $this->request->getPost('maxSlots');
-		if($this->stage instanceof Stages\GroupedChampionship)
+		if($this->stage instanceof Stages\Groups)
 		{
 			$this->stage->parameters['nbGroups'] = $this->request->getPost('nbGroups');
 			if($this->stage->parameters['nbGroups'] < 2)
@@ -202,7 +202,7 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 			if($this->request->getPost('slotsPerGroup') < 2)
 				$errors[] = _('There should be at least 2 slots per group');
 		}
-		else if($this->stage instanceof Stages\EliminationTree)
+		else if($this->stage instanceof Stages\Brackets)
 		{
 			$this->stage->parameters['slotsPerMatch'] = $this->request->getPost('slotsPerMatch');
 			if($this->stage->parameters['slotsPerMatch'] < 2)

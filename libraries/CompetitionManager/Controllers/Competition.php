@@ -267,7 +267,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		$this->openStage();
 	}
 	
-	function brackets($bracket=Stages\EliminationTree::WINNERS_BRACKET, $m=null)
+	function brackets($bracket=Stages\Brackets::WINNERS_BRACKET, $m=null)
 	{
 		$bracketMatches = $this->stage->matches[$bracket];
 		if(count($bracketMatches) == 1)
@@ -275,10 +275,10 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 			$this->matchDisplay->prepare($bracketMatches[0][0]);
 			$this->matchDisplay->emptyLabels = array();
 			if($bracketMatches[0][0]->state > State::UNKNOWN)
-				$this->matchDisplay->emptyLabels = 'BYE';
+				$this->matchDisplay->emptyLabels = _('BYE');
 			else
-				$this->matchDisplay->emptyLabels = $this->stage->getEmptyLabels(Stages\EliminationTree::WINNERS_BRACKET, 0, 0);
-			$this->matchDisplay->linesToShow = min($this->stage->maxSlots, $this->stage->parameters['slotsPerMatch']);
+				$this->matchDisplay->emptyLabels = $this->stage->getEmptyLabels($bracket, 0, 0);
+			$this->matchDisplay->linesToShow = min(16, $this->stage->parameters['slotsPerMatch']);
 			$this->response->bracket = $bracket;
 			return;
 		}
@@ -304,7 +304,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		}
 		
 		$this->response->bracket = $bracket;
-		$maxColumns = $bracket == Stages\EliminationTree::LOSERS_BRACKET || $this->stage->parameters['slotsPerMatch'] == 2 ? 4 : 3;
+		$maxColumns = $bracket == Stages\Brackets::LOSERS_BRACKET || $this->stage->parameters['slotsPerMatch'] < 5 ? 4 : 3;
 		if(count($bracketMatches) > $maxColumns)
 		{
 			$this->response->multipageTree = new \CompetitionManager\Utils\MultipageTree($bracketMatches, $maxColumns, $bracket);

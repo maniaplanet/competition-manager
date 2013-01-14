@@ -13,7 +13,7 @@ use CompetitionManager\Constants\Qualified;
 use CompetitionManager\Constants\State;
 use CompetitionManager\Utils\Formatting;
 
-class EliminationTree extends \CompetitionManager\Services\Stage
+class Brackets extends \CompetitionManager\Services\Stage
 {
 	const WINNERS_BRACKET = 0;
 	const LOSERS_BRACKET = 1;
@@ -21,7 +21,7 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 	
 	function __construct()
 	{
-		$this->type = \CompetitionManager\Constants\StageType::ELIMINATION_TREE;
+		$this->type = \CompetitionManager\Constants\StageType::BRACKETS;
 		$this->schedule = new \CompetitionManager\Services\Schedules\MultiSimple();
 		$this->parameters['slotsPerMatch'] = 8;
 		$this->parameters['withLosersBracket'] = false;
@@ -161,8 +161,16 @@ class EliminationTree extends \CompetitionManager\Services\Stage
 		{
 			if($match->state < State::OVER)
 			{
-				for($i=1; $i<=$nbQualified; ++$i)
-					$emptyLabels[] = '#'.($i+$offset).' of '.$match->name;
+				if($this->parameters['slotsPerMatch'] == 2)
+				{
+					if($offset)
+						$emptyLabels[] = 'Loser of '.$match->name;
+					else
+						$emptyLabels[] = 'Winner of '.$match->name;
+				}
+				else
+					for($i=1; $i<=$nbQualified; ++$i)
+						$emptyLabels[] = '#'.($i+$offset).' of '.$match->name;
 			}
 			next($previousMatches);
 		}

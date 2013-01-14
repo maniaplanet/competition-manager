@@ -76,21 +76,21 @@ class _Menu extends \ManiaLib\Application\View
 					if($currentAction == $stage->getAction() && $this->request->get('s') == $stage->stageId)
 					{
 						$menu->lastItem->setSelected();
-						if($stage instanceof Stages\EliminationTree && $stage->parameters['withLosersBracket'])
+						if($stage instanceof Stages\Brackets && $stage->parameters['withLosersBracket'])
 						{
 							$menu->addGap(-12);
 							$menu->addItem();
 							$menu->lastItem->icon->setVisibility(false);
-							$this->request->set('bracket', Stages\EliminationTree::WINNERS_BRACKET);
-							$menu->lastItem->text->setText(($this->response->bracket == Stages\EliminationTree::WINNERS_BRACKET ? '$g' : '')._('Winners bracket'));
+							$this->request->set('bracket', Stages\Brackets::WINNERS_BRACKET);
+							$menu->lastItem->text->setText(($this->response->bracket == Stages\Brackets::WINNERS_BRACKET ? '$g' : '')._('Winners bracket'));
 							$menu->lastItem->text->incPosX(6);
 							$menu->lastItem->setManialink($this->request->createLinkArgList('../'.$stage->getAction(), 'c', 's', 'bracket', 'external'));
 							
 							$menu->addGap(-12);
 							$menu->addItem();
 							$menu->lastItem->icon->setVisibility(false);
-							$this->request->set('bracket', Stages\EliminationTree::LOSERS_BRACKET);
-							$menu->lastItem->text->setText(($this->response->bracket == Stages\EliminationTree::LOSERS_BRACKET ? '$g' : '')._('Losers bracket'));
+							$this->request->set('bracket', Stages\Brackets::LOSERS_BRACKET);
+							$menu->lastItem->text->setText(($this->response->bracket == Stages\Brackets::LOSERS_BRACKET ? '$g' : '')._('Losers bracket'));
 							$menu->lastItem->text->incPosX(6);
 							$menu->lastItem->setManialink($this->request->createLinkArgList('../'.$stage->getAction(), 'c', 's', 'bracket', 'external'));
 							
@@ -99,8 +99,8 @@ class _Menu extends \ManiaLib\Application\View
 								$menu->addGap(-12);
 								$menu->addItem();
 								$menu->lastItem->icon->setVisibility(false);
-								$this->request->set('bracket', Stages\EliminationTree::GRAND_FINAL);
-								$menu->lastItem->text->setText(($this->response->bracket == Stages\EliminationTree::GRAND_FINAL ? '$g' : '')._('Grand final'));
+								$this->request->set('bracket', Stages\Brackets::GRAND_FINAL);
+								$menu->lastItem->text->setText(($this->response->bracket == Stages\Brackets::GRAND_FINAL ? '$g' : '')._('Grand final'));
 								$menu->lastItem->text->incPosX(6);
 								$menu->lastItem->setManialink($this->request->createLinkArgList('../'.$stage->getAction(), 'c', 's', 'bracket', 'external'));
 							}

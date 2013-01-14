@@ -77,11 +77,11 @@ class Stage extends AbstractObject
 				return 'Open Match';
 			case StageType::SINGLE_MATCH:
 				return 'Match';
-			case StageType::ELIMINATION_TREE:
+			case StageType::BRACKETS:
 				return 'Brackets';
 			case StageType::CHAMPIONSHIP:
 				return 'Championship';
-			case StageType::GROUPED_CHAMPIONSHIP:
+			case StageType::GROUPS:
 				return 'Groups';
 		}
 	}

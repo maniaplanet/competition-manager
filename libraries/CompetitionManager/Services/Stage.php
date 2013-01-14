@@ -64,9 +64,9 @@ abstract class Stage extends AbstractObject
 			case StageType::LOBBY: return new Stages\Lobby();
 			case StageType::OPEN_STAGE: return new Stages\OpenStage();
 			case StageType::SINGLE_MATCH: return new Stages\SingleMatch();
-			case StageType::ELIMINATION_TREE: return new Stages\EliminationTree();
+			case StageType::BRACKETS: return new Stages\Brackets();
 			case StageType::CHAMPIONSHIP: return new Stages\Championship();
-			case StageType::GROUPED_CHAMPIONSHIP: return new Stages\GroupedChampionship();
+			case StageType::GROUPS: return new Stages\Groups();
 		}
 	}
 	

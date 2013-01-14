@@ -31,14 +31,14 @@ $r = ManiaLib\Application\Request::getInstance();
 								<strong><?php echo _('Max Slots'); ?></strong><br/>
 								<i><?php printf(_('Maximum number of %s for this stage'), $competition->isTeam ? _('teams') : _('players')); ?></i>
 							</label>
-						<?php if($stage instanceof Stages\GroupedChampionship || $stage instanceof Stages\EliminationTree): ?>
+						<?php if($stage instanceof Stages\Groups || $stage instanceof Stages\Brackets): ?>
 							<input type="text" name="maxSlots" id="maxSlots" value="<?php echo $stage->maxSlots; ?>" readonly="readonly"/>
 						<?php else: ?>
 							<input type="text" name="maxSlots" id="maxSlots" value="<?php echo $stage->maxSlots; ?>" class="conditional-readonly"/>
 						<?php endif; ?>
 						</li>
 					<?php endif; ?>
-					<?php if($stage instanceof Stages\GroupedChampionship): ?>
+					<?php if($stage instanceof Stages\Groups): ?>
 						<li data-role="fieldcontain">
 							<label for="nbGroups">
 								<strong><?php echo _('Number of groups'); ?></strong><br/>
@@ -58,7 +58,7 @@ $r = ManiaLib\Application\Request::getInstance();
 								}).trigger('change');
 							});
 						</script>
-					<?php elseif($stage instanceof Stages\EliminationTree): ?>
+					<?php elseif($stage instanceof Stages\Brackets): ?>
 						<li data-role="fieldcontain">
 							<label for="nbRounds">
 								<strong><?php echo _('Number of rounds'); ?></strong><br/>

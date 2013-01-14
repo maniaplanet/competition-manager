@@ -11,13 +11,13 @@ namespace CompetitionManager\Constants;
 
 abstract class StageType
 {
-	const REGISTRATIONS        = 0;
-	const LOBBY                = 1;
-	const OPEN_STAGE           = 2;
-	const SINGLE_MATCH         = 3;
-	const ELIMINATION_TREE     = 4;
-	const CHAMPIONSHIP         = 5;
-	const GROUPED_CHAMPIONSHIP = 6;
+	const REGISTRATIONS = 0;
+	const LOBBY         = 1;
+	const OPEN_STAGE    = 2;
+	const SINGLE_MATCH  = 3;
+	const BRACKETS      = 4;
+	const CHAMPIONSHIP  = 5;
+	const GROUPS        = 6;
 }
 
 ?>

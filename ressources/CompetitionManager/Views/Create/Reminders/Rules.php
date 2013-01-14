@@ -2,9 +2,9 @@
 <?php if(!($locStage instanceof Stages\Lobby)): ?>
 	<li><span style="font-weight:normal"><?php echo _('Max Slots:'); ?></span> <?php echo $locStage->maxSlots; ?></li>
 <?php endif; ?>
-<?php if($locStage instanceof Stages\GroupedChampionship): ?>
+<?php if($locStage instanceof Stages\Groups): ?>
 	<li><span style="font-weight:normal"><?php echo _('Groups Number:'); ?></span> <?php echo $locStage->parameters['nbGroups']; ?></li>
-<?php elseif($locStage instanceof Stages\EliminationTree): ?>
+<?php elseif($locStage instanceof Stages\Brackets): ?>
 	<li><span style="font-weight:normal"><?php echo _('Slots Per Match:'); ?></span> <?php echo $locStage->parameters['slotsPerMatch']; ?></li>
 <?php endif; ?>
 <li data-role="list-divider" data-theme="d"><?php echo $locStage->rules->getName(); ?></li>

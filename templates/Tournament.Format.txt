@@ -1,6 +1,6 @@
 <format>
 	<description>A simple elimination tree</description>
 	<stages>
-		<eliminationTree/>
+		<brackets/>
 	</stages>
 </format>

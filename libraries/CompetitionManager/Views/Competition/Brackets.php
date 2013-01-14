@@ -13,7 +13,7 @@ use ManiaLib\Gui\Elements\Bgs1;
 use ManiaLib\Gui\Elements\Frame;
 use ManiaLib\Gui\Layouts;
 use CompetitionManager\Constants;
-use CompetitionManager\Services\Stages\EliminationTree;
+use CompetitionManager\Services\Stages;
 
 class Brackets extends \ManiaLib\Application\View
 {
@@ -52,12 +52,12 @@ class Brackets extends \ManiaLib\Application\View
 		$nbCols = count($this->response->matches);
 		$additionnalSpace = ((4 - $nbCols) * 55) / $nbCols;
 		
-		$step = -170 / count($this->response->matches[0]);
-		$yIndexes = range($step / 2, -170, $step);
+		$step = -178 / count($this->response->matches[0]);
+		$yIndexes = range($step / 2, -178, $step);
 		
 		$layout = new Layouts\Line();
 		$layout->setMarginWidth(10+$additionnalSpace);
-		$layout->setBorder(15+$additionnalSpace/2, 5);
+		$layout->setBorder(15+$additionnalSpace/2, 1);
 		$bracketFrame = new Frame(240);
 		$bracketFrame->setLayout($layout);
 		$bracketFrame->setPosition(-80, 90, -5);
@@ -98,10 +98,11 @@ class Brackets extends \ManiaLib\Application\View
 		$card->setValign('center');
 		foreach($match->participants as $participant)
 			$card->addParticipant($participant, false, $match->state >= Constants\State::STARTED && $participant->hasScore(), false);
+		
 		if($match->state > Constants\State::UNKNOWN)
 			$emptyLabels = 'BYE';
 		else
-			$emptyLabels = $this->response->stage->getEmptyLabels(EliminationTree::WINNERS_BRACKET, $this->response->baseRound+$round, $this->response->baseOffset+$offset);
+			$emptyLabels = $this->response->stage->getEmptyLabels($this->response->bracket, $this->response->baseRound+$round, $this->response->baseOffset+$offset);
 		for($i=count($match->participants); $i<$this->response->stage->parameters['slotsPerMatch']; ++$i)
 		{
 			if($emptyLabels)
@@ -125,7 +126,7 @@ class Brackets extends \ManiaLib\Application\View
 	
 	private function prepareNextRound($round, $yIndexes)
 	{
-		if($this->response->bracket == EliminationTree::WINNERS_BRACKET || ($this->response->baseRound+$round) % 2)
+		if($this->response->bracket == Stages\Brackets::WINNERS_BRACKET || ($this->response->baseRound+$round) % 2)
 		{
 			$this->response->baseOffset >>= 1;
 

@@ -17,7 +17,7 @@
 					<element name="openStage"><empty/></element>
 					<element name="singleMatch"><empty/></element>
 					<element name="championship"><empty/></element>
-					<element name="groupedChampionship"><empty/></element>
+					<element name="groups"><empty/></element>
 				</choice>
 			</zeroOrMore>
 
@@ -25,7 +25,7 @@
 				<element name="openStage"><empty/></element>
 				<element name="singleMatch"><empty/></element>
 				<element name="championship"><empty/></element>
-				<element name="eliminationTree"><empty/></element>
+				<element name="brackets"><empty/></element>
 			</choice>
 		</element>
 	</define>

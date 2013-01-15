@@ -11,7 +11,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
 class RoundsDuel extends Rounds
 {
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	public $roundsLimit = 5;
 	public $mapsLimit = 2;
 	public $disableRespawn = false;

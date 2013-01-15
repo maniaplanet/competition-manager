@@ -79,7 +79,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 			$events = ServerEvent::ON_PLAYER_CONNECT;
 			if($this->match->stage->competition->isTeam)
 				$events |= ServerEvent::ON_PLAYER_INFO_CHANGED;
-			if($this->match->rules->maxSlots == 2)
+			if($this->match->rules->fixedSlots == 2)
 				$events |= ServerEvent::ON_PLAYER_DISCONNECT;
 
 			$this->enableDedicatedEvents($events);
@@ -121,7 +121,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 			case self::READY:
 				if($this->isEverybodyHere())
 					$this->play();
-				else if($this->match->rules->maxSlots == 2)
+				else if($this->match->rules->fixedSlots == 2)
 				{
 					if(count($this->getMissing()) == 2)
 						$this->waitCancel();
@@ -236,7 +236,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 			{
 				if($this->isEverybodyHere())
 					$this->play();
-				else if($this->match->rules->maxSlots == 2 && count($this->getMissing()) == 1)
+				else if($this->match->rules->fixedSlots == 2 && count($this->getMissing()) == 1)
 					$this->waitForfeit();
 			}
 		}

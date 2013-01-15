@@ -16,7 +16,7 @@ use ManiaLib\Gui\Elements\Icons128x32_1;
 class Team extends AbstractRules
 {
 	public $gameMode = GameInfos::GAMEMODE_TEAM;
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	/** @setting none Max players per team */
 	public $slotsPerTeam = 3;
 	/** @setting ms Time limit after the first cross the line (0 to disable, 1 for automatic) */

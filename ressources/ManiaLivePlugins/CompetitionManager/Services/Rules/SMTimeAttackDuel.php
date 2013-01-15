@@ -11,7 +11,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
 class SMTimeAttackDuel extends CumulativeSMTimeAttack
 {
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	public $mapsLimit = 2;
 	
 	function onEndMatch($rankings, $winnerTeamOrMap)

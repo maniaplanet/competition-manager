@@ -12,7 +12,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 class Heroes extends Script
 {
 	public $name = 'Heroes.Script.txt';
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	public $timeLimit = 60;
 	public $capturableLimit = 15;
 	public $noDefCapturableLimit = 10;

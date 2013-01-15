@@ -12,7 +12,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 class Siege extends Script
 {
 	public $name = 'Siege.Script.txt';
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	public $slotsPerTeam = 5;
 	public $timeLimit = 45;
 	public $capturableLimit = 15;

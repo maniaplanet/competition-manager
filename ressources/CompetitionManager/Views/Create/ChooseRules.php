@@ -33,10 +33,48 @@ $r = ManiaLib\Application\Request::getInstance();
 							</label>
 						<?php if($stage instanceof Stages\Groups || $stage instanceof Stages\Brackets): ?>
 							<input type="text" name="maxSlots" id="maxSlots" value="<?php echo $stage->maxSlots; ?>" readonly="readonly"/>
+						<?php elseif($stage instanceof Stages\Championship): ?>
+							<input type="text" name="maxSlots" id="maxSlots" value="<?php echo $stage->maxSlots; ?>"/>
 						<?php else: ?>
-							<input type="text" name="maxSlots" id="maxSlots" value="<?php echo $stage->maxSlots; ?>" class="conditional-readonly"/>
+							<input type="text" name="maxSlots" id="maxSlots" value="<?php echo $stage->maxSlots; ?>" class="fixable"/>
 						<?php endif; ?>
 						</li>
+					<?php endif; ?>
+					<?php if($stage instanceof Stages\Championship): ?>
+						<li data-role="fieldcontain">
+							<label for="isFFA">
+								<strong><?php echo _('Matches type'); ?></strong><br/>
+							</label>
+							<select id="isFFA" name="isFFA" data-role="slider">
+								<option value="0" <?php echo !true ? 'selected="selected"' : ''; ?>><?php echo _('One-on-one'); ?></option>
+								<option value="1" <?php echo true ? 'selected="selected"' : ''; ?>><?php echo _('Free for all'); ?></option>
+							</select>
+						</li>
+						<li data-role="fieldcontain">
+							<label for="nbRounds">
+								<strong><?php echo _('Number of rounds'); ?></strong><br/>
+								<i class="helper-ffa"><?php echo _('How many matches will be played'); ?></i>
+								<i class="helper-1on1"><?php echo sprintf(_('How many matches between each %s'), $competition->isTeam ? _('teams') : _('players')); ?></i>
+							</label>
+							<input type="text" name="nbRounds" id="nbRounds" values="<?php echo $stage->parameters['nbRounds']; ?>"/>
+						</li>
+						<?php if(!($stage instanceof Stages\Groups)): ?>
+							<script>
+								$(document).bind('pageinit', function() {
+									$('select#gamemode').change(function() {
+										var selected = $(this).children(':selected');
+										if(selected.jqmData('fixed-slots') == 2)
+											$('select#isFFA').prop('readonly', true).val(0).trigger('change');
+										else if(selected.jqmData('fixed-slots')) {
+											$('select#isFFA').prop('readonly', true).val(1).trigger('change');
+
+										}
+										else
+											$('select#isFFA').prop('readonly', false).trigger('change');
+									}).trigger('change');
+								});
+							</script>
+						<?php endif; ?>
 					<?php endif; ?>
 					<?php if($stage instanceof Stages\Groups): ?>
 						<li data-role="fieldcontain">
@@ -49,7 +87,7 @@ $r = ManiaLib\Application\Request::getInstance();
 							<label for="slotsPerGroup">
 								<strong><?php echo _('Slots per group'); ?></strong><br/>
 							</label>
-							<input type="text" name="slotsPerGroup" id="slotsPerGroup" value="<?php echo $stage->parameters['nbGroups'] ? $stage->maxSlots / $stage->parameters['nbGroups'] : 2; ?>"/>
+							<input type="text" name="slotsPerGroup" id="slotsPerGroup" value="<?php echo $stage->parameters['nbGroups'] ? $stage->maxSlots / $stage->parameters['nbGroups'] : 2; ?>" class="conditional-readonly"/>
 						</li>
 						<script>
 							$(document).bind('pageinit', function() {
@@ -70,7 +108,7 @@ $r = ManiaLib\Application\Request::getInstance();
 							<label for="slotsPerMatch">
 								<strong><?php echo _('Slots per match'); ?></strong><br/>
 							</label>
-							<input type="text" name="slotsPerMatch" id="slotsPerMatch" value="<?php echo $stage->parameters['slotsPerMatch']; ?>" class="conditional-readonly"/>
+							<input type="text" name="slotsPerMatch" id="slotsPerMatch" value="<?php echo $stage->parameters['slotsPerMatch']; ?>" class="fixable"/>
 						</li>
 						<script>
 							$(document).bind('pageinit', function() {
@@ -87,7 +125,7 @@ $r = ManiaLib\Application\Request::getInstance();
 							<select name="gamemode" id="gamemode" data-native-menu="false">
 							<?php foreach($availableModes as $mode): ?>
 								<option value="<?php echo get_class($mode); ?>" <?php echo $stage->rules && $stage->rules->getId() == $mode->getId() ? 'selected="selected"' : ''; ?>
-										data-mode-id="<?php echo $mode->getId(); ?>" data-slots-limit="<?php echo $mode->maxSlots; ?>"><?php echo $mode->getName(); ?></option>
+										data-mode-id="<?php echo $mode->getId(); ?>" data-fixed-slots="<?php echo $mode->fixedSlots; ?>"><?php echo $mode->getName(); ?></option>
 							<?php endforeach; ?>
 							</select>
 						</li>

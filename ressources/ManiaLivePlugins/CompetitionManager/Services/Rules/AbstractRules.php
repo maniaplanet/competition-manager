@@ -14,7 +14,7 @@ use ManiaLive\DedicatedApi\Callback\Event;
 abstract class AbstractRules
 {
 	public $gameMode;
-	public $maxSlots = null;
+	public $fixedSlots = null;
 	
 	function compare($scoreA, $scoreB)
 	{

@@ -12,7 +12,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 class Joust extends Script
 {
 	public $name = 'Joust.Script.txt';
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	public $timeLimit = 300;
 	public $hitsLimit = 7;
 	public $hitsGap = 2;

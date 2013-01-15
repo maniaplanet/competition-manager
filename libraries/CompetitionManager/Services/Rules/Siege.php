@@ -12,7 +12,7 @@ namespace CompetitionManager\Services\Rules;
 class Siege extends Script
 {
 	public $name = 'Siege.Script.txt';
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	/** @setting none Max players per team */
 	public $slotsPerTeam = 5;
 	/** @setting s How long before a pole is capturable */

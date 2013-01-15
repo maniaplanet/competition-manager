@@ -26,7 +26,7 @@ class SingleMatch extends \CompetitionManager\Services\Stage
 	
 	function getInfo()
 	{
-		if($this->rules->maxSlots == 2)
+		if($this->rules->fixedSlots == 2)
 			$info[] =  sprintf(_('%d on %1$d match'), $this->rules->getTeamSize() ?: 1);
 		$info[] = _('Rules');
 		$info[] = $this->rules->getInfo();

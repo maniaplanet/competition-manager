@@ -12,7 +12,7 @@ namespace CompetitionManager\Services\Rules;
 class BattleWaves extends Script
 {
 	public $name = 'BattleWaves.Script.txt';
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	/** @setting none Max players per team */
 	public $slotsPerTeam = 5;
 	/** @setting s How long a wave lasts */

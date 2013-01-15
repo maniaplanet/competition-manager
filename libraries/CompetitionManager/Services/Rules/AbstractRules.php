@@ -16,7 +16,7 @@ abstract class AbstractRules
 	/** @var int */
 	public $gameMode;
 	/** @var int|null */
-	public $maxSlots = null;
+	public $fixedSlots = null;
 	
 	static function GetList($title, $isTeam=false, $isLobby=false, $isOpen=false)
 	{

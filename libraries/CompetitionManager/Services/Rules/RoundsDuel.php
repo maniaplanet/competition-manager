@@ -11,7 +11,7 @@ namespace CompetitionManager\Services\Rules;
 
 class RoundsDuel extends Rounds
 {
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	/** @setting none Rounds needed to win the map */
 	public $roundsLimit = 5;
 	/** @setting none Maps needed to win the match */

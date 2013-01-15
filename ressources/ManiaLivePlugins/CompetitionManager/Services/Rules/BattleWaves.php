@@ -12,7 +12,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 class BattleWaves extends Script
 {
 	public $name = 'BattleWaves.Script.txt';
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	public $slotsPerTeam = 5;
 	public $waveLimit = 15;
 	public $captureLimit = 30000;

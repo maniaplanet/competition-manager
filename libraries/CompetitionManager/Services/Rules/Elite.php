@@ -12,7 +12,7 @@ namespace CompetitionManager\Services\Rules;
 class Elite extends Script
 {
 	public $name = 'Elite.Script.txt';
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	/** @setting s Round duration (including when poles are capturable) */
 	public $timeLimit = 60;
 	/** @setting s How long poles are capturable */

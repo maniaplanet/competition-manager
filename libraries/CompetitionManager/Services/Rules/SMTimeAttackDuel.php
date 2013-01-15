@@ -11,7 +11,7 @@ namespace CompetitionManager\Services\Rules;
 
 class SMTimeAttackDuel extends CumulativeSMTimeAttack
 {
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	/** @setting none Maps needed to win the match */
 	public $mapsLimit = 2;
 	

@@ -28,6 +28,11 @@ class Championship extends \CompetitionManager\Services\Stage
 		
 	}
 	
+	function getRoundsCount()
+	{
+		return $this->maxSlots;
+	}
+	
 	function getScheduleNames()
 	{
 		return array();

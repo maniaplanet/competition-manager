@@ -12,7 +12,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 class Elite extends Script
 {
 	public $name = 'Elite.Script.txt';
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	public $timeLimit = 60;
 	public $timePole = 15;
 	public $captureLimit = 1.5;

@@ -14,7 +14,7 @@ use DedicatedApi\Structures\GameInfos;
 class Team extends AbstractRules
 {
 	public $gameMode = GameInfos::GAMEMODE_TEAM;
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	public $slotsPerTeam = 3;
 	public $finishTimeLimit = 1;
 	public $roundsLimit = 7;

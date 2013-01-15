@@ -12,7 +12,7 @@ namespace CompetitionManager\Services\Rules;
 class Joust extends Script
 {
 	public $name = 'Joust.Script.txt';
-	public $maxSlots = 2;
+	public $fixedSlots = 2;
 	/** @setting s How long a round can lasts at most */
 	public $timeLimit = 300;
 	/** @setting none Hits needed to win the round */

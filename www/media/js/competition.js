@@ -34,9 +34,9 @@ $(document).bind('pageinit', function() {
 		var selected = $(this).children(':selected');
 		$('fieldset[id|=settings]').hide().find('input').prop('disabled', true);
 		$('fieldset#settings-'+selected.jqmData('mode-id')).show().find('input').prop('disabled', false);
-		if(selected.jqmData('slots-limit'))
-			$('input.conditional-readonly').prop('readonly', true).val(selected.jqmData('slots-limit')).trigger('change');
+		if(selected.jqmData('fixed-slots'))
+			$('input.fixable').prop('readonly', true).val(selected.jqmData('fixed-slots')).trigger('change');
 		else
-			$('input.conditional-readonly').prop('readonly', false);
+			$('input.fixable').prop('readonly', false);
 	}).trigger('change');
 });

@@ -137,6 +137,13 @@ abstract class Formatting
 		else
 			return $n.$ends[$n % 10];
 	}
+	
+	static function dateTimeToString($datetime)
+	{
+		if(is_object($datetime))
+			return $datetime->format('Y-m-d H:i:s');
+		return $datetime;
+	}
 }
 
 ?>

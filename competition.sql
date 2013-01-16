@@ -3,7 +3,7 @@
 -- Server version:               5.5.20-log - MySQL Community Server (GPL)
 -- Server OS:                    Win32
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2012-12-13 15:08:35
+-- Date/time:                    2013-01-16 11:51:24
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -238,6 +238,7 @@ CREATE TABLE IF NOT EXISTS `Stages` (
   `startTime` datetime DEFAULT NULL,
   `endTime` datetime DEFAULT NULL,
   `rules` text NOT NULL,
+  `schedule` text NOT NULL,
   `matches` text NOT NULL,
   `parameters` text NOT NULL,
   PRIMARY KEY (`stageId`),

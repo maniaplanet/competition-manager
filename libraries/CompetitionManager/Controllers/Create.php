@@ -12,7 +12,6 @@ namespace CompetitionManager\Controllers;
 use DedicatedApi\Structures\GameInfos;
 use CompetitionManager\Filters\UserAgentAdapt;
 use CompetitionManager\Constants\State;
-use CompetitionManager\Services\Rules;
 use CompetitionManager\Services\Stages;
 use CompetitionManager\Services\TemplateService;
 

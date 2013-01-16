@@ -11,6 +11,7 @@ namespace CompetitionManager\Services;
 
 use CompetitionManager\Constants\Qualified;
 use CompetitionManager\Constants\State;
+use CompetitionManager\Utils\Formatting;
 
 class StageService extends \DedicatedManager\Services\AbstractService
 {
@@ -171,8 +172,8 @@ class StageService extends \DedicatedManager\Services\AbstractService
 				$stage->nextId ?: 'NULL',
 				$stage->minSlots,
 				$stage->maxSlots,
-				$stage->startTime ? $this->db()->quote($stage->startTime) : 'NULL',
-				$stage->endTime ? $this->db()->quote($stage->endTime) : 'NULL',
+				$stage->startTime ? $this->db()->quote(Formatting::dateTimeToString($stage->startTime)) : 'NULL',
+				$stage->endTime ? $this->db()->quote(Formatting::dateTimeToString($stage->endTime)) : 'NULL',
 				$this->db()->quote(JSON::serialize($stage->rules)),
 				$this->db()->quote(JSON::serialize($stage->schedule)),
 				$this->db()->quote(JSON::serialize(null)),
@@ -202,8 +203,8 @@ class StageService extends \DedicatedManager\Services\AbstractService
 				'UPDATE Stages SET maxSlots=%d, minSlots=%d ,startTime=%s, endTime=%s, rules=%s, schedule=%s, matches=%s, parameters=%s WHERE stageId=%d',
 				$stage->maxSlots,
 				$stage->minSlots,
-				$stage->startTime ? $this->db()->quote(is_string($stage->startTime) ? $stage->startTime : $stage->startTime->format('Y-m-d H:i:s')) : 'NULL',
-				$stage->endTime ? $this->db()->quote(is_string($stage->endTime) ? $stage->endTime : $stage->endTime->format('Y-m-d H:i:s')) : 'NULL',
+				$stage->startTime ? $this->db()->quote(Formatting::dateTimeToString($stage->startTime)) : 'NULL',
+				$stage->endTime ? $this->db()->quote(Formatting::dateTimeToString($stage->endTime)) : 'NULL',
 				$this->db()->quote(JSON::serialize($stage->rules)),
 				$this->db()->quote(JSON::serialize($stage->schedule)),
 				$this->db()->quote(JSON::serialize($stage->matches)),

@@ -93,7 +93,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 	function onReady()
 	{
 		$this->forfeitAction = ActionHandler::getInstance()->createAction(array($this, 'confirmForfeit'));
-		CustomUI::HideForAll(CustomUI::CHALLENGE_INFO);
+//		CustomUI::HideForAll(CustomUI::CHALLENGE_INFO);
 		Windows\Progress::Create()->show();
 		Windows\Status::Create()->show();
 		$this->updateStatus();
@@ -303,7 +303,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 		if(!$isStarted)
 		{
 			$this->connection->chatSendServerMessage(self::PREFIX.'Match is starting!');
-			$this->connection->nextMap();
+			$this->connection->restartMap();
 			$isStarted = true;
 		}
 		else

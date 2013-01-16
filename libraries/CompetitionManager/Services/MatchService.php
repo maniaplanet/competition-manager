@@ -10,6 +10,7 @@
 namespace CompetitionManager\Services;
 
 use CompetitionManager\Constants\State;
+use CompetitionManager\Utils\Formatting;
 
 class MatchService extends \DedicatedManager\Services\AbstractService
 {
@@ -217,8 +218,8 @@ class MatchService extends \DedicatedManager\Services\AbstractService
 				'INSERT INTO Matches(name, stageId, startTime, endTime, rules) VALUES (%s, %d, %s, %s, %s)',
 				$this->db()->quote($match->name),
 				$match->stageId,
-				$match->startTime ? $this->db()->quote($match->startTime) : 'NULL',
-				$match->endTime ? $this->db()->quote($match->endTime) : 'NULL',
+				$match->startTime ? $this->db()->quote(Formatting::dateTimeToString($match->startTime)) : 'NULL',
+				$match->endTime ? $this->db()->quote(Formatting::dateTimeToString($match->endTime)) : 'NULL',
 				$this->db()->quote(JSON::serialize($match->rules))
 			);
 		

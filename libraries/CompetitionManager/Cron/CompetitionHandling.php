@@ -76,7 +76,17 @@ class CompetitionHandling extends Cron
 
 			if($stage->nextId)
 			{
-				if(count($stage->participants) < $stage->minSlots)
+				$nextStage = $stageService->get($stage->nextId);
+				$participantsToKeep = array_filter(
+						$stage->participants,
+						function ($p) use ($nextStage, $competition)
+						{
+							if($competition->isTeam && count($p->players) < $nextStage->rules->getTeamSize())
+								return false;
+							return !$nextStage->maxSlots || ($p->rank !== null && $p->rank <= $nextStage->maxSlots);
+						}
+					);
+				if(count($participantsToKeep) < $stage->minSlots)
 				{
 					$this->debug('Stage #'.$stage->stageId.' finished, not enough participants so competition #'.$stage->competitionId.' cancelled');
 					$stageService->setState($stage->nextId, State::CANCELLED);
@@ -86,16 +96,6 @@ class CompetitionHandling extends Cron
 				else
 				{
 					$this->debug('Stage #'.$stage->stageId.' finished, setting up stage #'.$stage->nextId);
-					$nextStage = $stageService->get($stage->nextId);
-					$participantsToKeep = array_filter(
-							$stage->participants,
-							function ($p) use ($nextStage, $competition)
-							{
-								if($competition->isTeam && count($p->players) < $nextStage->rules->getTeamSize())
-									return false;
-								return !$nextStage->maxSlots || ($p->rank !== null && $p->rank <= $nextStage->maxSlots);
-							}
-						);
 					$stageService->assignParticipants($nextStage->stageId, $participantsToKeep, $nextStage->getDefaultDetails());
 					$stageService->setState($nextStage->stageId, State::READY);
 					$nextStage->onReady($participantsToKeep);
@@ -134,7 +134,7 @@ class CompetitionHandling extends Cron
 		if( ($matches = $matchService->getNextToAssign()) )
 		{
 			$serverService = new \CompetitionManager\Services\ServerService();
-			while($match = array_shift($matches) && $account = $serverService->getAvailableAccount())
+			while(($match = array_shift($matches)) && ($account = $serverService->getAvailableAccount()))
 			{
 				try
 				{

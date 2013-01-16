@@ -56,25 +56,39 @@ $r = ManiaLib\Application\Request::getInstance();
 								<i class="helper-ffa"><?php echo _('How many matches will be played'); ?></i>
 								<i class="helper-1on1"><?php echo sprintf(_('How many matches between each %s'), $competition->isTeam ? _('teams') : _('players')); ?></i>
 							</label>
-							<input type="text" name="nbRounds" id="nbRounds" values="<?php echo $stage->parameters['nbRounds']; ?>"/>
+							<input type="text" name="nbRounds" id="nbRounds" value="<?php echo $stage->parameters['nbRounds']; ?>"/>
 						</li>
-						<?php if(!($stage instanceof Stages\Groups)): ?>
-							<script>
-								$(document).bind('pageinit', function() {
-									$('select#gamemode').change(function() {
-										var selected = $(this).children(':selected');
-										if(selected.jqmData('fixed-slots') == 2)
-											$('select#isFFA').prop('readonly', true).val(0).trigger('change');
-										else if(selected.jqmData('fixed-slots')) {
-											$('select#isFFA').prop('readonly', true).val(1).trigger('change');
-
-										}
-										else
-											$('select#isFFA').prop('readonly', false).trigger('change');
-									}).trigger('change');
-								});
-							</script>
-						<?php endif; ?>
+						<script>
+							$(document).bind('pageinit', function() {
+								$('select#isFFA').change(function() {
+									if($(this).val() == 1) {
+										$('.helper-ffa').show();
+										$('.helper-1on1').hide();
+									}
+									else {
+										$('.helper-ffa').hide();
+										$('.helper-1on1').show();
+									}
+								}).trigger('change');
+								
+								<?php $fieldId = $stage instanceof Stages\Groups ? 'slotsPerGroup' : 'maxSlots'; ?>
+								$('select#gamemode').change(function() {
+									var selected = $(this).children(':selected');
+									if(selected.jqmData('fixed-slots') == 2) {
+										$('select#isFFA').slider('disable').val(0).trigger('change');
+										$('input#<?php echo $fieldId; ?>').prop('readonly', false).trigger('change');
+									}
+									else if(selected.jqmData('fixed-slots')) {
+										$('select#isFFA').slider('disable').val(1).trigger('change');
+										$('input#<?php echo $fieldId; ?>').prop('readonly', true).val(selected.jqmData('fixed-slots')).trigger('change');
+									}
+									else {
+										$('select#isFFA').slider('enable').trigger('change');
+										$('input#<?php echo $fieldId; ?>').prop('readonly', false).trigger('change');
+									}
+								}).trigger('change');
+							});
+						</script>
 					<?php endif; ?>
 					<?php if($stage instanceof Stages\Groups): ?>
 						<li data-role="fieldcontain">
@@ -87,7 +101,7 @@ $r = ManiaLib\Application\Request::getInstance();
 							<label for="slotsPerGroup">
 								<strong><?php echo _('Slots per group'); ?></strong><br/>
 							</label>
-							<input type="text" name="slotsPerGroup" id="slotsPerGroup" value="<?php echo $stage->parameters['nbGroups'] ? $stage->maxSlots / $stage->parameters['nbGroups'] : 2; ?>" class="conditional-readonly"/>
+							<input type="text" name="slotsPerGroup" id="slotsPerGroup" value="<?php echo $stage->maxSlots / ($stage->parameters['nbGroups'] ?: 4) ?: 4; ?>"/>
 						</li>
 						<script>
 							$(document).bind('pageinit', function() {

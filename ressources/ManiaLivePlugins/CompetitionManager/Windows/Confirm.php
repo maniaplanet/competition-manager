@@ -24,7 +24,7 @@ class Confirm extends \ManiaLive\Gui\Window
 	{
 		$this->setSize(30, 10);
 		$this->setHalign('right');
-		$this->setPosition(125-Constants\UI::PIXEL, 81);
+		$this->setPosition(120-Constants\UI::PIXEL, -(55+Constants\UI::PIXEL));
 		
 		$this->blink = new Icons128x128_Blink();
 		$this->blink->setSubStyle(Icons128x128_Blink::ShareBlink);

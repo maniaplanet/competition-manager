@@ -21,17 +21,23 @@ use CompetitionManager\Utils\Formatting;
 
 class Index extends \ManiaLib\Application\View
 {
-	const CANCELLED = 0;
-	const UPCOMING = 1;
-	const OPENED_REGISTERED_QUALIFIERS = 2;
-	const OPENED_REGISTERED_LOBBY = 3;
-	const OPENED_REGISTERED_DEFAULT = 4;
-	const OPENED_ALLOWED = 5;
-	const OPENED_FULL = 6;
-	const OPENED_FORBIDDEN = 7;
-	const CLOSED_PLAYER = 8;
-	const CLOSED_VISITOR = 9;
-	const OVER = 10;
+	const CANCELLED                    = 0x00;
+	const UPCOMING                     = 0x01;
+	const OPENED_REGISTERED_QUALIFIERS = 0x32;
+	const OPENED_REGISTERED_LOBBY      = 0x03;
+	const OPENED_REGISTERED_DEFAULT    = 0x34;
+	const OPENED_ALLOWED               = 0x35;
+	const OPENED_FULL                  = 0x26;
+	const OPENED_FORBIDDEN             = 0x27;
+	const CLOSED_PLAYER                = 0x08;
+	const CLOSED_VISITOR               = 0x09;
+	const OVER                         = 0x0a;
+	
+	const SHOW_REGISTER   = 0x10;
+	const SHOW_UNREGISTER = 0x20;
+	
+	/** @var Cards\Window */
+	private $progressCard;
 	
 	function display()
 	{
@@ -45,28 +51,23 @@ class Index extends \ManiaLib\Application\View
 		$frame->setPosX(40);
 		
 		$frame->add($this->welcome());
+		$frame->add($this->progressCard = $this->progress());
 		
 		switch($this->response->displayState)
 		{
 			case self::CANCELLED:
-				$card = $this->progress(_('Cancelled'), _('Not enough players to start...'));
-				$card->setTitleBackground('810');
-				$frame->add($card);
+				$this->progressSetTitle(_('Cancelled'));
+				$this->progressAddLabel(_('Not enough players to start...'));
+				$this->progressCard->setTitleBackground('810');
 				break;
 			
 			case self::UPCOMING:
+				$this->progressSetTitle(_('Upcoming'));
 				if($this->response->time < new \DateTime())
-					$card = $this->progress(
-							_('Upcoming'),
-							_('Registrations will be opened soon!')
-						);
+					$this->progressAddLabel(_('Registrations will be opened soon!'));
 				else
-					$card = $this->progress(
-							_('Upcoming'),
-							sprintf(_('Registrations will be opened %s'), Formatting::timeIn($this->response->time->getTimestamp()))
-						);
-				$card->setTitleBackground('08fa');
-				$frame->add($card);
+					$this->progressAddLabel(sprintf(_('Registrations will be opened %s'), Formatting::timeIn($this->response->time->getTimestamp())));
+				$this->progressCard->setTitleBackground('08fa');
 				break;
 				
 			case self::OPENED_REGISTERED_QUALIFIERS:
@@ -74,107 +75,100 @@ class Index extends \ManiaLib\Application\View
 				break;
 			
 			case self::OPENED_REGISTERED_LOBBY:
-				$card = $this->progress(
-						_('Currently: ').$this->response->competition->getCurrentStage()->getName(),
-						$this->response->nextUserEvent->message,
-						array(
-							array(_('Join'), $this->response->nextUserEvent->link)
-						)
-					);
-				$frame->add($card);
+				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
+				$this->progressAddLabel($this->response->nextUserEvent->message);
+				$this->progressAddButton(_('Join'), $this->response->nextUserEvent->link);
 				break;
 			
 			case self::OPENED_REGISTERED_DEFAULT:
-				$card = $this->progress(
-						_('Currently: ').$this->response->competition->getCurrentStage()->getName(),
-						$this->response->nextUserEvent->message
-					);
-				$frame->add($card);
+				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
+				$this->progressAddLabel($this->response->nextUserEvent->message);
+				if(!$this->response->competition->isTeam)
+					$this->progressAddButton(_('Unregister'), $this->request->createLinkArgList('../unregister', 'c', 'external'));
 				break;
 			
 			case self::OPENED_ALLOWED:
-				$buttons = array();
-				if($this->response->competition->isTeam)
-				{
-					foreach($this->response->teams as $uniqId => $team)
-					{
-						$this->request->set('team', $uniqId);
-						$buttons[] = array(sprintf(_('Register %s'), '$<'.$team->name.'$>'), $this->request->createLinkArgList('../register', 'c', 'team', 'external'));
-					}
-					$this->request->restore('team');
-				}
-				else
-					$buttons[] = array(_('Register'), $this->request->createLinkArgList('../register', 'c', 'external'));
-				
-				$card = $this->progress(
-						_('Currently: ').$this->response->competition->getCurrentStage()->getName(),
-						_('Registrations are opened, don\'t wait!'),
-						$buttons
-					);
-				$frame->add($card);
+				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
+				$this->progressAddLabel(_('Registrations are opened, don\'t wait!'));
+				if(!$this->response->competition->isTeam)
+					$this->progressAddButton(_('Register'), $this->request->createLinkArgList('../register', 'c', 'external'));
 				break;
 				
 			case self::OPENED_FULL:
-				$card = $this->progress(
-						_('Currently: ').$this->response->competition->getCurrentStage()->getName(),
-						_('All slots have already been taken')
-					);
-				$frame->add($card);
+				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
+				$this->progressAddLabel(_('All slots have already been taken'));
 				break;
 			
 			case self::OPENED_FORBIDDEN:
-				$card = $this->progress(
-						_('Currently: ').$this->response->competition->getCurrentStage()->getName(),
-						$this->response->competition->isTeam ? _('You cannot register, as you are not an administrator of any team') : _('You cannot register, check the conditions to enter for more details')
-					);
-				$frame->add($card);
+				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
+				if($this->response->competition->isTeam)
+					$this->progressAddLabel(_('You cannot register, as you are not an administrator of any team'));
+				else
+					$this->progressAddLabel(_('You cannot register, check the conditions to enter for more details'));
 				break;
 			
 			case self::CLOSED_PLAYER:
-				$buttons = array();
+				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
+				$this->progressAddLabel($this->response->nextUserEvent->message);
 				if($this->response->nextUserEvent->match)
-					$buttons[] = array($this->response->nextUserEvent->match->name, $this->response->nextUserEvent->link);
-				$card = $this->progress(
-						_('Currently: ').$this->response->competition->getCurrentStage()->getName(),
-						$this->response->nextUserEvent->message,
-						$buttons
-					);
-				$frame->add($card);
-				if($this->response->nextUserEvent->match)
+				{
+					$this->progressAddButton($this->response->nextUserEvent->match->name, $this->response->nextUserEvent->link);
 					break;
+				}
 				
 			case self::CLOSED_VISITOR:
+				$this->progressSetTitle(_('Spectate!'));
 				if($this->response->runningMatches)
 				{
-					$message = _('There are matches playing right now, go watch some!');
-					$buttons = array_map(function($m) { return array($m->name, $m->getManialink()); }, array_slice($this->response->runningMatches, 0, 5));
+					$this->progressAddLabel(_('There are matches playing right now, go watch some!'));
+					foreach(array_slice($this->response->runningMatches, 0, 5) as $match)
+						$this->progressAddButton($match->name, $match->getManialink());
 				}
 				else if($this->response->nextMatches)
 				{
-					$message = _('Check the next upcoming matches!');
-					$buttons = array_map(function($m) { return array($m->name, $m->getManialink()); }, array_slice($this->response->nextMatches, 0, 5));
+					$this->progressAddLabel(_('Check the next upcoming matches!'));
+					foreach(array_slice($this->response->nextMatches, 0, 5) as $match)
+						$this->progressAddButton($match->name, $match->getManialink());
 				}
 				else
-				{
-					$message = _('No matches to watch at the moment, come back later!');
-					$buttons = array();
-				}
-					
-				
-				$card = $this->progress(_('Spectate!'), $message, $buttons);
-				$frame->add($card);
+					$this->progressAddLabel(_('No matches to watch at the moment, come back later!'));
 				break;
 				
 			case self::OVER:
-				$card = $this->progress(
-						_('Over'),
-						_('This competition is over, congratulations to all participants'),
-						array(
-							array(_('See full results'), $this->request->createLinkArgList('../results', 'c', 'external'))
-						)
-					);
-				$frame->add($card);
+				$this->progressSetTitle(_('Over'));
+				$this->progressAddLabel(_('This competition is over, congratulations to all participants'));
+				$this->progressAddButton(_('See full results'), $this->request->createLinkArgList('../results', 'c', 'external'));
 				break;
+		}
+		
+		// (Un)Register buttons need to be handled a bit differently with teams
+		if($this->response->competition->isTeam)
+		{
+			if($this->response->displayState & self::SHOW_REGISTER && $this->response->registrableTeams)
+			{
+				$this->progressAddLabel(_('These are the teams you can register!'));
+				foreach($this->response->registrableTeams as $uniqId => $team)
+				{
+					$this->request->set('team', $uniqId);
+					$this->progressAddButton(
+							sprintf(_('Register %s'), '$<'.$team->name.'$>'),
+							$this->request->createLinkArgList('../register', 'c', 'team', 'external')
+						);
+				}
+			}
+			if($this->response->displayState & self::SHOW_UNREGISTER && $this->response->unregistrableTeams)
+			{
+				$this->progressAddLabel(_('You still have time to unregister the following teams.'));
+				foreach($this->response->unregistrableTeams as $uniqId => $team)
+				{
+					$this->request->set('team', $uniqId);
+					$this->progressAddButton(
+							sprintf(_('Unregister %s'), '$<'.$team->name.'$>'),
+							$this->request->createLinkArgList('../unregister', 'c', 'team', 'external')
+						);
+				}
+			}
+			$this->request->restore('team');
 		}
 		
 		//$frame->add($this->sponsors());
@@ -200,52 +194,49 @@ class Index extends \ManiaLib\Application\View
 	/**
 	 * @return Cards\Window
 	 */
-	private function progress($title, $message, $buttons=array())
+	private function progress()
 	{
-		$card = new Cards\Window(Constants\UI::STANDARD_WIDTH, Constants\UI::TITLE_HEIGHT + 10);
+		$card = new Cards\Window(Constants\UI::STANDARD_WIDTH, Constants\UI::TITLE_HEIGHT+2);
 		$card->setTitleBackground('060a');
-		$card->setTitle($title);
-		
-		$ui = new Label(Constants\UI::STANDARD_WIDTH-10, 0);
+		$layout = new Layouts\Column();
+		$layout->setMarginHeight(2);
+		$layout->setBorderHeight(2);
+		$card->content->setLayout($layout);
+
+		return $card;
+	}
+	
+	private function progressSetTitle($title)
+	{
+		$this->progressCard->setTitle($title);
+	}
+	
+	private function progressAddLabel($message)
+	{
+		$ui = new Label(Constants\UI::STANDARD_WIDTH-10, 6);
 		$ui->setRelativeAlign('center');
-		$ui->setAlign('center', 'center2');
-		$ui->setPosY(-5);
+		$ui->setAlign('center');
 		$ui->setTextSize(2);
 		$ui->setTextColor('dddd');
 		$ui->setText($message);
-		$card->content->add($ui);
-		
-		if(!$buttons)
-			return $card;
-		
-		$layout = new Layouts\Column(80, -2);
-		$layout->setMarginHeight(2);
-		$frame = new Frame(80, -2);
-		$frame->setLayout($layout);
-		$frame->setRelativeAlign('center', 'bottom');
-		$frame->setAlign('center', 'bottom');
-		$frame->setPosY(2);
-		$card->content->add($frame);
-		
-		foreach($buttons as $button)
-		{
-			list($text, $link) = $button;
-			
-			$ui = new Cards\HighlightedLabel(80, 8);
-			$ui->highlight->setBgcolor('0606');
-			$ui->highlight->setBgcolorFocus('060a');
-			$ui->highlight->setManialink($link);
-			$ui->label->setRelativeHalign('center');
-			$ui->label->setHalign('center');
-			$ui->label->setTextSize(2);
-			$ui->label->setText($text);
-			$frame->add($ui);
-			$frame->setSizeY($frame->getSizeY() + 10);
-		}
-		
-		$card->setSizeY($card->getSizeY() + $frame->getSizeY() + 3);
-
-		return $card;
+		$this->progressCard->content->add($ui);
+		$this->progressCard->setSizeY($this->progressCard->getSizeY() + 8);
+	}
+	
+	private function progressAddButton($text, $link)
+	{
+		$ui = new Cards\HighlightedLabel(80, 8);
+		$ui->setRelativeHalign('center');
+		$ui->setHalign('center');
+		$ui->highlight->setBgcolor('0606');
+		$ui->highlight->setBgcolorFocus('060a');
+		$ui->highlight->setManialink($link);
+		$ui->label->setRelativeHalign('center');
+		$ui->label->setHalign('center');
+		$ui->label->setTextSize(2);
+		$ui->label->setText($text);
+		$this->progressCard->content->add($ui);
+		$this->progressCard->setSizeY($this->progressCard->getSizeY() + 10);
 	}
 
 	// FIXME

@@ -17,6 +17,14 @@ class Registrations extends \CompetitionManager\Services\Stage
 	{
 		$this->type = \CompetitionManager\Constants\StageType::REGISTRATIONS;
 		$this->schedule = new \CompetitionManager\Services\Schedules\Range();
+		$this->parameters['unregisterEndTime'] = null;
+	}
+	
+	protected function onFetchObject()
+	{
+		parent::onFetchObject();
+		if($this->parameters['unregisterEndTime'])
+			$this->parameters['unregisterEndTime'] = new \DateTime($this->parameters['unregisterEndTime']);
 	}
 	
 	function getName()

@@ -269,6 +269,22 @@ abstract class WebServicesProxy
 	}
 	
 	/**
+	 * @param int $competitionId
+	 * @param int $participantId
+	 */
+	static function onUnregistration($competitionId, $participantId)
+	{
+		$service = new CompetitionService();
+		$competition = $service->get($competitionId);
+		$service = new ParticipantService();
+		$participant = $service->get($participantId);
+		
+		// TODO update SDK external with upcoming tag before putting uncommenting
+//		if($competition->remoteId)
+//			self::competitions()->removeTeam($competition->remoteId, $participant->teamId);
+	}
+	
+	/**
 	 * @param int $matchId
 	 */
 	static function onMatchReady($matchId)

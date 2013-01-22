@@ -64,17 +64,17 @@ class Brackets extends \CompetitionManager\Services\Stage
 	
 	function getScheduleNames()
 	{
-		$matchNames = array();
+		$roundNames = array();
 		
 		for($round = 0; $round < $this->getWBRoundsCount(); ++$round)
-			$matchNames[] = $this->roundName($round, false, true);
+			$roundNames[] = $this->roundName($round, false, true);
 		if($this->parameters['withLosersBracket'])
 		{
 			for($round = 0; $round < $this->getLBRoundsCount(); ++$round)
-				$matchNames[] = $this->roundName($round, true, true);
+				$roundNames[] = $this->roundName($round, true, true);
 		}
 		
-		return $matchNames;
+		return $roundNames;
 	}
 	
 	function getIcon()

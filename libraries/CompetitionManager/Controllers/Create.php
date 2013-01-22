@@ -193,21 +193,33 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 		$errors = array();
 		$this->stage->minSlots = $this->request->getPost('minSlots', 0);
 		$this->stage->maxSlots = $this->request->getPost('maxSlots');
-		if($this->stage instanceof Stages\Groups)
+		if($this->stage instanceof Stages\Championship)
 		{
-			$this->stage->parameters['nbGroups'] = $this->request->getPost('nbGroups');
-			if($this->stage->parameters['nbGroups'] < 2)
-				$errors[] = _('There should be at least 2 groups');
-			if($this->request->getPost('slotsPerGroup') < 2)
-				$errors[] = _('There should be at least 2 slots per group');
+			$this->stage->parameters['isFreeForAll'] = (bool) $this->request->getPost('isFreeForAll');
+			$this->stage->parameters['numberOfRounds'] = (int) $this->request->getPost('numberOfRounds');
+			if($this->stage->parameters['numberOfRounds'] < 1)
+				$errors[] = _('There should be at least 1 round');
+			if($this->stage instanceof Stages\Groups)
+			{
+				$this->stage->parameters['numberOfGroups'] = (int) $this->request->getPost('numberOfGroups');
+				$this->stage->parameters['qualifiedPerGroup'] = (int) $this->request->getPost('qualifiedPerGroup');
+				if($this->stage->parameters['numberOfGroups'] < 2)
+					$errors[] = _('Number of groups should be at least 2');
+				if($this->stage->maxSlots / $this->stage->parameters['numberOfGroups'] < 2)
+					$errors[] = _('Slots per group should be at least 2');
+				if($this->stage->parameters['qualifiedPerGroup'] < 1)
+					$errors[] = _('Qualified per group should be at least 1');
+				else if($this->stage->parameters['qualifiedPerGroup'] > $this->stage->maxSlots / $this->stage->parameters['numberOfGroups'])
+					$errors[] = _('Qualified per group should be lower or equal than slots per group');
+			}
 		}
 		else if($this->stage instanceof Stages\Brackets)
 		{
-			$this->stage->parameters['slotsPerMatch'] = $this->request->getPost('slotsPerMatch');
+			$this->stage->parameters['slotsPerMatch'] = (int) $this->request->getPost('slotsPerMatch');
 			if($this->stage->parameters['slotsPerMatch'] < 2)
 				$errors[] = _('There should be at least 2 slots per match');
-			$this->stage->parameters['withLosersBracket'] = $this->request->getPost('withLosersBracket', false);
-			$this->stage->parameters['withSmallFinal'] = $this->stage->parameters['slotsPerMatch'] == 2 && $this->request->getPost('withSmallFinal', false);
+			$this->stage->parameters['withLosersBracket'] = (bool) $this->request->getPost('withLosersBracket', false);
+			$this->stage->parameters['withSmallFinal'] = (bool) ($this->stage->parameters['slotsPerMatch'] == 2 && $this->request->getPost('withSmallFinal', false));
 		}
 		if(!($this->stage instanceof Stages\Lobby))
 		{

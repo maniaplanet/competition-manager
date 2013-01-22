@@ -14,9 +14,10 @@ class Groups extends Championship
 	function __construct()
 	{
 		$this->type = \CompetitionManager\Constants\StageType::GROUPS;
-		$this->schedule = new \CompetitionManager\Services\Schedules\Range();
-		$this->parameters['nbRounds'] = 1;
-		$this->parameters['nbGroups'] = 4;
+		$this->schedule = new \CompetitionManager\Services\Schedules\MultiSimple();
+		$this->parameters['numberOfRounds'] = 1;
+		$this->parameters['numberOfGroups'] = 4;
+		$this->parameters['qualifiedPerGroup'] = 2;
 	}
 	
 	function getName()

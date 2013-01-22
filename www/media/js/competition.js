@@ -2,7 +2,7 @@ $(document).bind('pageinit', function() {
 	$('select#isTeam').parent().find('.ui-slider-switch').css('width', '7em');
 	$('select#isLan').parent().find('.ui-slider-switch').css('width', '7em');
 	$('select#isScheduled').parent().find('.ui-slider-switch').css('width', '10em');
-	$('select#isFFA').parent().find('.ui-slider-switch').css('width', '10em');
+	$('select#isFreeForAll').parent().find('.ui-slider-switch').css('width', '10em');
 	$('#competitions-filter').prev().css('margin-top', '30px');
 	
 	$('select#isTeam').change(function() {

@@ -42,25 +42,25 @@ $r = ManiaLib\Application\Request::getInstance();
 					<?php endif; ?>
 					<?php if($stage instanceof Stages\Championship): ?>
 						<li data-role="fieldcontain">
-							<label for="isFFA">
+							<label for="isFreeForAll">
 								<strong><?php echo _('Matches type'); ?></strong><br/>
 							</label>
-							<select id="isFFA" name="isFFA" data-role="slider">
-								<option value="0" <?php echo !true ? 'selected="selected"' : ''; ?>><?php echo _('One-on-one'); ?></option>
-								<option value="1" <?php echo true ? 'selected="selected"' : ''; ?>><?php echo _('Free for all'); ?></option>
+							<select id="isFreeForAll" name="isFreeForAll" data-role="slider">
+								<option value="0" <?php echo !$stage->parameters['isFreeForAll'] ? 'selected="selected"' : ''; ?>><?php echo _('One-On-One'); ?></option>
+								<option value="1" <?php echo $stage->parameters['isFreeForAll'] ? 'selected="selected"' : ''; ?>><?php echo _('Free For All'); ?></option>
 							</select>
 						</li>
 						<li data-role="fieldcontain">
-							<label for="nbRounds">
+							<label for="numberOfRounds">
 								<strong><?php echo _('Number of rounds'); ?></strong><br/>
 								<i class="helper-ffa"><?php echo _('How many matches will be played'); ?></i>
 								<i class="helper-1on1"><?php echo sprintf(_('How many matches between each %s'), $competition->isTeam ? _('teams') : _('players')); ?></i>
 							</label>
-							<input type="text" name="nbRounds" id="nbRounds" value="<?php echo $stage->parameters['nbRounds']; ?>"/>
+							<input type="text" name="numberOfRounds" id="numberOfRounds" value="<?php echo $stage->parameters['numberOfRounds']; ?>"/>
 						</li>
 						<script>
 							$(document).bind('pageinit', function() {
-								$('select#isFFA').change(function() {
+								$('select#isFreeForAll').change(function() {
 									if($(this).val() == 1) {
 										$('.helper-ffa').show();
 										$('.helper-1on1').hide();
@@ -75,15 +75,15 @@ $r = ManiaLib\Application\Request::getInstance();
 								$('select#gamemode').change(function() {
 									var selected = $(this).children(':selected');
 									if(selected.jqmData('fixed-slots') == 2) {
-										$('select#isFFA').slider('disable').val(0).trigger('change');
+										$('select#isFreeForAll').slider('disable').val(0).trigger('change');
 										$('input#<?php echo $fieldId; ?>').prop('readonly', false).trigger('change');
 									}
 									else if(selected.jqmData('fixed-slots')) {
-										$('select#isFFA').slider('disable').val(1).trigger('change');
+										$('select#isFreeForAll').slider('disable').val(1).trigger('change');
 										$('input#<?php echo $fieldId; ?>').prop('readonly', true).val(selected.jqmData('fixed-slots')).trigger('change');
 									}
 									else {
-										$('select#isFFA').slider('enable').trigger('change');
+										$('select#isFreeForAll').slider('enable').trigger('change');
 										$('input#<?php echo $fieldId; ?>').prop('readonly', false).trigger('change');
 									}
 								}).trigger('change');
@@ -92,31 +92,37 @@ $r = ManiaLib\Application\Request::getInstance();
 					<?php endif; ?>
 					<?php if($stage instanceof Stages\Groups): ?>
 						<li data-role="fieldcontain">
-							<label for="nbGroups">
+							<label for="numberOfGroups">
 								<strong><?php echo _('Number of groups'); ?></strong><br/>
 							</label>
-							<input type="text" name="nbGroups" id="nbGroups" value="<?php echo $stage->parameters['nbGroups']; ?>"/>
+							<input type="text" name="numberOfGroups" id="numberOfGroups" value="<?php echo $stage->parameters['numberOfGroups']; ?>"/>
 						</li>
 						<li data-role="fieldcontain">
 							<label for="slotsPerGroup">
 								<strong><?php echo _('Slots per group'); ?></strong><br/>
 							</label>
-							<input type="text" name="slotsPerGroup" id="slotsPerGroup" value="<?php echo $stage->maxSlots / ($stage->parameters['nbGroups'] ?: 4) ?: 4; ?>"/>
+							<input type="text" id="slotsPerGroup" value="<?php echo $stage->maxSlots / ($stage->parameters['nbGroups'] ?: 4) ?: 4; ?>"/>
+						</li>
+						<li data-role="fieldcontain">
+							<label for="qualifiedPerGroup">
+								<strong><?php echo _('Qualified per group'); ?></strong><br/>
+							</label>
+							<input type="text" name="qualifiedPerGroup" id="qualifiedPerGroup" value="<?php echo $stage->parameters['qualifiedPerGroup'] ?: 2; ?>"/>
 						</li>
 						<script>
 							$(document).bind('pageinit', function() {
-								$('#nbGroups, #slotsPerGroup').change(function() {
-									$('#maxSlots').val(parseInt($('#nbGroups').val()) * parseInt($('#slotsPerGroup').val()))
+								$('#numberOfGroups, #slotsPerGroup').change(function() {
+									$('#maxSlots').val(parseInt($('#numberOfGroups').val()) * parseInt($('#slotsPerGroup').val()))
 								}).trigger('change');
 							});
 						</script>
 					<?php elseif($stage instanceof Stages\Brackets): ?>
 						<li data-role="fieldcontain">
-							<label for="nbRounds">
+							<label for="numberOfRounds">
 								<strong><?php echo _('Number of rounds'); ?></strong><br/>
 								<i><?php echo _('How many matches to final (included)'); ?></i>
 							</label>
-							<input type="text" id="nbRounds" value="<?php echo $stage->getWBRoundsCount(); ?>"/>
+							<input type="text" id="numberOfRounds" value="<?php echo $stage->getWBRoundsCount(); ?>"/>
 						</li>
 						<li data-role="fieldcontain">
 							<label for="slotsPerMatch">
@@ -126,8 +132,8 @@ $r = ManiaLib\Application\Request::getInstance();
 						</li>
 						<script>
 							$(document).bind('pageinit', function() {
-								$('#nbRounds, #slotsPerMatch').change(function() {
-									$('#maxSlots').val(parseInt($('#slotsPerMatch').val()) * Math.pow(2, parseInt($('#nbRounds').val()) - 1))
+								$('#numberOfRounds, #slotsPerMatch').change(function() {
+									$('#maxSlots').val(parseInt($('#slotsPerMatch').val()) * Math.pow(2, parseInt($('#numberOfRounds').val()) - 1))
 								}).trigger('change');
 							});
 						</script>

@@ -143,12 +143,13 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 			else
 				$this->response->displayState = Index::OPENED_FORBIDDEN;
 			
-			// Using can(Un)Register methods side effects for teams
+			$this->response->canRegister = $this->canRegister();
+			$this->response->canUnregister = $this->canUnregister();
 			if($this->competition->isTeam)
 			{
-				if($this->canRegister())
+				if($this->response->canRegister)
 					$this->response->registrableTeams = $this->registrableTeams;
-				if($this->canUnregister())
+				if($this->response->canUnregister)
 					$this->response->unregistrableTeams = $this->unregistrableTeams;
 //				$this->response->teams = WebServicesProxy::getUserTeams();
 			}
@@ -534,17 +535,16 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	
 	private function doUnregister($team=null)
 	{
-		$service = new \CompetitionManager\Services\StageService();
 		if($this->competition->isTeam)
 		{
 			$teams = WebServicesProxy::getUserTeams();
-			$service->excludeParticipants(reset($this->competition->stages)->stageId, array($teams[$team]));
+			reset($this->competition->stages)->onUnregistration($teams[$team]->participantId);
 			WebServicesProxy::onUnregistration($this->competition->competitionId, $teams[$team]->participantId);
 			Filters\NextPageMessage::success(sprintf(_('You successfully unregistered %s!'), '$<$i'.$teams[$team]->name.'$>'));
 		}
 		else
 		{
-			$service->excludeParticipants(reset($this->competition->stages)->stageId, $this->getUserParticipation());
+			reset($this->competition->stages)->onUnregistration(WebServicesProxy::getUser()->participantId);
 			WebServicesProxy::onUnregistration($this->competition->competitionId, WebServicesProxy::getUser()->participantId);
 			Filters\NextPageMessage::success(_('You have been successfully unregistered!'));
 		}

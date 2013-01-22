@@ -64,6 +64,12 @@ class Registrations extends \CompetitionManager\Services\Stage
 		$service->updateStageInfo($this->stageId, $participantId, rand(1, $this->maxSlots ?: 1337), null, null);
 	}
 	
+	function onUnregistration($participantId)
+	{
+		$service = new \CompetitionManager\Services\StageService();
+		$service->excludeParticipants($this->stageId, array($participantId));
+	}
+	
 	function onRun()
 	{
 		if($this->endTime < new \DateTime())

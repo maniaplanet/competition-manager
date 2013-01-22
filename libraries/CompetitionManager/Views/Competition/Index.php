@@ -83,15 +83,11 @@ class Index extends \ManiaLib\Application\View
 			case self::OPENED_REGISTERED_DEFAULT:
 				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
 				$this->progressAddLabel($this->response->nextUserEvent->message);
-				if(!$this->response->competition->isTeam)
-					$this->progressAddButton(_('Unregister'), $this->request->createLinkArgList('../unregister', 'c', 'external'));
 				break;
 			
 			case self::OPENED_ALLOWED:
 				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
 				$this->progressAddLabel(_('Registrations are opened, don\'t wait!'));
-				if(!$this->response->competition->isTeam)
-					$this->progressAddButton(_('Register'), $this->request->createLinkArgList('../register', 'c', 'external'));
 				break;
 				
 			case self::OPENED_FULL:
@@ -141,10 +137,12 @@ class Index extends \ManiaLib\Application\View
 				break;
 		}
 		
-		// (Un)Register buttons need to be handled a bit differently with teams
-		if($this->response->competition->isTeam)
+		// (Un)Register buttons need to be handled a bit differently
+		if($this->response->displayState & self::SHOW_REGISTER && $this->response->canRegister)
 		{
-			if($this->response->displayState & self::SHOW_REGISTER && $this->response->registrableTeams)
+			if(!$this->response->competition->isTeam)
+				$this->progressAddButton(_('Register'), $this->request->createLinkArgList('../register', 'c', 'external'));
+			else if($this->response->registrableTeams)
 			{
 				$this->progressAddLabel(_('These are the teams you can register!'));
 				foreach($this->response->registrableTeams as $uniqId => $team)
@@ -156,7 +154,13 @@ class Index extends \ManiaLib\Application\View
 						);
 				}
 			}
-			if($this->response->displayState & self::SHOW_UNREGISTER && $this->response->unregistrableTeams)
+			
+		}
+		if($this->response->displayState & self::SHOW_UNREGISTER && $this->response->canUnregister)
+		{
+			if(!$this->response->competition->isTeam)
+				$this->progressAddButton(_('Unregister'), $this->request->createLinkArgList('../unregister', 'c', 'external'));
+			else if($this->response->unregistrableTeams)
 			{
 				$this->progressAddLabel(_('You still have time to unregister the following teams.'));
 				foreach($this->response->unregistrableTeams as $uniqId => $team)
@@ -168,8 +172,8 @@ class Index extends \ManiaLib\Application\View
 						);
 				}
 			}
-			$this->request->restore('team');
 		}
+		$this->request->restore('team');
 		
 		//$frame->add($this->sponsors());
 		$frame->save();

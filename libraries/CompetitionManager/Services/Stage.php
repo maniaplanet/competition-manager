@@ -188,6 +188,15 @@ abstract class Stage extends AbstractObject
 		return false;
 	}
 	
+	/**
+	 * @param int $participantId
+	 * @return bool
+	 */
+	function onUnregistration($participantId)
+	{
+		return false;
+	}
+	
 	function onRun()
 	{
 		$service = new StageService();

@@ -1,6 +1,7 @@
 <?php
 require __DIR__.'/../Header.php';
-use CompetitionManager\WebUI\HTML;
+use CompetitionManager\Services\Stages;
+use CompetitionManager\Services\Schedules;
 $r = ManiaLib\Application\Request::getInstance();
 ?>
 <div data-role="page">
@@ -13,7 +14,7 @@ $r = ManiaLib\Application\Request::getInstance();
 		<div class="content-primary">
 			<form name="config" action="<?php echo $r->createLinkArgList('../set-schedule', 's'); ?>" method="post" data-ajax="false" data-role="collapsible-group">
 				<fieldset data-role="collapsible" data-collapsed="false" data-theme="b">
-				<?php if($stage->schedule instanceof \CompetitionManager\Services\Schedules\Simple): ?>
+				<?php if($stage->schedule instanceof Schedules\Simple): ?>
 					<legend><?php echo reset($stage->getScheduleNames()); ?></legend>
 					<ul data-role="listview">
 						<li data-role="fieldcontain">
@@ -23,7 +24,7 @@ $r = ManiaLib\Application\Request::getInstance();
 							<input type="text" name="startTime" id="startTime" value="<?php echo $stage->schedule->startTime; ?>" data-role="datetime-picker" data-step-minutes="5"/>
 						</li>
 					</ul>
-				<?php elseif($stage->schedule instanceof \CompetitionManager\Services\Schedules\Range): ?>
+				<?php elseif($stage->schedule instanceof Schedules\Range): ?>
 					<legend><?php echo reset($stage->getScheduleNames()); ?></legend>
 					<ul data-role="listview">
 						<li data-role="fieldcontain">
@@ -38,8 +39,17 @@ $r = ManiaLib\Application\Request::getInstance();
 							</label>
 							<input type="text" name="endTime" id="endTime" value="<?php echo $stage->schedule->endTime; ?>" data-role="datetime-picker" data-step-minutes="5"/>
 						</li>
+					<?php if($stage instanceof Stages\Registrations): ?>
+						<li data-role="fieldcontain">
+							<label for="unregisterEndTime">
+								<strong><?php echo _('Unregistration limit'); ?></strong><br/>
+								<i><?php echo _('Until when it is possible to unregister (always allowed by default)'); ?></i>
+							</label>
+							<input type="text" name="unregisterEndTime" id="unregisterEndTime" value="<?php echo $stage->parameters['unregisterEndTime']; ?>" data-role="datetime-picker" data-step-minutes="5"/>
+						</li>
+					<?php endif; ?>
 					</ul>
-				<?php elseif($stage->schedule instanceof \CompetitionManager\Services\Schedules\MultiSimple): ?>
+				<?php elseif($stage->schedule instanceof Schedules\MultiSimple): ?>
 					<?php $matchNames = $stage->getScheduleNames(); ?>
 					<legend><?php echo _('Set start times'); ?></legend>
 					<ul data-role="listview">

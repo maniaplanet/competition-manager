@@ -341,6 +341,8 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 					$errors[] = _('You have to set an end time.');
 				else if($this->stage->schedule->startTime && $this->stage->schedule->endTime < $this->stage->schedule->startTime)
 					$errors[] = _('This stage cannot end before it starts.');
+				if($this->stage instanceof Stages\Registrations)
+					$this->stage->parameters['unregisterEndTime'] = $this->request->getPost('unregisterEndTime');
 			}
 		}
 		else

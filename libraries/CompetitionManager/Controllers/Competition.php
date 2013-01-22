@@ -113,7 +113,6 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		else if($firstStage->state == State::STARTED)
 		{
 			$participant = $this->getUserParticipation();
-			$canRegisterCalled = true;
 			if($participant)
 			{
 				if($firstStage instanceof Stages\OpenStage)
@@ -136,7 +135,6 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 				}
 				else
 					$this->response->displayState = Index::OPENED_REGISTERED_DEFAULT;
-				$canRegisterCalled = false;
 			}
 			else if($this->canRegister())
 				$this->response->displayState = Index::OPENED_ALLOWED;
@@ -148,11 +146,10 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 			// Using can(Un)Register methods side effects for teams
 			if($this->competition->isTeam)
 			{
-				if(!$canRegisterCalled)
-					$this->canRegister();
-				$this->canUnregister();
-				$this->response->registrableTeams = $this->registrableTeams;
-				$this->response->unregistrableTeams = $this->unregistrableTeams;
+				if($this->canRegister())
+					$this->response->registrableTeams = $this->registrableTeams;
+				if($this->canUnregister())
+					$this->response->unregistrableTeams = $this->unregistrableTeams;
 //				$this->response->teams = WebServicesProxy::getUserTeams();
 			}
 		}
@@ -396,11 +393,15 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	
 	private function canRegister($team=null)
 	{
+		static $canRegister = null;
+		if($canRegister !== null)
+			return $canRegister;
+		
 		$first = reset($this->competition->stages);
 		
 		// Registrations are closed or not opened yet
 		if($first->state != State::STARTED)
-			return false;
+			return $canRegister = false;
 		
 		$service = new \CompetitionManager\Services\ParticipantService();
 		if($this->competition->isTeam)
@@ -417,38 +418,42 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 				}
 				
 				if(!$this->registrableTeams)
-					return false;
+					return $canRegister = false;
 			}
 			// When trying to register a team
 			else if(!\ManiaLib\Utils\Arrays::get(WebServicesProxy::getUserTeams(), $team))
-				return false;
+				return $canRegister = false;
 		}
 		else
 		{
 			// Player is already registered
 			if($this->getUserParticipation())
-				return false;
+				return $canRegister = false;
 			// Player does not own the title used in this competition
 			if(!$service->hasTitle(WebServicesProxy::getUser()->participantId, $this->competition->title))
-				return false;
+				return $canRegister = false;
 		}
 		
 		// No slot limits
 		if($first->maxSlots == 0)
-			return true;
+			return $canRegister = true;
 		
 		// Check slots availability
 		$service = new \CompetitionManager\Services\ParticipantService();
-		return $service->countByStage($first->stageId) < $first->maxSlots;
+		return $canRegister = $service->countByStage($first->stageId) < $first->maxSlots;
 	}
 	
 	private function canUnregister($team=null)
 	{
+		static $canUnregister = null;
+		if($canUnregister !== null)
+			return $canUnregister;
+		
 		$first = reset($this->competition->stages);
 		
 		// Registrations are closed or not opened yet
 		if($first->state != State::STARTED || !($first instanceof Stages\Registrations))
-			return false;
+			return $canUnregister = false;
 		
 		$service = new \CompetitionManager\Services\ParticipantService();
 		if($this->competition->isTeam)
@@ -463,17 +468,17 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 				}
 				
 				if(!$this->unregistrableTeams)
-					return false;
+					return $canUnregister = false;
 			}
 			// When trying to unregister a team
 			else if( !($team = \ManiaLib\Utils\Arrays::get(WebServicesProxy::getUserTeams(), $team))
 					|| !$service->isRegisteredInCompetition($team->participantId, $this->competition->competitionId))
-				return false;
+				return $canUnregister = false;
 		}
 		else if(!$this->getUserParticipation())
-			return false;
+			return $canUnregister = false;
 		
-		return !$first->parameters['unregisterEndTime'] || $first->parameters['unregisterEndTime'] > new \DateTime();
+		return $canUnregister = !$first->parameters['unregisterEndTime'] || $first->parameters['unregisterEndTime'] > new \DateTime();
 	}
 	
 	private function billRegister($transaction, $external=false, $team=null)
@@ -533,7 +538,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		if($this->competition->isTeam)
 		{
 			$teams = WebServicesProxy::getUserTeams();
-			$service->excludeParticipants(reset($this->competition->stages)->stageId, $teams[$team]);
+			$service->excludeParticipants(reset($this->competition->stages)->stageId, array($teams[$team]));
 			WebServicesProxy::onUnregistration($this->competition->competitionId, $teams[$team]->participantId);
 			Filters\NextPageMessage::success(sprintf(_('You successfully unregistered %s!'), '$<$i'.$teams[$team]->name.'$>'));
 		}

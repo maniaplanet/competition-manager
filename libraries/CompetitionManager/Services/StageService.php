@@ -101,17 +101,22 @@ class StageService extends \DedicatedManager\Services\AbstractService
 	
 	/**
 	 * @param int $stageId
-	 * @param int[] $participants
+	 * @param mixed[] $participants
 	 */
 	function excludeParticipants($stageId, $participants)
 	{
 		if(empty($participants))
 			return;
 		
+		$values = array_map(
+				function ($participant) {
+					return sprintf('%d', $participant instanceof Participant ? $participant->participantId : $participant);
+				},
+				$participants);
 		$this->db()->execute(
 				'DELETE FROM StageParticipants WHERE stageId=%d AND participantId IN (%s)',
 				$stageId,
-				implode(',', array_map(function ($participantId) { return sprintf('%d', $participantId); }, $participants))
+				implode(',', $values)
 			);
 	}
 	

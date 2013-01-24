@@ -103,12 +103,6 @@ $r = ManiaLib\Application\Request::getInstance();
 							</label>
 							<input type="text" id="slotsPerGroup" value="<?php echo $stage->maxSlots / ($stage->parameters['nbGroups'] ?: 4) ?: 4; ?>"/>
 						</li>
-						<li data-role="fieldcontain">
-							<label for="qualifiedPerGroup">
-								<strong><?php echo _('Qualified per group'); ?></strong><br/>
-							</label>
-							<input type="text" name="qualifiedPerGroup" id="qualifiedPerGroup" value="<?php echo $stage->parameters['qualifiedPerGroup'] ?: 2; ?>"/>
-						</li>
 						<script>
 							$(document).bind('pageinit', function() {
 								$('#numberOfGroups, #slotsPerGroup').change(function() {

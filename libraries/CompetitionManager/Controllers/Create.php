@@ -202,15 +202,10 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 			if($this->stage instanceof Stages\Groups)
 			{
 				$this->stage->parameters['numberOfGroups'] = (int) $this->request->getPost('numberOfGroups');
-				$this->stage->parameters['qualifiedPerGroup'] = (int) $this->request->getPost('qualifiedPerGroup');
 				if($this->stage->parameters['numberOfGroups'] < 2)
 					$errors[] = _('Number of groups should be at least 2');
 				if($this->stage->maxSlots / $this->stage->parameters['numberOfGroups'] < 2)
 					$errors[] = _('Slots per group should be at least 2');
-				if($this->stage->parameters['qualifiedPerGroup'] < 1)
-					$errors[] = _('Qualified per group should be at least 1');
-				else if($this->stage->parameters['qualifiedPerGroup'] > $this->stage->maxSlots / $this->stage->parameters['numberOfGroups'])
-					$errors[] = _('Qualified per group should be lower or equal than slots per group');
 			}
 		}
 		else if($this->stage instanceof Stages\Brackets)

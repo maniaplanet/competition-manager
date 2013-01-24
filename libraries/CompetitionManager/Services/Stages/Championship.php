@@ -29,9 +29,11 @@ class Championship extends \CompetitionManager\Services\Stage
 		
 	}
 	
-	function getRoundsCount()
+	function getRoundsCount($slots=null)
 	{
-		return $this->parameters['numberOfRounds'] * ($this->parameters['isFreeForAll'] ? 1 : $this->maxSlots-!($this->maxSlots&1));
+		if($slots === null)
+			$slots = $this->maxSlots;
+		return $this->parameters['numberOfRounds'] * ($this->parameters['isFreeForAll'] ?: $slots-!($slots&1));
 	}
 	
 	function getScheduleNames()
@@ -59,11 +61,14 @@ class Championship extends \CompetitionManager\Services\Stage
 		$this->matches = array();
 		$service = new \CompetitionManager\Services\MatchService();
 		
-		for($round = 0; $round < $this->getRoundsCount(); ++$round)
+		if($this->parameters['isFreeForAll'])
 		{
-			if($this->parameters['isFreeForAll'])
+			for($round=0; $round<$this->getRoundsCount(); ++$round)
 				$this->matches[] = $this->createMatch($service, $round)->matchId;
-			else
+		}
+		else
+		{
+			for($round=0; $round<$this->getRoundsCount(); ++$round)
 			{
 				$roundMatches = array();
 				for($i=0; $i<$this->maxSlots>>1; ++$i)
@@ -95,11 +100,11 @@ class Championship extends \CompetitionManager\Services\Stage
 		}
 		else
 		{
+			// Removing unnecessary matches
 			$nbParticipants = count($participants);
 			$nbMatchesPerRound = $nbParticipants>>1;
 			if($nbParticipants < $this->maxSlots)
 			{
-				$this->maxSlots = $nbParticipants;
 				foreach(array_splice($this->matches, -$this->getRoundsCount()) as $matchId)
 					$matchService->delete($matchId);
 				foreach($this->matches as &$roundMatches)
@@ -110,13 +115,14 @@ class Championship extends \CompetitionManager\Services\Stage
 				$stageService->update($this);
 			}
 			
+			// Assigning participants to their matches
 			if($nbParticipants & 1)
 				$participants[] = null;
 			list($homeParticipants, $awayParticipants) = array_chunk($participants, count($participants)>>1);
 			foreach($this->matches as $roundMatches)
 			{
-				foreach($roundMatches as $i => $matchId)
-					$matchService->assignParticipants($matchId, array($homeParticipants[$i], $awayParticipants[$i]), $this->rules->getDefaultDetails());
+				foreach($roundMatches as $index => $matchId)
+					$matchService->assignParticipants($matchId, array($homeParticipants[$index], $awayParticipants[$index]), $this->rules->getDefaultDetails());
 				array_unshift($homeParticipants, array_shift($awayParticipants));
 				array_splice($awayParticipants, -1, 0, array_pop($homeParticipants));
 			}

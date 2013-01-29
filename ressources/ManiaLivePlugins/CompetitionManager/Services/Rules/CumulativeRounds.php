@@ -9,7 +9,9 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
-use ManiaLive\DedicatedApi\Callback\Event;
+use ManiaLive\DedicatedApi\Callback;
+use ManiaLive\Event\Dispatcher;
+use ManiaLivePlugins\CompetitionManager\Event;
 
 class CumulativeRounds extends Rounds
 {
@@ -32,12 +34,13 @@ class CumulativeRounds extends Rounds
 	
 	function getNeededEvents()
 	{
-		return Event::ON_END_ROUND | Event::ON_END_MATCH;
+		return Callback\Event::ON_END_ROUND | Callback\Event::ON_END_MATCH;
 	}
 	
 	function onEndRound()
 	{
-		return ++$this->roundsDone == $this->roundsLimit;
+		if(++$this->roundsDone == $this->roundsLimit)
+			Dispatcher::dispatch(new Event(Event::ON_RULES_END_MAP));
 	}
 	
 	function onEndMatch($rankings, $winnerTeamOrMap)
@@ -66,7 +69,8 @@ class CumulativeRounds extends Rounds
 			$lastScore = $player->score;
 		}
 		
-		return ++$this->mapsDone == count(\ManiaLive\Data\Storage::getInstance()->maps);
+		if(++$this->mapsDone == count(\ManiaLive\Data\Storage::getInstance()->maps))
+			Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
 	}
 	
 	function _json_wakeup()

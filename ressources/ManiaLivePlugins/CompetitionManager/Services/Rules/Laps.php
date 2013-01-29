@@ -9,7 +9,10 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
-class Laps extends AbstractRules
+use ManiaLive\Event\Dispatcher;
+use ManiaLivePlugins\CompetitionManager\Event;
+
+class Laps extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 {
 	public $gamemode = GameInfos::GAMEMODE_LAPS;
 	public $lapsLimit = 0;
@@ -36,7 +39,7 @@ class Laps extends AbstractRules
 				$match->participants[$ranking['Login']]->score = $ranking['BestTime'];
 			}
 		
-		return true;
+		Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
 	}
 }
 

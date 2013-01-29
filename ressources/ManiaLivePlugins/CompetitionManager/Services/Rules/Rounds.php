@@ -11,7 +11,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
 use DedicatedApi\Structures\GameInfos;
 
-abstract class Rounds extends AbstractRules
+abstract class Rounds extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 {
 	public $gameMode = GameInfos::GAMEMODE_ROUNDS;
 }

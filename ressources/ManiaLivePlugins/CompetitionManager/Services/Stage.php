@@ -33,7 +33,7 @@ class Stage extends AbstractObject
 	public $startTime;
 	/** @var \DateTime */
 	public $endTime;
-	/** @var Rules\AbstractRules */
+	/** @var Rules */
 	public $rules;
 	/** @var mixed[] */
 	public $matches;

@@ -11,7 +11,7 @@ namespace CompetitionManager\Services\Stages;
 
 use CompetitionManager\Constants\State;
 
-class SingleMatch extends \CompetitionManager\Services\Stage
+class SingleMatch extends \CompetitionManager\Services\Stage implements IntermediateCompliant, LastCompliant
 {
 	function __construct()
 	{
@@ -84,6 +84,15 @@ class SingleMatch extends \CompetitionManager\Services\Stage
 	function onEnd()
 	{
 		
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Interfaces implementation
+	///////////////////////////////////////////////////////////////////////////
+	
+	function getPlaceholder($rank)
+	{
+		return sprintf(_('%d of previous stage'), $rank);
 	}
 }
 

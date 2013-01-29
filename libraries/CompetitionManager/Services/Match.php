@@ -21,7 +21,7 @@ class Match extends \CompetitionManager\Services\AbstractObject
 	public $startTime;
 	/** @var \DateTime */
 	public $endTime;
-	/** @var Rules\AbstractRules */
+	/** @var Rules */
 	public $rules;
 	/** @var int */
 	public $state;
@@ -111,7 +111,7 @@ class Match extends \CompetitionManager\Services\AbstractObject
 		$isLan = $matchService->isLAN($this->matchId);
 
 		$options = new \DedicatedManager\Services\ServerOptions();
-		$options->name = $this->name;
+		$options->name = '#'.$this->matchId.' '.($this->name ?: ($stage instanceof Stages\Lobby ? 'Lobby' : 'Match'));
 		$options->nextMaxPlayers = (int) !$stage->previousId;
 		$options->allowMapDownload = false;
 		$options->autoSaveReplays = !($stage instanceof Stages\Lobby);

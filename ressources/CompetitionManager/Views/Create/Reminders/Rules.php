@@ -2,11 +2,11 @@
 <?php if(!($locStage instanceof Stages\Lobby)): ?>
 	<li><span style="font-weight:normal"><?php echo _('Max Slots:'); ?></span> <?php echo $locStage->maxSlots; ?></li>
 <?php endif; ?>
-<?php if($locStage instanceof Stages\Championship): ?>
+<?php if($locStage instanceof Stages\Groups): ?>
 	<li><span style="font-weight:normal"><?php echo _('Matches Type:'); ?></span> <?php echo $locStage->parameters['isFreeForAll'] ? _('Free For All') : _('One-On-One'); ?></li>
-	<?php if($locStage instanceof Stages\Groups): ?>
+	<li><span style="font-weight:normal"><?php echo _('Rounds Number:'); ?></span> <?php echo $locStage->parameters['numberOfRounds']; ?></li>
+	<?php if(!($locStage instanceof Stages\Championship)): ?>
 		<li><span style="font-weight:normal"><?php echo _('Groups Number:'); ?></span> <?php echo $locStage->parameters['numberOfGroups']; ?></li>
-		<li><span style="font-weight:normal"><?php echo _('Qualified Per Group:'); ?></span> <?php echo $locStage->parameters['qualifiedPerGroups']; ?></li>
 	<?php endif; ?>
 <?php elseif($locStage instanceof Stages\Brackets): ?>
 	<li><span style="font-weight:normal"><?php echo _('Slots Per Match:'); ?></span> <?php echo $locStage->parameters['slotsPerMatch']; ?></li>

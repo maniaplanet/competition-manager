@@ -9,7 +9,7 @@
 
 namespace CompetitionManager\Services\Stages;
 
-class Championship extends \CompetitionManager\Services\Stage
+class Championship extends Groups implements LastCompliant
 {
 	function __construct()
 	{
@@ -17,6 +17,10 @@ class Championship extends \CompetitionManager\Services\Stage
 		$this->schedule = new \CompetitionManager\Services\Schedules\MultiSimple();
 		$this->parameters['isFreeForAll'] = false;
 		$this->parameters['numberOfRounds'] = 1;
+		$this->parameters['pointsForWin'] = 2;
+		$this->parameters['pointsForLoss'] = 1;
+		$this->parameters['pointsForForfeit'] = 0;
+		$this->parameters['scoringSystem'] = null;
 	}
 	
 	function getName()
@@ -34,21 +38,6 @@ class Championship extends \CompetitionManager\Services\Stage
 		if($slots === null)
 			$slots = $this->maxSlots;
 		return $this->parameters['numberOfRounds'] * ($this->parameters['isFreeForAll'] ?: $slots-!($slots&1));
-	}
-	
-	function getScheduleNames()
-	{
-		$roundNames = array();
-		
-		for($round = 1; $round <= $this->getRoundsCount(); ++$round)
-			$roundNames[] = sprintf(_('Round #%d'), $round);
-		
-		return $roundNames;
-	}
-	
-	function getIcon()
-	{
-		
 	}
 	
 	function getAction()
@@ -76,18 +65,6 @@ class Championship extends \CompetitionManager\Services\Stage
 				$this->matches[] = $roundMatches;
 			}
 		}
-	}
-	
-	private function createMatch($service, $round)
-	{
-		$match = new \CompetitionManager\Services\Match();
-		$match->name = sprintf(_('Round #%d'), $round+1);
-		$match->stageId = $this->stageId;
-		if(isset($this->schedule->startTimes[$round]))
-			$match->startTime = $this->schedule->startTimes[$round];
-		$service->create($match);
-		
-		return $match;
 	}
 	
 	function onReady($participants)
@@ -137,6 +114,15 @@ class Championship extends \CompetitionManager\Services\Stage
 	function onEnd()
 	{
 		
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Interfaces implementation
+	///////////////////////////////////////////////////////////////////////////
+	
+	function getPlaceholder($rank, $max)
+	{
+		return sprintf(_('#%d of previous stage'), $rank);
 	}
 }
 

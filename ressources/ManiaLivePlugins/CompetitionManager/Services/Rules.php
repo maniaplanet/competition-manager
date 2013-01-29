@@ -7,11 +7,11 @@
  * @date        $Date: 2012-12-04 13:05:22 +0100 (mar., 04 déc. 2012) $:
  */
 
-namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
+namespace ManiaLivePlugins\CompetitionManager\Services;
 
 use ManiaLive\DedicatedApi\Callback\Event;
 
-abstract class AbstractRules
+abstract class Rules
 {
 	public $gameMode;
 	public $fixedSlots = null;
@@ -39,6 +39,11 @@ abstract class AbstractRules
 	function onPlayerFinish($login, $timeOrScore) {}
 	function onEndRound() {}
 	function onEndMatch($rankings, $winnerTeamOrMap) {}
+	
+	function getForfeitWinnerScore()
+	{
+		return 1;
+	}
 }
 
 ?>

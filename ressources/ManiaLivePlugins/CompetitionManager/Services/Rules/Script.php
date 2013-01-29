@@ -11,7 +11,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
 use DedicatedApi\Structures\GameInfos;
 
-abstract class Script extends AbstractRules
+abstract class Script extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 {
 	public $gameMode = GameInfos::GAMEMODE_SCRIPT;
 	public $name;

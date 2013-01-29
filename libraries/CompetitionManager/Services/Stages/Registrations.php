@@ -11,7 +11,7 @@ namespace CompetitionManager\Services\Stages;
 
 use CompetitionManager\Constants\State;
 
-class Registrations extends \CompetitionManager\Services\Stage
+class Registrations extends \CompetitionManager\Services\Stage implements FirstCompliant, IntermediateCompliant
 {
 	function __construct()
 	{
@@ -56,20 +56,6 @@ class Registrations extends \CompetitionManager\Services\Stage
 	
 	function onReady($participants) { /* Nothing to do */ }
 	
-	function onRegistration($participantId)
-	{
-		$service = new \CompetitionManager\Services\StageService();
-		$service->assignParticipants($this->stageId, array($participantId));
-		$service = new \CompetitionManager\Services\ParticipantService();
-		$service->updateStageInfo($this->stageId, $participantId, rand(1, $this->maxSlots ?: 1337), null, null);
-	}
-	
-	function onUnregistration($participantId)
-	{
-		$service = new \CompetitionManager\Services\StageService();
-		$service->excludeParticipants($this->stageId, array($participantId));
-	}
-	
 	function onRun()
 	{
 		if($this->endTime < new \DateTime())
@@ -84,6 +70,29 @@ class Registrations extends \CompetitionManager\Services\Stage
 	function onEnd()
 	{
 		
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Interfaces implementation
+	///////////////////////////////////////////////////////////////////////////
+	
+	function onRegistration($participantId)
+	{
+		$service = new \CompetitionManager\Services\StageService();
+		$service->assignParticipants($this->stageId, array($participantId));
+		$service = new \CompetitionManager\Services\ParticipantService();
+		$service->updateStageInfo($this->stageId, $participantId, rand(1, $this->maxSlots ?: 1337), null, null);
+	}
+	
+	function onUnregistration($participantId)
+	{
+		$service = new \CompetitionManager\Services\StageService();
+		$service->excludeParticipants($this->stageId, array($participantId));
+	}
+	
+	function getPlaceholder($rank, $max)
+	{
+		return sprintf(_('#%d of random seed'), $rank);
 	}
 }
 

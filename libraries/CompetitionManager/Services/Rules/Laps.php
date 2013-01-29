@@ -13,7 +13,7 @@ use DedicatedApi\Structures\GameInfos;
 use ManiaLib\Gui\Elements\Icon;
 use ManiaLib\Gui\Elements\Icons128x32_1;
 
-class Laps extends AbstractRules
+class Laps extends \CompetitionManager\Services\Rules
 {
 	public $gameMode = GameInfos::GAMEMODE_LAPS;
 	/** @setting none Laps number (0 to use map default) */

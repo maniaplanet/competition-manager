@@ -9,6 +9,9 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
+use ManiaLive\Event\Dispatcher;
+use ManiaLivePlugins\CompetitionManager\Event;
+
 class CumulativeTMTimeAttack extends TMTimeAttack
 {
 	public $timeLimit = 300000;
@@ -46,7 +49,8 @@ class CumulativeTMTimeAttack extends TMTimeAttack
 			$lastScore = $player->score;
 		}
 		
-		return ++$this->mapsDone == count(\ManiaLive\Data\Storage::getInstance()->maps);
+		if(++$this->mapsDone == count(\ManiaLive\Data\Storage::getInstance()->maps))
+			Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
 	}
 }
 

@@ -11,7 +11,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
 use DedicatedApi\Structures\GameInfos;
 
-abstract class TMTimeAttack extends AbstractRules
+abstract class TMTimeAttack extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 {
 	public $gameMode = GameInfos::GAMEMODE_TIMEATTACK;
 	

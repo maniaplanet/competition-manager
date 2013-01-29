@@ -11,7 +11,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
 use DedicatedApi\Structures\GameInfos;
 
-class Team extends AbstractRules
+class Team extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 {
 	public $gameMode = GameInfos::GAMEMODE_TEAM;
 	public $fixedSlots = 2;
@@ -34,6 +34,11 @@ class Team extends AbstractRules
 	function getTeamSize()
 	{
 		return $this->slotsPerTeam;
+	}
+	
+	function getForfeitWinnerScore()
+	{
+		return $this->mapsLimit;
 	}
 }
 

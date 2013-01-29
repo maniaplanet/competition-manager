@@ -9,6 +9,9 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
+use ManiaLive\Event\Dispatcher;
+use ManiaLivePlugins\CompetitionManager\Event;
+
 class Royal extends Script
 {
 	public $name = 'Royal.Script.txt';
@@ -42,7 +45,7 @@ class Royal extends Script
 				$match->participants[$ranking['Login']]->rank = $ranking['Rank'];
 		}
 		
-		return true;
+		Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
 	}
 }
 

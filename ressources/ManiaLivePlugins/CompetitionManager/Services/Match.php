@@ -25,7 +25,7 @@ class Match extends AbstractObject
 	public $startTime;
 	/** @var \DateTime */
 	public $endTime;
-	/** @var Rules\AbstractRules */
+	/** @var Rules */
 	public $rules;
 	/** @var int */
 	public $state;

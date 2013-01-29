@@ -31,16 +31,16 @@ $r = ManiaLib\Application\Request::getInstance();
 								<strong><?php echo _('Max Slots'); ?></strong><br/>
 								<i><?php printf(_('Maximum number of %s for this stage'), $competition->isTeam ? _('teams') : _('players')); ?></i>
 							</label>
-						<?php if($stage instanceof Stages\Groups || $stage instanceof Stages\Brackets): ?>
-							<input type="text" name="maxSlots" id="maxSlots" value="<?php echo $stage->maxSlots; ?>" readonly="readonly"/>
-						<?php elseif($stage instanceof Stages\Championship): ?>
+						<?php if($stage instanceof Stages\Championship): ?>
 							<input type="text" name="maxSlots" id="maxSlots" value="<?php echo $stage->maxSlots; ?>"/>
+						<?php elseif($stage instanceof Stages\Groups || $stage instanceof Stages\Brackets): ?>
+							<input type="text" name="maxSlots" id="maxSlots" value="<?php echo $stage->maxSlots; ?>" readonly="readonly"/>
 						<?php else: ?>
 							<input type="text" name="maxSlots" id="maxSlots" value="<?php echo $stage->maxSlots; ?>" class="fixable"/>
 						<?php endif; ?>
 						</li>
 					<?php endif; ?>
-					<?php if($stage instanceof Stages\Championship): ?>
+					<?php if($stage instanceof Stages\Groups): ?>
 						<li data-role="fieldcontain">
 							<label for="isFreeForAll">
 								<strong><?php echo _('Matches type'); ?></strong><br/>
@@ -53,25 +53,60 @@ $r = ManiaLib\Application\Request::getInstance();
 						<li data-role="fieldcontain">
 							<label for="numberOfRounds">
 								<strong><?php echo _('Number of rounds'); ?></strong><br/>
-								<i class="helper-ffa"><?php echo _('How many matches will be played'); ?></i>
-								<i class="helper-1on1"><?php echo sprintf(_('How many matches between each %s'), $competition->isTeam ? _('teams') : _('players')); ?></i>
+								<i class="ffa-compliant"><?php echo _('How many matches will be played'); ?></i>
+								<i class="versus-compliant"><?php echo sprintf(_('How many matches between each %s'), $competition->isTeam ? _('teams') : _('players')); ?></i>
 							</label>
 							<input type="text" name="numberOfRounds" id="numberOfRounds" value="<?php echo $stage->parameters['numberOfRounds']; ?>"/>
+						</li>
+						<li data-role="fieldcontain" class="versus-compliant">
+							<label for="pointsForWin">
+								<strong><?php echo _('Points for victory'); ?></strong><br/>
+							</label>
+							<input type="text" name="pointsForWin" id="pointsForWin" value="<?php echo $stage->parameters['pointsForWin']; ?>"/>
+						</li>
+						<li data-role="fieldcontain" class="versus-compliant">
+							<label for="pointsForLoss">
+								<strong><?php echo _('Points for defeat'); ?></strong><br/>
+							</label>
+							<input type="text" name="pointsForLoss" id="pointsForLoss" value="<?php echo $stage->parameters['pointsForLoss']; ?>"/>
+						</li>
+						<li data-role="fieldcontain" class="versus-compliant">
+							<label for="pointsForForfeit">
+								<strong><?php echo _('Points for forfeit'); ?></strong><br/>
+								<i><?php echo sprintf(_('For a %s who didn\'t show up or leaved'), $competition->isTeam ? _('team') : _('player')); ?></i>
+							</label>
+							<input type="text" name="pointsForForfeit" id="pointsForForfeit" value="<?php echo $stage->parameters['pointsForForfeit']; ?>"/>
+						</li>
+						<li data-role="fieldcontain" class="ffa-compliant">
+							<fieldset data-role="controlgroup">
+								<legend>
+									<strong><?php echo _('Scoring system'); ?></strong><br/>
+									<i><?php echo _('Points awarded for each match'); ?></i>
+								</legend>
+<!--								<input type="radio" name="scoringSystem" id="scoringSystem-none"
+									   value="" <?php echo !$stage->parameters['scoringSystem'] ? 'checked="checked"' : ''; ?>/>
+								<label for="scoringSystem-none"><?php echo _('* Use match results'); ?></label>-->
+							<?php foreach($scoringSystems as $name => $system): ?>
+								<input type="radio" name="scoringSystem" id="scoringSystem-<?php echo md5($name); ?>"
+									   value="<?php echo $name; ?>" <?php echo $system == $stage->parameters['scoringSystem'] ? 'checked="checked"' : ''; ?>/>
+								<label for="scoringSystem-<?php echo md5($name); ?>"><?php echo $name; ?></label>
+							<?php endforeach; ?>
+							</fieldset>
 						</li>
 						<script>
 							$(document).bind('pageinit', function() {
 								$('select#isFreeForAll').change(function() {
 									if($(this).val() == 1) {
-										$('.helper-ffa').show();
-										$('.helper-1on1').hide();
+										$('.ffa-compliant').show().find('input').prop('disabled', false);
+										$('.versus-compliant').hide().find('input').prop('disabled', true);
 									}
 									else {
-										$('.helper-ffa').hide();
-										$('.helper-1on1').show();
+										$('.ffa-compliant').hide().find('input').prop('disabled', true);
+										$('.versus-compliant').show().find('input').prop('disabled', false);
 									}
 								}).trigger('change');
 								
-								<?php $fieldId = $stage instanceof Stages\Groups ? 'slotsPerGroup' : 'maxSlots'; ?>
+								<?php $fieldId = $stage instanceof Stages\Championship ? 'maxSlots' : 'slotsPerGroup'; ?>
 								$('select#gamemode').change(function() {
 									var selected = $(this).children(':selected');
 									if(selected.jqmData('fixed-slots') == 2) {
@@ -89,27 +124,27 @@ $r = ManiaLib\Application\Request::getInstance();
 								}).trigger('change');
 							});
 						</script>
-					<?php endif; ?>
-					<?php if($stage instanceof Stages\Groups): ?>
-						<li data-role="fieldcontain">
-							<label for="numberOfGroups">
-								<strong><?php echo _('Number of groups'); ?></strong><br/>
-							</label>
-							<input type="text" name="numberOfGroups" id="numberOfGroups" value="<?php echo $stage->parameters['numberOfGroups']; ?>"/>
-						</li>
-						<li data-role="fieldcontain">
-							<label for="slotsPerGroup">
-								<strong><?php echo _('Slots per group'); ?></strong><br/>
-							</label>
-							<input type="text" id="slotsPerGroup" value="<?php echo $stage->maxSlots / ($stage->parameters['nbGroups'] ?: 4) ?: 4; ?>"/>
-						</li>
-						<script>
-							$(document).bind('pageinit', function() {
-								$('#numberOfGroups, #slotsPerGroup').change(function() {
-									$('#maxSlots').val(parseInt($('#numberOfGroups').val()) * parseInt($('#slotsPerGroup').val()))
-								}).trigger('change');
-							});
-						</script>
+						<?php if(!($stage instanceof Stages\Championship)): ?>
+							<li data-role="fieldcontain">
+								<label for="numberOfGroups">
+									<strong><?php echo _('Number of groups'); ?></strong><br/>
+								</label>
+								<input type="text" name="numberOfGroups" id="numberOfGroups" value="<?php echo $stage->parameters['numberOfGroups']; ?>"/>
+							</li>
+							<li data-role="fieldcontain">
+								<label for="slotsPerGroup">
+									<strong><?php echo _('Slots per group'); ?></strong><br/>
+								</label>
+								<input type="text" id="slotsPerGroup" value="<?php echo $stage->maxSlots / ($stage->parameters['nbGroups'] ?: 4) ?: 4; ?>"/>
+							</li>
+							<script>
+								$(document).bind('pageinit', function() {
+									$('#numberOfGroups, #slotsPerGroup').change(function() {
+										$('#maxSlots').val(parseInt($('#numberOfGroups').val()) * parseInt($('#slotsPerGroup').val()))
+									}).trigger('change');
+								});
+							</script>
+						<?php endif; ?>
 					<?php elseif($stage instanceof Stages\Brackets): ?>
 						<li data-role="fieldcontain">
 							<label for="numberOfRounds">

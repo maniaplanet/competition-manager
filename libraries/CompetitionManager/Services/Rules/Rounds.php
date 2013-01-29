@@ -13,7 +13,7 @@ use DedicatedApi\Structures\GameInfos;
 use ManiaLib\Gui\Elements\Icon;
 use ManiaLib\Gui\Elements\Icons128x32_1;
 
-abstract class Rounds extends AbstractRules
+abstract class Rounds extends \CompetitionManager\Services\Rules
 {
 	public $gameMode = GameInfos::GAMEMODE_ROUNDS;
 	

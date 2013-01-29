@@ -9,6 +9,9 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
+use ManiaLive\Event\Dispatcher;
+use ManiaLivePlugins\CompetitionManager\Event;
+
 class TMTimeAttackDuel extends CumulativeTMTimeAttack
 {
 	public $fixedSlots = 2;
@@ -24,11 +27,14 @@ class TMTimeAttackDuel extends CumulativeTMTimeAttack
 			{
 				$match->participants[$logins[$loginIndex]]->rank = 1;
 				$match->participants[$logins[1 - $loginIndex]]->rank = 2;
-				return true;
+				Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
 			}
 		}
-		
-		return false;
+	}
+	
+	function getForfeitWinnerScore()
+	{
+		return $this->mapsLimit;
 	}
 }
 

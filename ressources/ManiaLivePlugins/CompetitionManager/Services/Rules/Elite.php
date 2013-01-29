@@ -9,6 +9,10 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
+use ManiaLive\DedicatedApi\Callback;
+use ManiaLive\Event\Dispatcher;
+use ManiaLivePlugins\CompetitionManager\Event;
+
 class Elite extends Script
 {
 	public $name = 'Elite.Script.txt';
@@ -43,21 +47,35 @@ class Elite extends Script
 		$dedicated->setModeScriptSettings($settings);
 	}
 	
-	function onEndMatch($rankings, $winnerTeamOrMap)
+	function getNeededEvents()
 	{
+		return Callback\Event::ON_MODE_SCRIPT_CALLBACK;
+	}
+	
+	function onModeScriptCallback($param1, $param2)
+	{
+		if($param1 != 'EndMap')
+			return;
+		
+		$param2 = json_decode($param2);
+		$winnerTeam = $param2->MapWinnerClan-1;
+		
 		$match = \ManiaLivePlugins\CompetitionManager\Services\Match::getInstance();
 		$teamIds = array_keys($match->participants);
-		if(isset($teamIds[$winnerTeamOrMap]))
+		if(isset($teamIds[$winnerTeam]))
 		{
-			if(++$match->participants[$teamIds[$winnerTeamOrMap]]->score == $this->mapsLimit)
+			if(++$match->participants[$teamIds[$winnerTeam]]->score == $this->mapsLimit)
 			{
-				$match->participants[$teamIds[$winnerTeamOrMap]]->rank = 1;
-				$match->participants[$teamIds[1 - $winnerTeamOrMap]]->rank = 2;
-				return true;
+				$match->participants[$teamIds[$winnerTeam]]->rank = 1;
+				$match->participants[$teamIds[1 - $winnerTeam]]->rank = 2;
+				Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
 			}
 		}
-		
-		return false;
+	}
+	
+	function getForfeitWinnerScore()
+	{
+		return $this->mapsLimit;
 	}
 }
 

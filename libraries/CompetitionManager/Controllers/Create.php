@@ -154,7 +154,7 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 	
 	function chooseRules()
 	{
-		$this->response->availableModes = \CompetitionManager\Services\Rules\AbstractRules::GetList(
+		$this->response->availableModes = \CompetitionManager\Services\Rules::GetList(
 				$this->competition->title,
 				$this->competition->isTeam,
 				$this->stage instanceof Stages\Lobby
@@ -193,13 +193,25 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 		$errors = array();
 		$this->stage->minSlots = $this->request->getPost('minSlots', 0);
 		$this->stage->maxSlots = $this->request->getPost('maxSlots');
-		if($this->stage instanceof Stages\Championship)
+		if($this->stage instanceof Stages\Groups)
 		{
 			$this->stage->parameters['isFreeForAll'] = (bool) $this->request->getPost('isFreeForAll');
 			$this->stage->parameters['numberOfRounds'] = (int) $this->request->getPost('numberOfRounds');
 			if($this->stage->parameters['numberOfRounds'] < 1)
 				$errors[] = _('There should be at least 1 round');
-			if($this->stage instanceof Stages\Groups)
+			if($this->stage->parameters['isFreeForAll'])
+			{
+				$service = new TemplateService();
+				$name = $this->request->getPost('scoringSystem');
+				$this->stage->parameters['scoringSystem'] = $name ? $service->get($name, TemplateService::SCORING) : null;
+			}
+			else
+			{
+				$this->stage->parameters['pointsForWin'] = (int) $this->request->getPost('pointsForWin');
+				$this->stage->parameters['pointsForLoss'] = (int) $this->request->getPost('pointsForLoss');
+				$this->stage->parameters['pointsForForfeit'] = (int) $this->request->getPost('pointsForForfeit');
+			}
+			if(!($this->stage instanceof Stages\Championship))
 			{
 				$this->stage->parameters['numberOfGroups'] = (int) $this->request->getPost('numberOfGroups');
 				if($this->stage->parameters['numberOfGroups'] < 2)
@@ -246,7 +258,7 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 				else
 					$this->stage->rules->$setting = @reset($this->request->getPost($setting));
 			}
-			array_splice($errors, count($errors), 0, $this->stage->rules->validate());
+			array_merge($errors, $this->stage->rules->validate());
 		}
 		
 		if($errors)

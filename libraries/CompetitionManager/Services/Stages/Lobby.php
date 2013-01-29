@@ -11,7 +11,7 @@ namespace CompetitionManager\Services\Stages;
 
 use CompetitionManager\Constants\State;
 
-class Lobby extends \CompetitionManager\Services\Stage
+class Lobby extends \CompetitionManager\Services\Stage implements FirstCompliant, IntermediateCompliant
 {
 	function __construct()
 	{
@@ -67,6 +67,20 @@ class Lobby extends \CompetitionManager\Services\Stage
 		$service->setState($this->matches[0], State::READY);
 	}
 	
+	function onRun() { /* Done in ManiaLive plugin */ }
+	
+	function onMatchOver($match)
+	{
+		$service = new \CompetitionManager\Services\MatchService();
+		$service->setState($match->matchId, State::ARCHIVED);
+	}
+	
+	function onEnd() {}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Interfaces implementation
+	///////////////////////////////////////////////////////////////////////////
+	
 	function onRegistration($participantId)
 	{
 		$service = new \CompetitionManager\Services\StageService();
@@ -98,15 +112,15 @@ class Lobby extends \CompetitionManager\Services\Stage
 		}
 	}
 	
-	function onRun() { /* Done in ManiaLive plugin */ }
-	
-	function onMatchOver($match)
+	function onUnregistration($participantId)
 	{
-		$service = new \CompetitionManager\Services\MatchService();
-		$service->setState($match->matchId, State::ARCHIVED);
+		// Done in ManiaLive plugin
 	}
 	
-	function onEnd() {}
+	function getPlaceholder($rank, $max)
+	{
+		return sprintf(_('#%d of random seed'), $rank);
+	}
 }
 
 ?>

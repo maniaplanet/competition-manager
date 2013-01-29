@@ -9,6 +9,9 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
+use ManiaLive\Event\Dispatcher;
+use ManiaLivePlugins\CompetitionManager\Event;
+
 class Siege extends Script
 {
 	public $name = 'Siege.Script.txt';
@@ -45,11 +48,14 @@ class Siege extends Script
 			{
 				$match->participants[$teamIds[$winnerTeamOrMap]]->rank = 1;
 				$match->participants[$teamIds[1 - $winnerTeamOrMap]]->rank = 2;
-				return true;
+				Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
 			}
 		}
-		
-		return false;
+	}
+	
+	function getForfeitWinnerScore()
+	{
+		return $this->mapsLimit;
 	}
 }
 

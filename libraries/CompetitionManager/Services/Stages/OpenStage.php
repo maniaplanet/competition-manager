@@ -12,7 +12,7 @@ namespace CompetitionManager\Services\Stages;
 use CompetitionManager\Constants\Qualified;
 use CompetitionManager\Constants\State;
 
-class OpenStage extends \CompetitionManager\Services\Stage
+class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompliant, IntermediateCompliant, LastCompliant
 {
 	function __construct()
 	{
@@ -99,23 +99,6 @@ class OpenStage extends \CompetitionManager\Services\Stage
 			$service->setState($matchId, State::READY);
 			\CompetitionManager\Services\WebServicesProxy::onMatchReady($matchId);
 		}
-	}
-	
-	function onRegistration($participantId)
-	{
-		if($this->previousId)
-			return false;
-		
-		$matchDetails = $this->rules->getDefaultDetails();
-		$stageDetails = $this->getDefaultDetails();
-		
-		$service = new \CompetitionManager\Services\StageService();
-		$service->assignParticipants($this->stageId, array($participantId), $stageDetails, Qualified::NO);
-		$service = new \CompetitionManager\Services\MatchService();
-		foreach($this->matches as $matchId)
-			$service->assignParticipants($matchId, array($participantId), $matchDetails);
-		
-		return true;
 	}
 	
 	function onRun()
@@ -210,6 +193,39 @@ class OpenStage extends \CompetitionManager\Services\Stage
 	function onEnd()
 	{
 		
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Interfaces implementation
+	///////////////////////////////////////////////////////////////////////////
+	
+	function onRegistration($participantId)
+	{
+		if($this->previousId)
+			return;
+		
+		$matchDetails = $this->rules->getDefaultDetails();
+		$stageDetails = $this->getDefaultDetails();
+		
+		$service = new \CompetitionManager\Services\StageService();
+		$service->assignParticipants($this->stageId, array($participantId), $stageDetails, Qualified::NO);
+		$service = new \CompetitionManager\Services\MatchService();
+		foreach($this->matches as $matchId)
+			$service->assignParticipants($matchId, array($participantId), $matchDetails);
+	}
+	
+	function onUnregistration($participantId)
+	{
+		$service = new \CompetitionManager\Services\StageService();
+		$service->excludeParticipants($this->stageId, array($participantId));
+		$service = new \CompetitionManager\Services\MatchService();
+		foreach($this->matches as $matchId)
+			$service->excludeParticipants($matchId, array($participantId));
+	}
+	
+	function getPlaceholder($rank, $max)
+	{
+		return sprintf(_('#%d of previous stage'), $rank);
 	}
 }
 

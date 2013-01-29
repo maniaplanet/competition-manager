@@ -13,7 +13,7 @@ use DedicatedApi\Structures\GameInfos;
 use ManiaLib\Gui\Elements\Icon;
 use ManiaLib\Gui\Elements\Icons128x32_1;
 
-class Cup extends AbstractRules
+class Cup extends \CompetitionManager\Services\Rules
 {
 	public $gameMode = GameInfos::GAMEMODE_CUP;
 	/** @setting ms Time limit after the first cross the line (0 to disable, 1 for automatic) */

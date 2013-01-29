@@ -9,13 +9,18 @@
 
 namespace CompetitionManager\Services\Stages;
 
-class Groups extends Championship
+class Groups extends \CompetitionManager\Services\Stage implements IntermediateCompliant
 {
 	function __construct()
 	{
 		$this->type = \CompetitionManager\Constants\StageType::GROUPS;
 		$this->schedule = new \CompetitionManager\Services\Schedules\MultiSimple();
+		$this->parameters['isFreeForAll'] = false;
 		$this->parameters['numberOfRounds'] = 1;
+		$this->parameters['pointsForWin'] = 2;
+		$this->parameters['pointsForLoss'] = 1;
+		$this->parameters['pointsForForfeit'] = 0;
+		$this->parameters['scoringSystem'] = null;
 		$this->parameters['numberOfGroups'] = 4;
 		$this->parameters['groupParticipants'] = array();
 	}
@@ -36,6 +41,21 @@ class Groups extends Championship
 			$slots = $this->maxSlots;
 		$slotsPerGroup = ceil($slots / $this->parameters['numberOfGroups']);
 		return $this->parameters['numberOfRounds'] * ($this->parameters['isFreeForAll'] ?: $slotsPerGroup-!($slotsPerGroup&1));
+	}
+	
+	function getScheduleNames()
+	{
+		$roundNames = array();
+		
+		for($round = 1; $round <= $this->getRoundsCount(); ++$round)
+			$roundNames[] = sprintf(_('Round #%d'), $round);
+		
+		return $roundNames;
+	}
+	
+	function getIcon()
+	{
+		
 	}
 	
 	function getAction()
@@ -66,6 +86,18 @@ class Groups extends Championship
 					$this->matches[$group][] = $roundMatches;
 				}
 		}
+	}
+	
+	private function createMatch($service, $round)
+	{
+		$match = new \CompetitionManager\Services\Match();
+		$match->name = sprintf(_('Round #%d'), $round+1);
+		$match->stageId = $this->stageId;
+		if(isset($this->schedule->startTimes[$round]))
+			$match->startTime = $this->schedule->startTimes[$round];
+		$service->create($match);
+		
+		return $match;
 	}
 	
 	function onReady($participants)
@@ -132,6 +164,34 @@ class Groups extends Championship
 	function onEnd()
 	{
 		
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Interfaces implementation
+	///////////////////////////////////////////////////////////////////////////
+	
+	function getPlaceholder($rank, $max)
+	{
+		$qualifiedPerGroup = floor($max / $this->parameters['numberOfGroups']);
+		$qualified = $qualifiedPerGroup * $this->parameters['numberOfGroups'];
+		if($rank > $qualified)
+			return _('BYE');
+		
+		$group = floor(($rank-1) / $qualifiedPerGroup);
+		$groupRank = (($rank-1) % $qualifiedPerGroup) + 1;
+		return sprintf(_('#%d of group %s'), $groupRank, self::getGroupLetter($group));
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Utilities
+	///////////////////////////////////////////////////////////////////////////
+	
+	static function getGroupLetter($group)
+	{
+		$groupLetter = '';
+		for(++$group; $group>0; $group=floor($group/26))
+			$groupLetter = chr(ord('A')+($group-1)%26).$groupLetter;
+		return $groupLetter;
 	}
 }
 

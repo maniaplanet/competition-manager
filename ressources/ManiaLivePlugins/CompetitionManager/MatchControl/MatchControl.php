@@ -18,7 +18,7 @@ use ManiaLivePlugins\CompetitionManager\Services\JSON;
 use ManiaLivePlugins\CompetitionManager\Services\Match;
 use ManiaLivePlugins\CompetitionManager\Windows;
 
-class MatchControl extends \ManiaLive\PluginHandler\Plugin
+class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLivePlugins\CompetitionManager\Listener
 {
 	const WAIT_CANCEL  = -3;
 	const WAIT_FORFEIT = -2;
@@ -61,7 +61,6 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 		if(!($this->match->rules instanceof \ManiaLivePlugins\CompetitionManager\Services\Rules\Script))
 			$this->connection->setApiVersion('2011-10-06');
 		$this->match->rules->configure($this->connection);
-		$this->connection->setServerName('[$<'.$this->match->stage->competition->name.'$>] '.($this->match->name ?: 'Match'));
 		if($this->match->stage->competition->isTeam)
 		{
 			$team1 = reset($this->match->participants);
@@ -162,8 +161,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 	
 	function onEndRound()
 	{
-		if($this->match->rules->onEndRound())
-			$this->connection->nextMap();
+		$this->match->rules->onEndRound();
 	}
 	
 	function onEndMatch($rankings, $winnerTeamOrMap)
@@ -174,16 +172,39 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 		{
 			if($this->isInWarmUp)
 				$this->isInWarmUp = false;
-			else if($this->match->rules->onEndMatch($rankings, $winnerTeamOrMap))
-				$this->over();
+			$this->match->rules->onEndMatch($rankings, $winnerTeamOrMap);
 		}
 		
 		$firstCall = false;
 	}
 	
+	function onModeScriptCallback($param1, $param2)
+	{
+		$this->match->rules->onModeScriptCallback($param1, $param2);
+	}
+	
 	function onBeginMap($map, $warmUp, $matchContinuation)
 	{
 		$this->isInWarmUp = (bool) $warmUp;
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Rules callback
+	///////////////////////////////////////////////////////////////////////////
+	
+	function onRulesEndRound()
+	{
+		$this->connection->forceEndRound();
+	}
+	
+	function onRulesEndMap()
+	{
+		$this->connection->nextMap(true);
+	}
+	
+	function onRulesEndMatch()
+	{
+		$this->over();
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -276,12 +297,15 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 		
 		unset($this->players[$login]);
 
-		foreach($this->match->participants as $team)
+		if($this->match->stage->competition->isTeam)
 		{
-			if(isset($team->players[$login]))
+			foreach($this->match->participants as $team)
 			{
-				$team->players[$login] = false;
-				break;
+				if(isset($team->players[$login]))
+				{
+					$team->players[$login] = false;
+					break;
+				}
 			}
 		}
 		
@@ -313,6 +337,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 		$this->updateStatus();
 		Windows\CountDown::EraseAll();
 		
+		\ManiaLive\Event\Dispatcher::register(\ManiaLivePlugins\CompetitionManager\Event::getClass(), $this);
 		$this->enableDedicatedEvents($this->match->rules->getNeededEvents() | ServerEvent::ON_BEGIN_MAP);
 		$this->disableTickerEvent();
 	}
@@ -481,7 +506,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 		$missing = $this->getMissing();
 		$winner = @reset(array_diff_key($this->match->participants, $missing));
 		$winner->rank = 1;
-		$winner->score = 1;
+		$winner->score = $this->match->rules->getForfeitWinnerScore();
 		foreach($missing as $participant)
 			$participant->rank = null;
 		$this->over();
@@ -512,9 +537,9 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin
 		foreach($this->match->participants as $participant)
 		{
 			$this->db->execute(
-					'UPDATE MatchParticipants SET rank=%s, score=%d, scoreDetails=%s WHERE matchId=%d AND participantId=%d',
+					'UPDATE MatchParticipants SET rank=%s, score=%s, scoreDetails=%s WHERE matchId=%d AND participantId=%d',
 					intval($participant->rank) ?: 'NULL',
-					intval($participant->rank) ? $participant->score : 'NULL',
+					intval($participant->rank) ? intval($participant->score) : 'NULL',
 					$this->db->quote(JSON::serialize($participant->scoreDetails)),
 					$this->match->matchId,
 					$participant->participantId

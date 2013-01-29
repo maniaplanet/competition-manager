@@ -9,6 +9,9 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
+use ManiaLive\Event\Dispatcher;
+use ManiaLivePlugins\CompetitionManager\Event;
+
 class Melee extends Script
 {
 	public $name = 'Melee.Script.txt';
@@ -32,7 +35,7 @@ class Melee extends Script
 				$match->participants[$ranking['Login']]->rank = $ranking['Rank'];
 		}
 		
-		return true;
+		Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
 	}
 }
 

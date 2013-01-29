@@ -13,7 +13,7 @@ use DedicatedApi\Structures\GameInfos;
 use ManiaLib\Gui\Elements\Icon;
 use ManiaLib\Gui\Elements\Icons128x32_1;
 
-class Team extends AbstractRules
+class Team extends \CompetitionManager\Services\Rules
 {
 	public $gameMode = GameInfos::GAMEMODE_TEAM;
 	public $fixedSlots = 2;

@@ -13,7 +13,7 @@ use CompetitionManager\Constants\Qualified;
 use CompetitionManager\Constants\State;
 use CompetitionManager\Utils\Formatting;
 
-class Brackets extends \CompetitionManager\Services\Stage
+class Brackets extends \CompetitionManager\Services\Stage implements LastCompliant
 {
 	const WINNERS_BRACKET = 0;
 	const LOSERS_BRACKET = 1;
@@ -120,9 +120,11 @@ class Brackets extends \CompetitionManager\Services\Stage
 				$ranks = $ranks[$offset];
 				sort($ranks);
 				
+				$service = new \CompetitionManager\Services\StageService();
+				$previousStage = $service->get($this->previousId);
 				$emptyLabels = array();
 				foreach($ranks as $rank)
-					$emptyLabels[] = '#'.$rank.' of previous stage';
+					$emptyLabels[] = $previousStage->getPlaceholder($rank, $this->maxSlots);
 				return $emptyLabels;
 			}
 			

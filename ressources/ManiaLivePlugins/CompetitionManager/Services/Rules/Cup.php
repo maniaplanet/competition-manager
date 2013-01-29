@@ -11,7 +11,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
 use DedicatedApi\Structures\GameInfos;
 
-class Cup extends AbstractRules
+class Cup extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 {
 	public $gameMode = GameInfos::GAMEMODE_CUP;
 	public $finishTimeLimit = 1;

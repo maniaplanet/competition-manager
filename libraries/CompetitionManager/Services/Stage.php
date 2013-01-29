@@ -34,7 +34,7 @@ abstract class Stage extends AbstractObject
 	public $startTime;
 	/** @var \DateTime */
 	public $endTime;
-	/** @var Rules\AbstractRules */
+	/** @var Rules */
 	public $rules;
 	/** @var AbstractSchedule */
 	public $schedule;
@@ -178,24 +178,6 @@ abstract class Stage extends AbstractObject
 	 * @param Participant[]
 	 */
 	abstract function onReady($participants);
-	
-	/**
-	 * @param int $participantId
-	 * @return bool
-	 */
-	function onRegistration($participantId)
-	{
-		return false;
-	}
-	
-	/**
-	 * @param int $participantId
-	 * @return bool
-	 */
-	function onUnregistration($participantId)
-	{
-		return false;
-	}
 	
 	function onRun()
 	{

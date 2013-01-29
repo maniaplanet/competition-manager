@@ -52,7 +52,6 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 		if(!($this->lobby->rules instanceof \ManiaLivePlugins\CompetitionManager\Services\Rules\Script))
 			$this->connection->setApiVersion('2011-10-06');
 		$this->lobby->rules->configure($this->connection);
-		$this->connection->setServerName('[$<'.$this->lobby->stage->competition->name.'$>] '.($this->lobby->name ?: 'Lobby'));
 		$this->connection->setHideServer(0);
 		
 		foreach($this->storage->players as $player)
@@ -68,7 +67,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 	
 	function onReady()
 	{
-		CustomUI::HideForAll(CustomUI::CHALLENGE_INFO);
+//		CustomUI::HideForAll(CustomUI::CHALLENGE_INFO);
 		Windows\Progress::Create()->show();
 		Windows\Status::Create()->show();
 		$this->updateStatus();

@@ -7,9 +7,9 @@
  * @date        $Date: 2012-12-20 15:47:38 +0100 (jeu., 20 déc. 2012) $:
  */
 
-namespace CompetitionManager\Services\Rules;
+namespace CompetitionManager\Services;
 
-abstract class AbstractRules
+abstract class Rules
 {
 	private $id;
 	private $settings = array();

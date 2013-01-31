@@ -47,7 +47,6 @@ class Server extends \DedicatedManager\Services\Server
 		$config->wsapi->password = $wsConfig->password;
 
 		$config->plugins[] = $isLobby ? 'CompetitionManager\\LobbyControl' : 'CompetitionManager\\MatchControl';
-		$config->plugins[] = 'NewboO\\CallbacksTest';
 		$config->__other = <<<CONFIG
 alias competition = 'ManiaLivePlugins\CompetitionManager\Config'
 competition.matchId = $this->matchId

@@ -10,7 +10,7 @@
 namespace CompetitionManager\Services;
 
 use CompetitionManager\Constants\StageType;
-use CompetitionManager\Services\Schedules\AbstractSchedule;
+use CompetitionManager\Services\Scores;
 
 abstract class Stage extends AbstractObject
 {
@@ -36,7 +36,7 @@ abstract class Stage extends AbstractObject
 	public $endTime;
 	/** @var Rules */
 	public $rules;
-	/** @var AbstractSchedule */
+	/** @var Schedule */
 	public $schedule;
 	/** @var mixed[] */
 	public $matches;
@@ -165,11 +165,11 @@ abstract class Stage extends AbstractObject
 	abstract function getAction();
 	
 	/**
-	 * @return ScoreDetails\BasicDetails
+	 * @return Score
 	 */
-	function getDefaultDetails()
+	function getDefaultScore()
 	{
-		return $this->rules->getDefaultDetails();
+		return new Scores\None();
 	}
 	
 	abstract function onCreate();

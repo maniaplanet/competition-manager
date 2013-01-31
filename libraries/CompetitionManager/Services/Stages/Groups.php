@@ -9,6 +9,8 @@
 
 namespace CompetitionManager\Services\Stages;
 
+use CompetitionManager\Services\Scores;
+
 class Groups extends \CompetitionManager\Services\Stage implements IntermediateCompliant
 {
 	function __construct()
@@ -63,6 +65,13 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 		return 'groups';
 	}
 	
+	function getDefaultScore()
+	{
+		$score = new Scores\Summary();
+		$score->main = new Scores\Points();
+		return $score;
+	}
+	
 	function onCreate()
 	{
 		$this->matches = array();
@@ -115,7 +124,7 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 		{
 			foreach($this->matches as $groupMatches)
 				foreach($groupMatches as $matchId)
-					$matchService->assignParticipants($matchId, $participants, $this->rules->getDefaultDetails());
+					$matchService->assignParticipants($matchId, $participants, $this->rules->getDefaultScore());
 		}
 		else
 		{
@@ -148,7 +157,7 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 				foreach($groupMatches as $roundMatches)
 				{
 					foreach($roundMatches as $index => $matchId)
-						$matchService->assignParticipants($matchId, array($homeParticipants[$index], $awayParticipants[$index]), $this->rules->getDefaultDetails());
+						$matchService->assignParticipants($matchId, array($homeParticipants[$index], $awayParticipants[$index]), $this->rules->getDefaultScore());
 					array_unshift($homeParticipants, array_shift($awayParticipants));
 					array_splice($awayParticipants, -1, 0, array_pop($homeParticipants));
 				}

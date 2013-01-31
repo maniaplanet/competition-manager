@@ -36,9 +36,11 @@ class Team extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 		return $this->slotsPerTeam;
 	}
 	
-	function getForfeitWinnerScore()
+	function onForfeit($winner, $forfeit)
 	{
-		return $this->mapsLimit;
+		parent::onForfeit($winner, $forfeit);
+		$winner->score->points = $this->mapsLimit;
+		$forfeit->score->points = null;
 	}
 }
 

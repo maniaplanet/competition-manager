@@ -9,7 +9,7 @@
 
 namespace CompetitionManager\Services\Schedules;
 
-class None extends AbstractSchedule
+class None extends \CompetitionManager\Services\Schedule
 {
 	function getTimesLimit()
 	{

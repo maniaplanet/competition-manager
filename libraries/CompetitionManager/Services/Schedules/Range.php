@@ -9,7 +9,7 @@
 
 namespace CompetitionManager\Services\Schedules;
 
-class Range extends AbstractSchedule
+class Range extends \CompetitionManager\Services\Schedule
 {
 	/** @var \DateTime */
 	public $startTime;

@@ -79,7 +79,7 @@ class Match extends AbstractObject
 	function updateParticipantList()
 	{
 		$result = self::db()->execute(
-				'SELECT Pa.participantId, Pl.*, T.*, IFNULL(Pl.name, T.name) as name, IFNULL(Pl.path, T.path) as path, MP.rank, MP.score, MP.scoreDetails, MP.qualified '.
+				'SELECT Pa.participantId, Pl.*, T.*, IFNULL(Pl.name, T.name) as name, IFNULL(Pl.path, T.path) as path, MP.rank, MP.score, MP.qualified '.
 				'FROM MatchParticipants MP '.
 					'INNER JOIN Participants Pa USING(participantId) '.
 					'LEFT JOIN Players Pl USING(login) '.

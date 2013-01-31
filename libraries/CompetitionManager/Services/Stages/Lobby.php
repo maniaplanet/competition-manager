@@ -84,11 +84,11 @@ class Lobby extends \CompetitionManager\Services\Stage implements FirstCompliant
 	function onRegistration($participantId)
 	{
 		$service = new \CompetitionManager\Services\StageService();
-		$service->assignParticipants($this->stageId, array($participantId));
+		$service->assignParticipants($this->stageId, array($participantId), $this->getDefaultScore());
 		$service = new \CompetitionManager\Services\MatchService();
-		$service->assignParticipants(reset($this->matches), array($participantId), null);
+		$service->assignParticipants(reset($this->matches), array($participantId), $this->rules->getDefaultScore());
 		$service = new \CompetitionManager\Services\ParticipantService();
-		$service->updateStageInfo($this->stageId, $participantId, rand(1, $this->maxSlots), null, null);
+		$service->updateStageInfo($this->stageId, $participantId, rand(1, $this->maxSlots), $this->getDefaultScore());
 		$participant = $service->get($participantId);
 		
 		$this->fetchMatches();

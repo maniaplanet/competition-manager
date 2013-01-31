@@ -9,6 +9,8 @@
 
 namespace CompetitionManager\Services\Rules;
 
+use CompetitionManager\Services\Scores;
+
 class Siege extends Script
 {
 	public $name = 'Siege.Script.txt';
@@ -44,6 +46,13 @@ class Siege extends Script
 	function getTeamSize()
 	{
 		return $this->slotsPerTeam;
+	}
+	
+	function getDefaultScore()
+	{
+		$score = new Scores\Detailed();
+		$score->main = new Scores\Points();
+		return $score;
 	}
 }
 

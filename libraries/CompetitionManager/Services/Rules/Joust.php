@@ -9,6 +9,8 @@
 
 namespace CompetitionManager\Services\Rules;
 
+use CompetitionManager\Services\Scores;
+
 class Joust extends Script
 {
 	public $name = 'Joust.Script.txt';
@@ -43,6 +45,13 @@ class Joust extends Script
 	function getTitle()
 	{
 		return 'SMStormJoust@nadeolabs';
+	}
+	
+	function getDefaultScore()
+	{
+		$score = new Scores\Detailed();
+		$score->main = new Scores\Points();
+		return $score;
 	}
 }
 

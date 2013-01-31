@@ -47,6 +47,13 @@ class BattleWaves extends Script
 	{
 		return $this->slotsPerTeam;
 	}
+	
+	function getDefaultScore()
+	{
+		$score = new Scores\Detailed();
+		$score->main = new Scores\Points();
+		return $score;
+	}
 }
 
 ?>

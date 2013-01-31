@@ -80,23 +80,23 @@ class StageService extends \DedicatedManager\Services\AbstractService
 	/**
 	 * @param int $stageId
 	 * @param mixed[] $participants
-	 * @param ScoreDetails\BasicDetails $scoreDetails
+	 * @param Score $score
 	 * @param int $qualified
 	 */
-	function assignParticipants($stageId, $participants, $scoreDetails=null, $qualified=Qualified::UNKNOWN)
+	function assignParticipants($stageId, $participants, $score, $qualified=Qualified::UNKNOWN)
 	{
 		if(empty($participants))
 			return;
 		
 		$db = $this->db();
 		$values = array_map(
-				function ($participant) use ($stageId, $scoreDetails, $db, $qualified)
+				function ($participant) use ($stageId, $score, $db, $qualified)
 				{
 					$participantId = $participant instanceof Participant ? $participant->participantId : $participant;
-					return sprintf('(%d, %d, %s, %d)', $stageId, $participantId, $db->quote(JSON::serialize($scoreDetails)), $qualified);
+					return sprintf('(%d, %d, %s, %d)', $stageId, $participantId, $db->quote(JSON::serialize($score)), $qualified);
 				},
 				$participants);
-		$this->db()->execute('INSERT IGNORE INTO StageParticipants(stageId, participantId, scoreDetails, qualified) VALUES %s', implode(',', $values));
+		$this->db()->execute('INSERT IGNORE INTO StageParticipants(stageId, participantId, score, qualified) VALUES %s', implode(',', $values));
 	}
 	
 	/**

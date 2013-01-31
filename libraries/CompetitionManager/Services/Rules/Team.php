@@ -12,6 +12,7 @@ namespace CompetitionManager\Services\Rules;
 use DedicatedApi\Structures\GameInfos;
 use ManiaLib\Gui\Elements\Icon;
 use ManiaLib\Gui\Elements\Icons128x32_1;
+use CompetitionManager\Services\Scores;
 
 class Team extends \CompetitionManager\Services\Rules
 {
@@ -48,9 +49,11 @@ class Team extends \CompetitionManager\Services\Rules
 		return 'TMCanyon';
 	}
 	
-	function getTeamSize()
+	function getDefaultScore()
 	{
-		return $this->slotsPerTeam;
+		$score = new Scores\Detailed();
+		$score->main = new Scores\Points();
+		return $score;
 	}
 }
 

@@ -40,9 +40,10 @@ abstract class Rules
 	function onEndRound() {}
 	function onEndMatch($rankings, $winnerTeamOrMap) {}
 	
-	function getForfeitWinnerScore()
+	function onForfeit($winner, $forfeit)
 	{
-		return 1;
+		$winner->rank = 1;
+		$forfeit->rank = null;
 	}
 }
 

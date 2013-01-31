@@ -9,6 +9,8 @@
 
 namespace CompetitionManager\Services\Rules;
 
+use CompetitionManager\Services\Scores;
+
 class Melee extends Script
 {
 	public $name = 'Melee.Script.txt';
@@ -30,6 +32,11 @@ class Melee extends Script
 	function getTitle()
 	{
 		return 'SMStorm';
+	}
+	
+	function getDefaultScore()
+	{
+		return new Scores\Points();
 	}
 }
 

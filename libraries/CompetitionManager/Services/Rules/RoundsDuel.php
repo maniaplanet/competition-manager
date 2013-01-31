@@ -9,6 +9,8 @@
 
 namespace CompetitionManager\Services\Rules;
 
+use CompetitionManager\Services\Scores;
+
 class RoundsDuel extends Rounds
 {
 	public $fixedSlots = 2;
@@ -27,6 +29,13 @@ class RoundsDuel extends Rounds
 	function getInfo()
 	{
 		return _('1on1, first to "rounds limit" wins the map, first to "maps limit" wins the match');
+	}
+	
+	function getDefaultScore()
+	{
+		$score = new Scores\Detailed();
+		$score->main = new Scores\Points();
+		return $score;
 	}
 }
 

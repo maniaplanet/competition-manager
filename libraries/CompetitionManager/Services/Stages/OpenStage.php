@@ -11,6 +11,7 @@ namespace CompetitionManager\Services\Stages;
 
 use CompetitionManager\Constants\Qualified;
 use CompetitionManager\Constants\State;
+use CompetitionManager\Services\Scores;
 
 class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompliant, IntermediateCompliant, LastCompliant
 {
@@ -59,14 +60,14 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 		return 'openMatch';
 	}
 	
-	function getDefaultDetails()
+	function getDefaultScore()
 	{
-		$matchDetails = $this->rules->getDefaultDetails();
 		if(count($this->matches) == 1)
-			return $matchDetails;
-		$details = new \CompetitionManager\Services\ScoreDetails\MapsCount();
-		$details->isTime = $matchDetails->isTime;
-		return $details;
+			return new Scores\None();
+		
+		$score = new Scores\Counting();
+		$score->main = $this->rules->getDefaultScore();
+		return $score;
 	}
 	
 	function onCreate()
@@ -91,11 +92,11 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 	function onReady($participants)
 	{
 		$this->participants = $participants;
-		$scoreDetails = $this->rules->getDefaultDetails();
+		$score = $this->rules->getDefaultScore();
 		$service = new \CompetitionManager\Services\MatchService();
 		foreach($this->matches as $matchId)
 		{
-			$service->assignParticipants($matchId, $this->participants, $scoreDetails);
+			$service->assignParticipants($matchId, $this->participants, $score);
 			$service->setState($matchId, State::READY);
 			\CompetitionManager\Services\WebServicesProxy::onMatchReady($matchId);
 		}
@@ -129,41 +130,24 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 			$this->matches[0]->fetchParticipants();
 			foreach($this->matches[0]->participants as $participantId => $participant)
 				$this->participants[$participantId] = $participant;
-			
-			$rules = $this->rules;
-			uasort($this->participants, function($p1, $p2) use($rules) { return $rules->compare($p1->score, $p2->score); });
 		}
 		else
 		{
 			$this->fetchParticipants();
 			foreach($this->participants as $participant)
-			{
-				$participant->score = null;
-				$participant->scoreDetails->nbMaps = 0;
-			}
+				$participant->score = $this->getDefaultScore();
 			foreach($this->matches as $match)
 			{
 				$match->fetchParticipants();
 				foreach($match->participants as $participantId => $participant)
-				{
-					if($participant->score > 0)
+					if(!$participant->score->isNull())
 					{
-						$this->participants[$participantId]->score += $participant->score;
-						++$this->participants[$participantId]->scoreDetails->nbMaps;
+						$this->participants[$participantId]->score->main = $this->participants[$participantId]->score->main->add($participant->score);
+						++$this->participants[$participantId]->score->count;
 					}
-				}
 			}
-		
-			$rules = $this->rules;
-			uasort($this->participants,
-					function($p1, $p2) use($rules)
-					{
-						$mapsDiff = $p2->scoreDetails->nbMaps - $p1->scoreDetails->nbMaps;
-						if($mapsDiff)
-							return $mapsDiff;
-						return $rules->compare($p1->score, $p2->score);
-					});
 		}
+		uasort($this->participants, function($p1, $p2) { return $p1->score->compareTo($p2->score); });
 		
 		// Update ranks
 		$rank = 1;
@@ -178,7 +162,7 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 			if($participant->score === null)
 				break;
 			$participant->rank = $rank++;
-			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score, $participant->scoreDetails);
+			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
 			if($this->nextId)
 				$service->setStageQualification($this->stageId, $participantId, $participant->rank > $nextPlayersLimit ? Qualified::NO : Qualified::YES);
 		}
@@ -204,8 +188,8 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 		if($this->previousId)
 			return;
 		
-		$matchDetails = $this->rules->getDefaultDetails();
-		$stageDetails = $this->getDefaultDetails();
+		$matchDetails = $this->rules->getDefaultScore();
+		$stageDetails = $this->getDefaultScore();
 		
 		$service = new \CompetitionManager\Services\StageService();
 		$service->assignParticipants($this->stageId, array($participantId), $stageDetails, Qualified::NO);

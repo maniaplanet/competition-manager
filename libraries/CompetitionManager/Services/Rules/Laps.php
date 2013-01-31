@@ -12,6 +12,7 @@ namespace CompetitionManager\Services\Rules;
 use DedicatedApi\Structures\GameInfos;
 use ManiaLib\Gui\Elements\Icon;
 use ManiaLib\Gui\Elements\Icons128x32_1;
+use CompetitionManager\Services\Scores;
 
 class Laps extends \CompetitionManager\Services\Rules
 {
@@ -50,11 +51,11 @@ class Laps extends \CompetitionManager\Services\Rules
 		return 'TMCanyon';
 	}
 	
-	function getDefaultDetails()
+	function getDefaultScore()
 	{
-		$details = new \CompetitionManager\Services\ScoreDetails\BasicDetails();
-		$details->isTime = true;
-		return $details;
+		$score = new Scores\Counting();
+		$score->main = new Scores\Time();
+		return $score;
 	}
 }
 

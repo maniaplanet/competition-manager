@@ -73,7 +73,7 @@ class Championship extends Groups implements LastCompliant
 		if($this->parameters['isFreeForAll'])
 		{
 			foreach($this->matches as $matchId)
-				$matchService->assignParticipants($matchId, $participants, $this->rules->getDefaultDetails());
+				$matchService->assignParticipants($matchId, $participants, $this->rules->getDefaultScore());
 		}
 		else
 		{
@@ -99,7 +99,7 @@ class Championship extends Groups implements LastCompliant
 			foreach($this->matches as $roundMatches)
 			{
 				foreach($roundMatches as $index => $matchId)
-					$matchService->assignParticipants($matchId, array($homeParticipants[$index], $awayParticipants[$index]), $this->rules->getDefaultDetails());
+					$matchService->assignParticipants($matchId, array($homeParticipants[$index], $awayParticipants[$index]), $this->rules->getDefaultScore());
 				array_unshift($homeParticipants, array_shift($awayParticipants));
 				array_splice($awayParticipants, -1, 0, array_pop($homeParticipants));
 			}

@@ -9,15 +9,10 @@
 
 namespace CompetitionManager\Services\Scores;
 
-class Time extends \CompetitionManager\Services\Score
+class Points extends \CompetitionManager\Services\Score
 {
 	/** @var int */
-	public $time;
-	
-	function __construct($order=self::NATURAL)
-	{
-		parent::__construct($order);
-	}
+	public $points;
 	
 	function isVisible()
 	{
@@ -26,24 +21,24 @@ class Time extends \CompetitionManager\Services\Score
 	
 	function isNull()
 	{
-		return $this->time === null;
+		return $this->points === null;
 	}
 	
-	function compareTo(Time $score)
+	function compareTo(Points $score)
 	{
-		return $this->order * $this->_compareNullable($this->time, $score->time);
+		return $this->order * $this->_compareNullable($this->points, $score->points);
 	}
 	
-	function add(Time $score)
+	function add(Points $score)
 	{
 		$sum = parent::add($score);
-		$sum->time = $this->time + $score->time;
+		$sum->points = $this->points + $score->points;
 		return $sum;
 	}
 	
 	function __toString()
 	{
-		return $this->time ? \CompetitionManager\Utils\Formatting::milliseconds($this->time) : '-:--.---';
+		return $this->points === null ? '-' : (string) $this->points;
 	}
 }
 

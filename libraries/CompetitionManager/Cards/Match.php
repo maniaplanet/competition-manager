@@ -69,7 +69,7 @@ class Match extends Frame
 		$ui = new Participant($this->sizeX, 5);
 		$ui->setName($participant->name);
 		$ui->setRank($participant->rank);
-		$ui->setScore($participant->formatScore(null), $participant->scoreDetails->isTime);
+		$ui->setScore($participant->score);
 		$ui->setVisibilities($showRank, $showScore);
 		$ui->setCustomization($isUser, $participant->qualified);
 		

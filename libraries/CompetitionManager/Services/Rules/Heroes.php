@@ -9,6 +9,8 @@
 
 namespace CompetitionManager\Services\Rules;
 
+use CompetitionManager\Services\Scores;
+
 class Heroes extends Script
 {
 	public $name = 'Heroes.Script.txt';
@@ -48,6 +50,13 @@ class Heroes extends Script
 	function getTeamSize()
 	{
 		return 5;
+	}
+	
+	function getDefaultScore()
+	{
+		$score = new Scores\Detailed();
+		$score->main = new Scores\Points();
+		return $score;
 	}
 }
 

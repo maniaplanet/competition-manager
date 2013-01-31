@@ -36,7 +36,8 @@ class Laps extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 			if(isset($match->participants[$ranking['Login']]))
 			{
 				$match->participants[$ranking['Login']]->rank = $ranking['Rank'];
-				$match->participants[$ranking['Login']]->score = $ranking['BestTime'];
+				$match->participants[$ranking['Login']]->score->time = $ranking['BestTime'];
+				$match->participants[$ranking['Login']]->score->count = $ranking['NbrLapsFinished'];
 			}
 		
 		Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));

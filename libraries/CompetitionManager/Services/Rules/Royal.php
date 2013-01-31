@@ -43,13 +43,6 @@ class Royal extends Script
 	{
 		return 'SMStormRoyal@nadeolabs';
 	}
-	
-	function getDefaultDetails()
-	{
-		$details = new \CompetitionManager\Services\ScoreDetails\BasicDetails();
-		$details->show = false;
-		return $details;
-	}
 }
 
 ?>

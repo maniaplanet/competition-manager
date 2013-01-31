@@ -68,11 +68,12 @@ class Participant extends Frame
 		$this->rank->label->setText($rank ?: '-');
 	}
 	
-	function setScore($score, $isTime)
+	function setScore($score)
 	{
 		$this->score->label->setText($score);
-		if($isTime)
-			$this->score->setSizeX(2*$this->sizeY);
+		// FIXME score width
+//		if($isTime)
+//			$this->score->setSizeX(2*$this->sizeY);
 	}
 	
 	function setTeamLink($teamId)

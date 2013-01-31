@@ -79,9 +79,9 @@ class Registrations extends \CompetitionManager\Services\Stage implements FirstC
 	function onRegistration($participantId)
 	{
 		$service = new \CompetitionManager\Services\StageService();
-		$service->assignParticipants($this->stageId, array($participantId));
+		$service->assignParticipants($this->stageId, array($participantId), $this->getDefaultScore());
 		$service = new \CompetitionManager\Services\ParticipantService();
-		$service->updateStageInfo($this->stageId, $participantId, rand(1, $this->maxSlots ?: 1337), null, null);
+		$service->updateStageInfo($this->stageId, $participantId, rand(1, $this->maxSlots ?: 1337), $this->getDefaultScore());
 	}
 	
 	function onUnregistration($participantId)

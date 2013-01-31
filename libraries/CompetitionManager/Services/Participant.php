@@ -18,10 +18,8 @@ abstract class Participant extends AbstractObject
 	
 	/** @var int */
 	public $rank = null;
-	/** @var string */
+	/** @var Score */
 	public $score = null;
-	/** @var ScoreDetails\BasicDetails */
-	public $scoreDetails = null;
 	/** @var int */
 	public $qualified = \CompetitionManager\Constants\Qualified::UNKNOWN;
 	
@@ -50,34 +48,8 @@ abstract class Participant extends AbstractObject
 	
 	protected function onFetchObject()
 	{
-		if($this->scoreDetails)
-			$this->scoreDetails = JSON::unserialize($this->scoreDetails);
-	}
-	
-	function hasScore()
-	{
-		return !$this->scoreDetails || $this->scoreDetails->show;
-	}
-	
-	function formatScore($detailsStyle='$888$i')
-	{
-		if(!$this->scoreDetails)
-			return $this->score === null ? '-' : $this->score;
-		
-		if($this->scoreDetails->isTime)
-			$scoreStr = $this->score === null ? '-:--.---' : \CompetitionManager\Utils\Formatting::milliseconds($this->score);
-		else
-			$scoreStr = $this->score === null ? '-' : $this->score;
-		
-		if($detailsStyle)
-		{
-			if($this->scoreDetails instanceof \CompetitionManager\Services\ScoreDetails\TriesCount)
-				$scoreStr .= $detailsStyle.' ('.$this->scoreDetails->nbTries.' '.ngettext('try', 'tries', $this->scoreDetails->nbTries).')';
-			else if($this->scoreDetails instanceof \CompetitionManager\Services\ScoreDetails\MapsCount)
-				$scoreStr .= $detailsStyle.' ('.$this->scoreDetails->nbMaps.' '.ngettext('map', 'maps', $this->scoreDetails->nbMaps).')';
-		}
-		
-		return $scoreStr;
+		if($this->score)
+			$this->score = JSON::unserialize($this->score);
 	}
 }
 

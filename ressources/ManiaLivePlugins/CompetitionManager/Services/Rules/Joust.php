@@ -40,18 +40,21 @@ class Joust extends Script
 		$logins = array_keys($match->participants);
 		if( ($loginIndex = array_search($rankings[0]['Login'], $logins)) !== false )
 		{
-			if(++$match->participants[$logins[$loginIndex]]->score == $this->mapsLimit)
+			if(++$match->participants[$logins[$loginIndex]]->score->points == $this->mapsLimit)
 			{
 				$match->participants[$logins[$loginIndex]]->rank = 1;
 				$match->participants[$logins[1 - $loginIndex]]->rank = 2;
+				$match->participants[$logins[1 - $loginIndex]]->score->points |= 0;
 				Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
 			}
 		}
 	}
 	
-	function getForfeitWinnerScore()
+	function onForfeit($winner, $forfeit)
 	{
-		return $this->mapsLimit;
+		parent::onForfeit($winner, $forfeit);
+		$winner->score->points = $this->mapsLimit;
+		$forfeit->score->points = null;
 	}
 }
 

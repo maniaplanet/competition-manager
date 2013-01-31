@@ -64,7 +64,7 @@ class ParticipantService extends \DedicatedManager\Services\AbstractService
 	function getWithMatchScore($participantId, $matchId)
 	{
 		$result = $this->db()->execute(
-				'SELECT Pa.participantId, '.self::TEAM_OR_PLAYER_INFO.', MP.rank, MP.score, MP.scoreDetails, MP.qualified '.
+				'SELECT Pa.participantId, '.self::TEAM_OR_PLAYER_INFO.', MP.rank, MP.score, MP.qualified '.
 				'FROM Participants Pa '.
 					'LEFT JOIN Players Pl USING(login) '.
 					'LEFT JOIN Teams T USING(teamId) '.
@@ -83,7 +83,7 @@ class ParticipantService extends \DedicatedManager\Services\AbstractService
 	function getWithStageScore($participantId, $stageId)
 	{
 		$result = $this->db()->execute(
-				'SELECT Pa.participantId, '.self::TEAM_OR_PLAYER_INFO.', SP.rank, SP.score, SP.scoreDetails, SP.qualified '.
+				'SELECT Pa.participantId, '.self::TEAM_OR_PLAYER_INFO.', SP.rank, SP.score, SP.qualified '.
 				'FROM Participants Pa '.
 					'LEFT JOIN Players Pl USING(login) '.
 					'LEFT JOIN Teams T USING(teamId) '.
@@ -101,7 +101,7 @@ class ParticipantService extends \DedicatedManager\Services\AbstractService
 	function getByMatch($matchId, $offset=0, $length=0)
 	{
 		$result = $this->db()->execute(
-				'SELECT Pa.participantId, '.self::TEAM_OR_PLAYER_INFO.', MP.rank, MP.score, MP.scoreDetails, MP.qualified '.
+				'SELECT Pa.participantId, '.self::TEAM_OR_PLAYER_INFO.', MP.rank, MP.score, MP.qualified '.
 				'FROM MatchParticipants MP '.
 					'INNER JOIN Participants Pa USING(participantId) '.
 					'LEFT JOIN Players Pl USING(login) '.
@@ -120,7 +120,7 @@ class ParticipantService extends \DedicatedManager\Services\AbstractService
 	function getByStage($stageId, $offset=0, $length=0)
 	{
 		$result = $this->db()->execute(
-				'SELECT Pa.participantId, '.self::TEAM_OR_PLAYER_INFO.', SP.rank, SP.score, SP.scoreDetails, SP.qualified '.
+				'SELECT Pa.participantId, '.self::TEAM_OR_PLAYER_INFO.', SP.rank, SP.score, SP.qualified '.
 				'FROM StageParticipants SP '.
 					'INNER JOIN Participants Pa USING(participantId) '.
 					'LEFT JOIN Players Pl USING(login) '.
@@ -355,16 +355,14 @@ class ParticipantService extends \DedicatedManager\Services\AbstractService
 	 * @param int $matchId
 	 * @param int $participantId
 	 * @param int $rank
-	 * @param int|null $score
-	 * @param ScoreDetails\BasicDetails $scoreDetails
+	 * @param Score $score
 	 */
-	function updateMatchInfo($matchId, $participantId, $rank, $score, $scoreDetails)
+	function updateMatchInfo($matchId, $participantId, $rank, $score)
 	{
 		$this->db()->execute(
-				'UPDATE MatchParticipants SET rank=%s, score=%s, scoreDetails=%s WHERE matchId=%d AND participantId=%d',
+				'UPDATE MatchParticipants SET rank=%s, score=%s WHERE matchId=%d AND participantId=%d',
 				$rank !== null ? $rank : 'NULL',
-				$score !== null ? $score : 'NULL',
-				$this->db()->quote(JSON::serialize($scoreDetails)),
+				$this->db()->quote(JSON::serialize($score)),
 				$matchId,
 				$participantId
 			);
@@ -387,16 +385,14 @@ class ParticipantService extends \DedicatedManager\Services\AbstractService
 	 * @param int $stageId
 	 * @param int $participantId
 	 * @param int $rank
-	 * @param int|null $score
-	 * @param ScoreDetails\BasicDetails $scoreDetails
+	 * @param Score $score
 	 */
-	function updateStageInfo($stageId, $participantId, $rank, $score, $scoreDetails)
+	function updateStageInfo($stageId, $participantId, $rank, $score)
 	{
 		$this->db()->execute(
-				'UPDATE StageParticipants SET rank=%s, score=%s, scoreDetails=%s WHERE stageId=%d AND participantId=%d',
+				'UPDATE StageParticipants SET rank=%s, score=%s WHERE stageId=%d AND participantId=%d',
 				$rank !== null ? $rank : 'NULL',
-				$score !== null ? $score : 'NULL',
-				$this->db()->quote(JSON::serialize($scoreDetails)),
+				$this->db()->quote(JSON::serialize($score)),
 				$stageId,
 				$participantId
 			);

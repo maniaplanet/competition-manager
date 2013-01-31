@@ -12,6 +12,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 use ManiaLive\DedicatedApi\Callback;
 use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\CompetitionManager\Event;
+use ManiaLivePlugins\CompetitionManager\Services\Scores;
 
 class Elite extends Script
 {
@@ -54,28 +55,46 @@ class Elite extends Script
 	
 	function onModeScriptCallback($param1, $param2)
 	{
-		if($param1 != 'EndMap')
-			return;
+		static $mapScores = array(0, 0);
 		
-		$param2 = json_decode($param2);
-		$winnerTeam = $param2->MapWinnerClan-1;
-		
-		$match = \ManiaLivePlugins\CompetitionManager\Services\Match::getInstance();
-		$teamIds = array_keys($match->participants);
-		if(isset($teamIds[$winnerTeam]))
+		switch($param1)
 		{
-			if(++$match->participants[$teamIds[$winnerTeam]]->score == $this->mapsLimit)
-			{
-				$match->participants[$teamIds[$winnerTeam]]->rank = 1;
-				$match->participants[$teamIds[1 - $winnerTeam]]->rank = 2;
-				Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
-			}
+			case 'EndTurn':
+				$param2 = json_decode($param2);
+				$mapScores = array($param2->Clan1RoundScore, $param2->Clan2RoundScore);
+				break;
+				
+			case 'EndMap':
+				$param2 = json_decode($param2);
+				$winnerTeam = $param2->MapWinnerClan-1;
+
+				$match = \ManiaLivePlugins\CompetitionManager\Services\Match::getInstance();
+				$teamIds = array_keys($match->participants);
+				if(isset($teamIds[$winnerTeam]))
+				{
+					foreach($mapScores as $index => $points)
+					{
+						$mapScore = new Scores\Points();
+						$mapScore->points = $points;
+						$match->participants[$teamIds[$index]]->score->details[] = $mapScore;
+					}
+					
+					if(++$match->participants[$teamIds[$winnerTeam]]->score->points == $this->mapsLimit)
+					{
+						$match->participants[$teamIds[$winnerTeam]]->rank = 1;
+						$match->participants[$teamIds[1 - $winnerTeam]]->rank = 2;
+						$match->participants[$teamIds[1 - $winnerTeam]]->score->points |= 0;
+						Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
+					}
+				}
 		}
 	}
 	
-	function getForfeitWinnerScore()
+	function onForfeit($winner, $forfeit)
 	{
-		return $this->mapsLimit;
+		parent::onForfeit($winner, $forfeit);
+		$winner->score->points = $this->mapsLimit;
+		$forfeit->score->points = null;
 	}
 }
 

@@ -9,6 +9,8 @@
 
 namespace CompetitionManager\Services\Rules;
 
+use CompetitionManager\Services\Scores;
+
 class SMTimeAttackDuel extends CumulativeSMTimeAttack
 {
 	public $fixedSlots = 2;
@@ -23,6 +25,13 @@ class SMTimeAttackDuel extends CumulativeSMTimeAttack
 	function getInfo()
 	{
 		return _('1on1, best time wins the map, first to "maps limit" wins the match');
+	}
+	
+	function getDefaultScore()
+	{
+		$score = new Scores\Detailed();
+		$score->main = new Scores\Points();
+		return $score;
 	}
 }
 

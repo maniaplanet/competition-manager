@@ -50,20 +50,24 @@ class CumulativeRounds extends Rounds
 		foreach($rankings as $ranking)
 		{
 			if(isset($match->participants[$ranking['Login']]))
-				$match->participants[$ranking['Login']]->score += $ranking['Score'];
+			{
+				$mapScore = new \ManiaLivePlugins\CompetitionManager\Services\Scores\Points();
+				$mapScore->points = $ranking['Score'];
+				$match->participants[$ranking['Login']]->score->points += $ranking['Score'];
+				$match->participants[$ranking['Login']]->score->details[] = $mapScore;
+			}
 		}
+		usort($match->participants, function($a, $b) { return $a->score->compareTo($b->score); });
 		
-		$self = $this;
-		usort($match->participants, function($a, $b) use ($self) { return $self->compare($a->score, $b->score); });
 		$rank = $realRank = 0;
 		$lastScore = null;
 		foreach($match->participants as $player)
 		{
-			if(!$player->score)
+			if(!$player->score->points)
 				break;
 			
 			++$realRank;
-			if($player->score != $lastScore)
+			if($player->score->points != $lastScore->points)
 				$rank = $realRank;
 			$player->rank = $rank;
 			$lastScore = $player->score;

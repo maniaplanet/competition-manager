@@ -94,7 +94,7 @@ class Stage extends AbstractObject
 	function updateParticipantList()
 	{
 		$result = self::db()->execute(
-				'SELECT Pa.participantId, Pl.*, T.*, IFNULL(Pl.name, T.name) as name, IFNULL(Pl.path, T.path) as path, SP.rank, SP.score, SP.scoreDetails, SP.qualified '.
+				'SELECT Pa.participantId, Pl.*, T.*, IFNULL(Pl.name, T.name) as name, IFNULL(Pl.path, T.path) as path, SP.rank, SP.score, SP.qualified '.
 				'FROM StageParticipants SP '.
 					'INNER JOIN Participants Pa USING(participantId) '.
 					'LEFT JOIN Players Pl USING(login) '.

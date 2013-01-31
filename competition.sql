@@ -3,7 +3,7 @@
 -- Server version:               5.5.20-log - MySQL Community Server (GPL)
 -- Server OS:                    Win32
 -- HeidiSQL version:             7.0.0.4053
--- Date/time:                    2013-01-16 11:51:24
+-- Date/time:                    2013-01-31 12:46:38
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -130,8 +130,7 @@ CREATE TABLE IF NOT EXISTS `MatchParticipants` (
   `matchId` int(10) unsigned NOT NULL,
   `participantId` int(10) unsigned NOT NULL,
   `rank` int(10) unsigned DEFAULT NULL,
-  `score` int(10) unsigned DEFAULT NULL,
-  `scoreDetails` text,
+  `score` text NOT NULL,
   `qualified` tinyint(1) unsigned NOT NULL DEFAULT '2',
   UNIQUE KEY `matchId_login` (`matchId`,`participantId`),
   KEY `matchParticipant` (`participantId`),
@@ -213,8 +212,7 @@ CREATE TABLE IF NOT EXISTS `StageParticipants` (
   `stageId` int(10) unsigned NOT NULL,
   `participantId` int(10) unsigned NOT NULL,
   `rank` int(10) unsigned DEFAULT NULL,
-  `score` int(10) unsigned DEFAULT NULL,
-  `scoreDetails` text,
+  `score` tinytext NOT NULL,
   `qualified` tinyint(1) unsigned NOT NULL DEFAULT '2',
   UNIQUE KEY `stageId_participantId` (`stageId`,`participantId`),
   KEY `stageParticipant` (`participantId`),

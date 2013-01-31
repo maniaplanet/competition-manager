@@ -505,10 +505,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 		
 		$missing = $this->getMissing();
 		$winner = @reset(array_diff_key($this->match->participants, $missing));
-		$winner->rank = 1;
-		$winner->score = $this->match->rules->getForfeitWinnerScore();
-		foreach($missing as $participant)
-			$participant->rank = null;
+		$this->match->rules->onForfeit($winner, reset($missing));
 		$this->over();
 	}
 	
@@ -537,10 +534,9 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 		foreach($this->match->participants as $participant)
 		{
 			$this->db->execute(
-					'UPDATE MatchParticipants SET rank=%s, score=%s, scoreDetails=%s WHERE matchId=%d AND participantId=%d',
+					'UPDATE MatchParticipants SET rank=%s, score=%s WHERE matchId=%d AND participantId=%d',
 					intval($participant->rank) ?: 'NULL',
-					intval($participant->rank) ? intval($participant->score) : 'NULL',
-					$this->db->quote(JSON::serialize($participant->scoreDetails)),
+					$this->db->quote(JSON::serialize($participant->score)),
 					$this->match->matchId,
 					$participant->participantId
 				);

@@ -143,22 +143,22 @@ class MatchService extends \DedicatedManager\Services\AbstractService
 	/**
 	 * @param int $matchId
 	 * @param mixed[] $participants
-	 * @param ScoreDetails\BasicDetails $scoreDetails
+	 * @param Score $score
 	 */
-	function assignParticipants($matchId, $participants, $scoreDetails)
+	function assignParticipants($matchId, $participants, $score)
 	{
 		if(empty($participants))
 			return;
 		
 		$db = $this->db();
 		$values = array_map(
-				function ($participant) use ($matchId, $scoreDetails, $db)
+				function ($participant) use ($matchId, $score, $db)
 				{
 					$participantId = $participant instanceof Participant ? $participant->participantId : $participant;
-					return sprintf('(%d, %d, %s)', $matchId, $participantId, $db->quote(JSON::serialize($scoreDetails)));
+					return sprintf('(%d, %d, %s)', $matchId, $participantId, $db->quote(JSON::serialize($score)));
 				},
 				$participants);
-		$this->db()->execute('INSERT IGNORE INTO MatchParticipants(matchId, participantId, scoreDetails) VALUES %s', implode(',', $values));
+		$this->db()->execute('INSERT IGNORE INTO MatchParticipants(matchId, participantId, score) VALUES %s', implode(',', $values));
 	}
 	
 	/**

@@ -9,7 +9,7 @@
 
 namespace CompetitionManager\Services\Schedules;
 
-class MultiSimple extends AbstractSchedule
+class MultiSimple extends \CompetitionManager\Services\Schedule
 {
 	/** @var \DateTime[] */
 	public $startTimes = array();

@@ -65,7 +65,7 @@ class SingleMatch extends \CompetitionManager\Services\Stage implements Intermed
 	{
 		$this->participants = $participants;
 		$service = new \CompetitionManager\Services\MatchService();
-		$service->assignParticipants(reset($this->matches), $this->participants, $this->getDefaultDetails());
+		$service->assignParticipants(reset($this->matches), $this->participants, $this->rules->getDefaultScore());
 		$service->setState(reset($this->matches), \CompetitionManager\Constants\State::READY);
 		\CompetitionManager\Services\WebServicesProxy::onMatchReady(reset($this->matches));
 	}
@@ -75,7 +75,7 @@ class SingleMatch extends \CompetitionManager\Services\Stage implements Intermed
 		$match->fetchParticipants();
 		$service = new \CompetitionManager\Services\ParticipantService();
 		foreach($match->participants as $participantId => $participant)
-			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score, $participant->scoreDetails);
+			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
 		
 		$service = new \CompetitionManager\Services\MatchService();
 		$service->setState($match->matchId, State::ARCHIVED);
@@ -90,7 +90,7 @@ class SingleMatch extends \CompetitionManager\Services\Stage implements Intermed
 	// Interfaces implementation
 	///////////////////////////////////////////////////////////////////////////
 	
-	function getPlaceholder($rank)
+	function getPlaceholder($rank, $max)
 	{
 		return sprintf(_('%d of previous stage'), $rank);
 	}

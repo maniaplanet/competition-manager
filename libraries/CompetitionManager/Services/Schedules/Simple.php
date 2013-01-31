@@ -9,7 +9,7 @@
 
 namespace CompetitionManager\Services\Schedules;
 
-class Simple extends AbstractSchedule
+class Simple extends \CompetitionManager\Services\Schedule
 {
 	/** @var \DateTime */
 	public $startTime;

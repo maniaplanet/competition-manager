@@ -9,6 +9,8 @@
 
 namespace CompetitionManager\Services\Rules;
 
+use CompetitionManager\Services\Scores;
+
 class CumulativeRounds extends Rounds
 {
 	/** @setting ms Time limit after the first cross the line (0 to disable, 1 for automatic) */
@@ -28,6 +30,13 @@ class CumulativeRounds extends Rounds
 	function getInfo()
 	{
 		return _('Results are accumulated between maps');
+	}
+	
+	function getDefaultScore()
+	{
+		$score = new Scores\Detailed();
+		$score->main = new Scores\Points();
+		return $score;
 	}
 	
 	function _json_sleep()

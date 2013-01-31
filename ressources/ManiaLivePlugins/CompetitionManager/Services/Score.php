@@ -7,7 +7,7 @@
  * @date        $Date: $:
  */
 
-namespace CompetitionManager\Services;
+namespace ManiaLivePlugins\CompetitionManager\Services;
 
 abstract class Score
 {
@@ -28,14 +28,6 @@ abstract class Score
 	function isVisible()
 	{
 		return false;
-	}
-	
-	/**
-	 * @return bool
-	 */
-	function isNull()
-	{
-		return true;
 	}
 	
 	/**

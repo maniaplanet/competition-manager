@@ -9,6 +9,8 @@
 
 namespace CompetitionManager\Services\Rules;
 
+use CompetitionManager\Services\Scores;
+
 class CumulativeTMTimeAttack extends TMTimeAttack
 {
 	/** @setting ms Map duration */
@@ -24,11 +26,12 @@ class CumulativeTMTimeAttack extends TMTimeAttack
 		return _('Results are accumulated between maps');
 	}
 	
-	function getDefaultDetails()
+	function getDefaultScore()
 	{
-		$details = new \CompetitionManager\Services\ScoreDetails\MapsCount();
-		$details->isTime = true;
-		return $details;
+		$score = new Scores\Counting();
+		$score->main = new Scores\Detailed();
+		$score->main->main = new Scores\Time();
+		return $score;
 	}
 }
 

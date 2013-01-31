@@ -9,6 +9,8 @@
 
 namespace CompetitionManager\Services\Rules;
 
+use CompetitionManager\Services\Scores;
+
 class AsynchronousTMTimeAttack extends TMTimeAttack
 {
 	/** @setting none Maximum number of "official" tries, or 0 for unlimited */
@@ -24,11 +26,9 @@ class AsynchronousTMTimeAttack extends TMTimeAttack
 		return _('Players come and play anytime with an optional maximum of tries');
 	}
 	
-	function getDefaultDetails()
+	function getDefaultScore()
 	{
-		$details = new \CompetitionManager\Services\ScoreDetails\TriesCount();
-		$details->isTime = true;
-		return $details;
+		return new Scores\Time();
 	}
 }
 

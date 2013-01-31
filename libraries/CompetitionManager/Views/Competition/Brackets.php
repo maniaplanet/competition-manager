@@ -97,7 +97,7 @@ class Brackets extends \ManiaLib\Application\View
 		$card->setPosY($posY);
 		$card->setValign('center');
 		foreach($match->participants as $participant)
-			$card->addParticipant($participant, false, $match->state >= Constants\State::STARTED && $participant->hasScore(), false);
+			$card->addParticipant($participant, false, $match->state >= Constants\State::STARTED && $participant->score->isVisible(), false);
 		
 		if($match->state > Constants\State::UNKNOWN)
 			$emptyLabels = 'BYE';

@@ -11,6 +11,7 @@ namespace CompetitionManager\Services\Stages;
 
 use CompetitionManager\Constants\Qualified;
 use CompetitionManager\Constants\State;
+use CompetitionManager\Services\Scores;
 use CompetitionManager\Utils\Formatting;
 
 class Brackets extends \CompetitionManager\Services\Stage implements LastCompliant
@@ -87,9 +88,9 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 		return 'brackets';
 	}
 	
-	function getDefaultDetails()
+	function getDefaultScore()
 	{
-		return null;
+		return new Scores\Points();
 	}
 	
 	function findMatch($matchId)
@@ -302,7 +303,7 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 			}
 			else
 			{
-				$matchService->assignParticipants($matchId, $participantsByMatchId[$matchId], $this->rules->getDefaultDetails());
+				$matchService->assignParticipants($matchId, $participantsByMatchId[$matchId], $this->rules->getDefaultScore());
 				$matchService->setState($matchId, State::READY);
 				\CompetitionManager\Services\WebServicesProxy::onMatchReady($matchId);
 			}
@@ -339,13 +340,21 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 			)
 		{
 			foreach($match->participants as $participantId => $participant)
-				$participantService->updateStageInfo($this->stageId, $participantId, $participant->rank, count($this->matches[self::WINNERS_BRACKET]) * 2, null);
+			{
+				$score = $this->getDefaultScore();
+				$score->points = count($this->matches[self::WINNERS_BRACKET]) * 2;
+				$participantService->updateStageInfo($this->stageId, $participantId, $participant->rank, $score);
+			}
 		}
 		// Small final case
 		else if($this->parameters['withSmallFinal'] && $round == count($this->matches[$bracket]) - 1)
 		{
 			foreach($match->participants as $participantId => $participant)
-				$participantService->updateStageInfo($this->stageId, $participantId, $participant->rank + $this->parameters['slotsPerMatch'], count($this->matches[$bracket]), null);
+			{
+				$score = $this->getDefaultScore();
+				$score->points = count($this->matches[$bracket]);
+				$participantService->updateStageInfo($this->stageId, $participantId, $participant->rank + $this->parameters['slotsPerMatch'], $score);
+			}
 		}
 		else
 		{
@@ -354,7 +363,7 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 			foreach($match->participants as $participantId => $participant)
 			{
 				if($participant->rank == null)
-					$participantService->updateStageInfo($this->stageId, $participantId, 0, null, null);
+					$participantService->updateStageInfo($this->stageId, $participantId, 0, $this->getDefaultScore());
 				else if($participant->rank <= $maxQualified)
 					$qualified[] = $participantId;
 				else
@@ -366,7 +375,11 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 					if($isRescued)
 						$falling[] = $participantId;
 					else
-						$participantService->updateStageInfo($this->stageId, $participantId, 0, $round+1, null);
+					{
+						$score = $this->getDefaultScore();
+						$score->points = $round+1;
+						$participantService->updateStageInfo($this->stageId, $participantId, 0, $score);
+					}
 				}
 			}
 			
@@ -435,7 +448,7 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 	
 	private function continueBracket($service, $participants, $matchId, $pairedId, $skippable=true)
 	{
-		$service->assignParticipants($matchId, $participants, $this->rules->getDefaultDetails());
+		$service->assignParticipants($matchId, $participants, $this->rules->getDefaultScore());
 		if($service->getState($pairedId) == State::ARCHIVED)
 		{
 			$match = $service->get($matchId);
@@ -444,7 +457,7 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 			{
 				$participantService = new \CompetitionManager\Services\ParticipantService();
 				foreach($match->participants as $participant)
-					$participantService->updateMatchInfo($matchId, $participant->participantId, 1, null, $participant->scoreDetails);
+					$participantService->updateMatchInfo($matchId, $participant->participantId, 1, $participant->score);
 				$this->onMatchOver($match);
 			}
 			else
@@ -458,7 +471,7 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 	function onEnd()
 	{
 		$this->fetchParticipants();
-		uasort($this->participants, function($p1, $p2) { return $p2->score - $p1->score; });
+		uasort($this->participants, function($p1, $p2) { return $p1->score->compareTo($p2->score); });
 		
 		$service = new \CompetitionManager\Services\ParticipantService();
 		$rank = $realRank = 1;
@@ -476,7 +489,7 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 				$realRank = $rank;
 				$lastScore = $player->score;
 			}
-			$service->updateStageInfo($this->stageId, $login, $realRank, $lastScore, null);
+			$service->updateStageInfo($this->stageId, $login, $realRank, $lastScore);
 			$this->participants[$login]->rank = $realRank;
 			$rank++;
 		}

@@ -12,6 +12,7 @@ namespace CompetitionManager\Services\Rules;
 use DedicatedApi\Structures\GameInfos;
 use ManiaLib\Gui\Elements\Icon;
 use ManiaLib\Gui\Elements\Icons128x32_1;
+use CompetitionManager\Services\Scores;
 
 class Cup extends \CompetitionManager\Services\Rules
 {
@@ -45,6 +46,13 @@ class Cup extends \CompetitionManager\Services\Rules
 	function getTitle()
 	{
 		return 'TMCanyon';
+	}
+	
+	function getDefaultScore()
+	{
+		$score = new Scores\Detailed();
+		$score->main = new Scores\Points();
+		return $score;
 	}
 	
 	function _json_sleep()

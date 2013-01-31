@@ -47,18 +47,21 @@ class BattleWaves extends Script
 		$teamIds = array_keys($match->participants);
 		if(isset($teamIds[$winnerTeamOrMap]))
 		{
-			if(++$match->participants[$teamIds[$winnerTeamOrMap]]->score == $this->mapsLimit)
+			if(++$match->participants[$teamIds[$winnerTeamOrMap]]->score->points == $this->mapsLimit)
 			{
 				$match->participants[$teamIds[$winnerTeamOrMap]]->rank = 1;
 				$match->participants[$teamIds[1 - $winnerTeamOrMap]]->rank = 2;
+				$match->participants[$teamIds[1 - $winnerTeamOrMap]]->score->points |= 0;
 				Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
 			}
 		}
 	}
 	
-	function getForfeitWinnerScore()
+	function onForfeit($winner, $forfeit)
 	{
-		return $this->mapsLimit;
+		parent::onForfeit($winner, $forfeit);
+		$winner->score->points = $this->mapsLimit;
+		$forfeit->score->points = null;
 	}
 }
 

@@ -23,11 +23,6 @@ class LobbySMTimeAttack extends SMTimeAttack
 	{
 		return _('Classic Time-Attack');
 	}
-	
-	function getDefaultDetails()
-	{
-		return null;
-	}
 }
 
 ?>

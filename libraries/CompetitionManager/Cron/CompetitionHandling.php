@@ -96,7 +96,7 @@ class CompetitionHandling extends Cron
 				else
 				{
 					$this->debug('Stage #'.$stage->stageId.' finished, setting up stage #'.$stage->nextId);
-					$stageService->assignParticipants($nextStage->stageId, $participantsToKeep, $nextStage->getDefaultDetails());
+					$stageService->assignParticipants($nextStage->stageId, $participantsToKeep, $nextStage->getDefaultScore());
 					$stageService->setState($nextStage->stageId, State::READY);
 					$nextStage->onReady($participantsToKeep);
 				}

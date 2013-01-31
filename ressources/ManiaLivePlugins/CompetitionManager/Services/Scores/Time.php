@@ -7,9 +7,9 @@
  * @date        $Date: $:
  */
 
-namespace CompetitionManager\Services\Scores;
+namespace ManiaLivePlugins\CompetitionManager\Services\Scores;
 
-class Time extends \CompetitionManager\Services\Score
+class Time extends \ManiaLivePlugins\CompetitionManager\Services\Score
 {
 	/** @var int */
 	public $time;
@@ -22,11 +22,6 @@ class Time extends \CompetitionManager\Services\Score
 	function isVisible()
 	{
 		return true;
-	}
-	
-	function isNull()
-	{
-		return $this->time === null;
 	}
 	
 	function compareTo(Time $score)
@@ -43,7 +38,7 @@ class Time extends \CompetitionManager\Services\Score
 	
 	function __toString()
 	{
-		return $this->time ? \CompetitionManager\Utils\Formatting::milliseconds($this->time) : '-:--.---';
+		return $this->time ? \ManiaLive\Utilities\Time::fromTM($this->time) : '-:--.---';
 	}
 }
 

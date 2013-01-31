@@ -25,15 +25,15 @@ abstract class Rules
 			switch($title)
 			{
 //				case 'TMCanyon':
-//					return array(new Team());
+//					return array(new Rules\Team());
 //				case 'SMStorm':
-//					return array(new BattleWaves());
+//					return array(new Rules\BattleWaves());
 				case 'SMStormElite@nadeolabs':
-					return array(new Elite());
+					return array(new Rules\Elite());
 //				case 'SMStormEliteExperimental@nadeolabs':
-//					return array(new EliteExperimental());
+//					return array(new Rules\EliteExperimental());
 //				case 'SMStormHeroes@nadeolabs':
-//					return array(new Heroes());
+//					return array(new Rules\Heroes());
 			}
 		}
 		else if($isLobby)
@@ -42,22 +42,22 @@ abstract class Rules
 			{
 				case 'TMCanyon':
 					return array(
-						new LobbyTMTimeAttack(),
-						new LobbyRounds()
+						new Rules\LobbyTMTimeAttack(),
+						new Rules\LobbyRounds()
 					);
 				case 'SMStorm':
 //				case 'SMStormElite@nadeolabs':
 //				case 'SMStormEliteExperimental@nadeolabs':
 //				case 'SMStormHeroes@nadeolabs':
 					return array(
-						new Melee(),
-						new BattleWaves(),
-						new LobbySMTimeAttack()
+						new Rules\Melee(),
+						new Rules\BattleWaves(),
+						new Rules\LobbySMTimeAttack()
 					);
 				case 'SMStormRoyal@nadeolabs':
-					return array(new Royal());
+					return array(new Rules\Royal());
 				case 'SMStormJoust@nadeolabs':
-					return array(new LobbyJoust());
+					return array(new Rules\LobbyJoust());
 			}
 		}
 		else if($isOpen)
@@ -65,9 +65,9 @@ abstract class Rules
 			switch($title)
 			{
 //				case 'TMCanyon':
-//					return array(new AsynchronousTMTimeAttack());
+//					return array(new Rules\AsynchronousTMTimeAttack());
 //				case 'SMStorm':
-//					return array(new AsynchronousSMTimeAttack());
+//					return array(new Rules\AsynchronousSMTimeAttack());
 			}
 		}
 		else
@@ -76,23 +76,23 @@ abstract class Rules
 			{
 				case 'TMCanyon':
 					return array(
-//						new CumulativeTMTimeAttack(),
-//						new TMTimeAttackDuel(),
-//						new CumulativeRounds(),
-//						new RoundsDuel(),
-						new Laps(),
-//						new Cup()
+//						new Rules\CumulativeTMTimeAttack(),
+//						new Rules\TMTimeAttackDuel(),
+//						new Rules\CumulativeRounds(),
+//						new Rules\RoundsDuel(),
+						new Rules\Laps(),
+//						new Rules\Cup()
 					);
 				case 'SMStorm':
 					return array(
-						new Melee(),
-//						new CumulativeSMTimeAttack(),
-//						new SMTimeAttackDuel()
+						new Rules\Melee(),
+//						new Rules\CumulativeSMTimeAttack(),
+//						new Rules\SMTimeAttackDuel()
 					);
 				case 'SMStormRoyal@nadeolabs':
-					return array(new Royal());
+					return array(new Rules\Royal());
 				case 'SMStormJoust@nadeolabs':
-					return array(new Joust());
+					return array(new Rules\Joust());
 			}
 		}
 		
@@ -167,9 +167,9 @@ abstract class Rules
 		return 0;
 	}
 	
-	function getDefaultDetails()
+	function getDefaultScore()
 	{
-		return new \CompetitionManager\Services\ScoreDetails\BasicDetails();
+		return new Scores\None();
 	}
 }
 

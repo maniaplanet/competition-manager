@@ -7,9 +7,9 @@
  * @date        $Date: 2012-10-15 15:18:28 +0200 (lun., 15 oct. 2012) $:
  */
 
-namespace CompetitionManager\Services\Schedules;
+namespace CompetitionManager\Services;
 
-abstract class AbstractSchedule
+abstract class Schedule
 {
 	abstract function getTimesLimit();
 }

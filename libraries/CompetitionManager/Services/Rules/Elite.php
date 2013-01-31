@@ -9,6 +9,8 @@
 
 namespace CompetitionManager\Services\Rules;
 
+use CompetitionManager\Services\Scores;
+
 class Elite extends Script
 {
 	public $name = 'Elite.Script.txt';
@@ -52,6 +54,13 @@ class Elite extends Script
 	function getTeamSize()
 	{
 		return 3;
+	}
+	
+	function getDefaultScore()
+	{
+		$score = new Scores\Detailed();
+		$score->main = new Scores\Points();
+		return $score;
 	}
 }
 

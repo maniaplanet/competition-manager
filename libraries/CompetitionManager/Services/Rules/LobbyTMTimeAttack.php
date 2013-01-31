@@ -23,11 +23,6 @@ class LobbyTMTimeAttack extends TMTimeAttack
 	{
 		return _('Classic Time-Attack');
 	}
-	
-	function getDefaultDetails()
-	{
-		return null;
-	}
 }
 
 ?>

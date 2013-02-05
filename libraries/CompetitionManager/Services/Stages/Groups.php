@@ -21,7 +21,6 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 		$this->parameters['numberOfRounds'] = 1;
 		$this->parameters['pointsForWin'] = 2;
 		$this->parameters['pointsForLoss'] = 1;
-		$this->parameters['pointsForForfeit'] = 0;
 		$this->parameters['scoringSystem'] = null;
 		$this->parameters['numberOfGroups'] = 4;
 		$this->parameters['groupParticipants'] = array();
@@ -70,6 +69,26 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 		$score = new Scores\Summary();
 		$score->main = new Scores\Points();
 		return $score;
+	}
+	
+	function findMatch($matchId)
+	{
+		foreach($this->matches as $group => $groupRounds)
+		{
+			if($this->parameters['isFreeForAll'])
+			{
+				foreach($groupRounds as $round => $matchOrId)
+					if(($matchOrId instanceof \CompetitionManager\Services\Match && $matchOrId->matchId == $matchId) || $matchOrId == $matchId)
+						return array($group, $round);
+			}
+			else
+			{
+				foreach($groupRounds as $round => $roundMatches)
+					foreach($roundMatches as $matchOrId)
+						if(($matchOrId instanceof \CompetitionManager\Services\Match && $matchOrId->matchId == $matchId) || $matchOrId == $matchId)
+							return array($group, $round);
+			}
+		}
 	}
 	
 	function onCreate()
@@ -167,7 +186,37 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 	
 	function onMatchOver($match)
 	{
-		// TODO how to give points ? (might be almost same function than parent)
+		list($group, $round) = $this->findMatch($match->matchId);
+		$match->fetchParticipants();
+		$this->fetchParticipants();
+		
+		foreach($match->participants as $matchResult)
+		{
+			$stageResult = $this->participants[$matchResult->participantId];
+			$stageResult->score->summary[$round] = $matchResult->rank;
+			$stageResult->score->points = null;
+			foreach($stageResult->score->summary as $rank)
+			{
+				if($rank === null)
+					continue;
+				
+				if($this->parameters['isFreeForAll'])
+					$pointsByRank = $this->parameters['scoringSystem']->points;
+				else
+					$pointsByRank = array($this->parameters['pointsForWin'], $this->parameters['pointsForLoss']);
+				
+				$stageResult->score->points += $pointsByRank[$rank-1];
+			}
+		}
+		
+		$groupParticipants = array_intersect_key($this->participants, array_flip($this->parameters['groupParticipants'][$group]));
+		$service = new \CompetitionManager\Services\ParticipantService();
+		$service->rankParticipants($groupParticipants);
+		foreach($groupParticipants as $participantId => $participant)
+			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
+		
+		$service = new \CompetitionManager\Services\MatchService();
+		$service->setState($match->matchId, State::ARCHIVED);
 	}
 	
 	function onEnd()

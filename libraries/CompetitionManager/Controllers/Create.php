@@ -209,7 +209,6 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 			{
 				$this->stage->parameters['pointsForWin'] = (int) $this->request->getPost('pointsForWin');
 				$this->stage->parameters['pointsForLoss'] = (int) $this->request->getPost('pointsForLoss');
-				$this->stage->parameters['pointsForForfeit'] = (int) $this->request->getPost('pointsForForfeit');
 			}
 			if(!($this->stage instanceof Stages\Championship))
 			{

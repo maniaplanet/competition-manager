@@ -67,15 +67,9 @@ $r = ManiaLib\Application\Request::getInstance();
 						<li data-role="fieldcontain" class="versus-compliant">
 							<label for="pointsForLoss">
 								<strong><?php echo _('Points for defeat'); ?></strong><br/>
+								<i><?php echo sprintf(_('A %s who didn\'t show up or leaved will always got no points'), $competition->isTeam ? _('team') : _('player')); ?></i>
 							</label>
 							<input type="text" name="pointsForLoss" id="pointsForLoss" value="<?php echo $stage->parameters['pointsForLoss']; ?>"/>
-						</li>
-						<li data-role="fieldcontain" class="versus-compliant">
-							<label for="pointsForForfeit">
-								<strong><?php echo _('Points for forfeit'); ?></strong><br/>
-								<i><?php echo sprintf(_('For a %s who didn\'t show up or leaved'), $competition->isTeam ? _('team') : _('player')); ?></i>
-							</label>
-							<input type="text" name="pointsForForfeit" id="pointsForForfeit" value="<?php echo $stage->parameters['pointsForForfeit']; ?>"/>
 						</li>
 						<li data-role="fieldcontain" class="ffa-compliant">
 							<fieldset data-role="controlgroup">

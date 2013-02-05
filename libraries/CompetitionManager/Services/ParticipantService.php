@@ -410,6 +410,27 @@ class ParticipantService extends \DedicatedManager\Services\AbstractService
 				$qualified, $stageId, $participantId
 			);
 	}
+	
+	/**
+	 * @param Participant[] $participants
+	 */
+	function rankParticipants($participants)
+	{
+		uasort($participants, function($p1, $p2) { return $p1->score->compareTo($p2->score); });
+		
+		$rank = $realRank = 1;
+		$lastScore = null;
+		foreach($participants as $login => $player)
+		{
+			if($lastScore == null || $player->score->compareTo($lastScore))
+			{
+				$realRank = $rank;
+				$lastScore = $player->score;
+			}
+			$participants[$login]->rank = $realRank;
+			$rank++;
+		}
+	}
 }
 
 ?>

@@ -342,8 +342,8 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 			foreach($match->participants as $participantId => $participant)
 			{
 				$score = $this->getDefaultScore();
-				$score->points = count($this->matches[self::WINNERS_BRACKET]) * 2;
-				$participantService->updateStageInfo($this->stageId, $participantId, $participant->rank, $score);
+				$score->points = $this->maxSlots - $participant->rank;
+				$participantService->updateStageInfo($this->stageId, $participantId, 0, $score);
 			}
 		}
 		// Small final case
@@ -352,8 +352,8 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 			foreach($match->participants as $participantId => $participant)
 			{
 				$score = $this->getDefaultScore();
-				$score->points = count($this->matches[$bracket]);
-				$participantService->updateStageInfo($this->stageId, $participantId, $participant->rank + $this->parameters['slotsPerMatch'], $score);
+				$score->points = $this->maxSlots - $this->parameters['slotsPerMatch'] - $participant->rank;
+				$participantService->updateStageInfo($this->stageId, $participantId, 0, $score);
 			}
 		}
 		else
@@ -474,25 +474,9 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 		uasort($this->participants, function($p1, $p2) { return $p1->score->compareTo($p2->score); });
 		
 		$service = new \CompetitionManager\Services\ParticipantService();
-		$rank = $realRank = 1;
-		$lastScore = 0;
-		foreach($this->participants as $login => $player)
-		{
-			if($player->rank)
-			{
-				$lastScore = $player->score;
-				$rank++;
-				continue;
-			}
-			if($player->score != $lastScore)
-			{
-				$realRank = $rank;
-				$lastScore = $player->score;
-			}
-			$service->updateStageInfo($this->stageId, $login, $realRank, $lastScore);
-			$this->participants[$login]->rank = $realRank;
-			$rank++;
-		}
+		$service->rankParticipants($this->participants);
+		foreach($this->participants as $participantId => $participant)
+			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
 	}
 	
 	private function roundName($round, $losersBracket=false, $plural=false)

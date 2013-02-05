@@ -102,29 +102,27 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 		}
 	}
 	
-	function onRun()
+	private function updateGuestLists()
 	{
-		parent::onRun();
-		$this->fetchMatches();
-		
-		// Update guestlists if stage is merged with registrations
-		if(!$this->previousId)
+		foreach($this->matches as $match)
 		{
-			foreach($this->matches as $match)
+			$service = new \CompetitionManager\Services\ServerService();
+			$server = $service->getByMatch($match->matchId);
+			if($server)
 			{
-				$service = new \CompetitionManager\Services\ServerService();
-				$server = $service->getByMatch($match->matchId);
-				if($server)
-				{
-					$match->createGuestList(true);
-					$connection = \DedicatedApi\Connection::factory($server->rpcHost, $server->rpcPort, 5, 'SuperAdmin', $server->rpcPassword);
-					$connection->loadGuestList('GuestLists\competition.match-'.$match->matchId.'.txt');
-					$server->closeConnection();
-				}
+				$match->createGuestList();
+				$server->openConnection();
+				$server->connection->loadGuestList('GuestLists\competition.match-'.$match->matchId.'.txt');
+				$server->closeConnection();
 			}
 		}
+	}
+	
+	private function updateScores()
+	{
+		$this->fetchMatches();
+		$this->fetchParticipants();
 		
-		// Update scores
 		if(count($this->matches) == 1)
 		{
 			$this->matches[0]->fetchParticipants();
@@ -133,7 +131,6 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 		}
 		else
 		{
-			$this->fetchParticipants();
 			foreach($this->participants as $participant)
 				$participant->score = $this->getDefaultScore();
 			foreach($this->matches as $match)
@@ -147,25 +144,46 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 					}
 			}
 		}
-		uasort($this->participants, function($p1, $p2) { return $p1->score->compareTo($p2->score); });
+	}
+	
+	private function updateRanking()
+	{
+		$this->fetchParticipants();
 		
-		// Update ranks
-		$rank = 1;
+		$service = new \CompetitionManager\Services\ParticipantService();
+		$service->rank($this->participants);
+		
 		if($this->nextId)
 		{
-			$service = new \CompetitionManager\Services\StageService();
-			$nextPlayersLimit = $service->get($this->nextId)->maxSlots;
+			$stageService = new \CompetitionManager\Services\StageService();
+			$nextStage = $stageService->get($this->nextId);
+			
+			$service->breakTies($this->participants, $nextStage->maxSlots);
+			foreach($this->participants as $participantId => $participant)
+			{
+				$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
+				if($participant->rank <= $nextStage->maxSlots)
+					$service->setStageQualification($this->stageId, $participantId, Constants\Qualified::YES);
+				else if($participant->rank === null)
+					$service->setStageQualification($this->stageId, $participantId, Constants\Qualified::LEAVED);
+				else
+					$service->setStageQualification($this->stageId, $participantId, Constants\Qualified::NO);
+			}
 		}
-		$service = new \CompetitionManager\Services\ParticipantService();
-		foreach($this->participants as $participantId => $participant)
-		{
-			if($participant->score === null)
-				break;
-			$participant->rank = $rank++;
-			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
-			if($this->nextId)
-				$service->setStageQualification($this->stageId, $participantId, $participant->rank > $nextPlayersLimit ? Qualified::NO : Qualified::YES);
-		}
+		else
+			foreach($this->participants as $participantId => $participant)
+				$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
+	}
+	
+	function onRun()
+	{
+		parent::onRun();
+		
+		if(!$this->previousId)
+			$this->updateGuestLists();
+		
+		$this->updateScores();
+		$this->updateRanking();
 	}
 	
 	function onMatchOver($match)
@@ -176,7 +194,7 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 	
 	function onEnd()
 	{
-		
+		// Everything is already done in onRun()
 	}
 	
 	///////////////////////////////////////////////////////////////////////////

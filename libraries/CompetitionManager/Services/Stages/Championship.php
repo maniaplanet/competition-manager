@@ -45,6 +45,23 @@ class Championship extends Groups implements LastCompliant
 		return 'championship';
 	}
 	
+	function findMatch($matchId)
+	{
+		if($this->parameters['isFreeForAll'])
+		{
+			foreach($this->matches as $round => $matchOrId)
+				if(($matchOrId instanceof \CompetitionManager\Services\Match && $matchOrId->matchId == $matchId) || $matchOrId == $matchId)
+					return $round;
+		}
+		else
+		{
+			foreach($this->matches as $round => $roundMatches)
+				foreach($roundMatches as $matchOrId)
+					if(($matchOrId instanceof \CompetitionManager\Services\Match && $matchOrId->matchId == $matchId) || $matchOrId == $matchId)
+						return $round;
+		}
+	}
+	
 	function onCreate()
 	{
 		$this->matches = array();
@@ -108,12 +125,63 @@ class Championship extends Groups implements LastCompliant
 	
 	function onMatchOver($match)
 	{
-		// TODO how to give points ?
+		$round = $this->findMatch($match->matchId);
+		$match->fetchParticipants();
+		$this->fetchParticipants();
+
+		if($this->parameters['isFreeForAll'])
+			$pointsByRank = $this->parameters['scoringSystem']->points;
+		else
+			$pointsByRank = array($this->parameters['pointsForWin'], $this->parameters['pointsForLoss']);
+		
+		foreach($match->participants as $matchResult)
+		{
+			$stageResult = $this->participants[$matchResult->participantId];
+			$stageResult->score->summary[$round] = $matchResult->rank;
+			$stageResult->score->points = null;
+			foreach($stageResult->score->summary as $rank)
+			{
+				if($rank === null)
+					continue;
+				$stageResult->score->points += $pointsByRank[min($rank, count($pointsByRank))-1];
+			}
+		}
+		
+		$service = new \CompetitionManager\Services\ParticipantService();
+		$service->rank($this->participants);
+		foreach($this->participants as $participantId => $participant)
+			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
+		
+		$service = new \CompetitionManager\Services\MatchService();
+		$service->setState($match->matchId, State::ARCHIVED);
 	}
 	
 	function onEnd()
 	{
+		$this->fetchParticipants();
 		
+		$service = new \CompetitionManager\Services\ParticipantService();
+		$service->rank($this->participants);
+		if($this->nextId)
+		{
+			$stageService = new \CompetitionManager\Services\StageService();
+			$nextStage = $stageService->get($this->nextId);
+			
+			$service->breakTies($this->participants, $nextStage->maxSlots);
+			foreach($this->participants as $participantId => $participant)
+			{
+				$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
+				if($participant->rank <= $nextStage->maxSlots)
+					$service->setStageQualification($this->stageId, $participantId, Constants\Qualified::YES);
+				else if($participant->rank === null)
+					$service->setStageQualification($this->stageId, $participantId, Constants\Qualified::LEAVED);
+				else
+					$service->setStageQualification($this->stageId, $participantId, Constants\Qualified::NO);
+			}
+		}
+		else
+			foreach($this->participants as $participantId => $participant)
+				$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////

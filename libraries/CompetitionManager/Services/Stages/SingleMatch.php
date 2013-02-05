@@ -9,13 +9,13 @@
 
 namespace CompetitionManager\Services\Stages;
 
-use CompetitionManager\Constants\State;
+use CompetitionManager\Constants;
 
 class SingleMatch extends \CompetitionManager\Services\Stage implements IntermediateCompliant, LastCompliant
 {
 	function __construct()
 	{
-		$this->type = \CompetitionManager\Constants\StageType::SINGLE_MATCH;
+		$this->type = Constants\StageType::SINGLE_MATCH;
 		$this->schedule = new \CompetitionManager\Services\Schedules\Simple();
 	}
 	
@@ -66,7 +66,7 @@ class SingleMatch extends \CompetitionManager\Services\Stage implements Intermed
 		$this->participants = $participants;
 		$service = new \CompetitionManager\Services\MatchService();
 		$service->assignParticipants(reset($this->matches), $this->participants, $this->rules->getDefaultScore());
-		$service->setState(reset($this->matches), \CompetitionManager\Constants\State::READY);
+		$service->setState(reset($this->matches), Constants\State::READY);
 		\CompetitionManager\Services\WebServicesProxy::onMatchReady(reset($this->matches));
 	}
 	
@@ -78,12 +78,35 @@ class SingleMatch extends \CompetitionManager\Services\Stage implements Intermed
 			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
 		
 		$service = new \CompetitionManager\Services\MatchService();
-		$service->setState($match->matchId, State::ARCHIVED);
+		$service->setState($match->matchId, Constants\State::ARCHIVED);
 	}
 	
 	function onEnd()
 	{
+		$this->fetchParticipants();
 		
+		$service = new \CompetitionManager\Services\ParticipantService();
+		$service->rank($this->participants);
+		if($this->nextId)
+		{
+			$stageService = new \CompetitionManager\Services\StageService();
+			$nextStage = $stageService->get($this->nextId);
+			
+			$service->breakTies($this->participants, $nextStage->maxSlots);
+			foreach($this->participants as $participantId => $participant)
+			{
+				$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
+				if($participant->rank <= $nextStage->maxSlots)
+					$service->setStageQualification($this->stageId, $participantId, Constants\Qualified::YES);
+				else if($participant->rank === null)
+					$service->setStageQualification($this->stageId, $participantId, Constants\Qualified::LEAVED);
+				else
+					$service->setStageQualification($this->stageId, $participantId, Constants\Qualified::NO);
+			}
+		}
+		else
+			foreach($this->participants as $participantId => $participant)
+				$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
 	}
 	
 	///////////////////////////////////////////////////////////////////////////

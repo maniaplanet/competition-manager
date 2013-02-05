@@ -319,17 +319,6 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 		$matchService = new \CompetitionManager\Services\MatchService();
 		$maxQualified = $this->parameters['slotsPerMatch'] >> 1;
 		
-		// Update qualification state
-		foreach($match->participants as $participantId => $participant)
-		{
-			if($participant->rank == null)
-				$participantService->setMatchQualification($match->matchId, $participantId, Qualified::LEAVED);
-			else if($participant->rank <= $maxQualified)
-				$participantService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
-			else
-				$participantService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
-		}
-		
 		// Final or Grand final case
 		if($bracket == self::GRAND_FINAL
 				|| ($bracket == self::WINNERS_BRACKET
@@ -360,6 +349,7 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 		{
 			$qualified = array();
 			$falling = array();
+			$participantService->breakTies($match->participants, $maxQualified);
 			foreach($match->participants as $participantId => $participant)
 			{
 				if($participant->rank == null)
@@ -443,6 +433,17 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 			}
 		}
 		
+		// Update qualification state
+		foreach($match->participants as $participantId => $participant)
+		{
+			if($participant->rank == null)
+				$participantService->setMatchQualification($match->matchId, $participantId, Qualified::LEAVED);
+			else if($participant->rank <= $maxQualified)
+				$participantService->setMatchQualification($match->matchId, $participantId, Qualified::YES);
+			else
+				$participantService->setMatchQualification($match->matchId, $participantId, Qualified::NO);
+		}
+		
 		$matchService->setState($match->matchId, State::ARCHIVED);
 	}
 	
@@ -471,13 +472,16 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 	function onEnd()
 	{
 		$this->fetchParticipants();
-		uasort($this->participants, function($p1, $p2) { return $p1->score->compareTo($p2->score); });
 		
 		$service = new \CompetitionManager\Services\ParticipantService();
-		$service->rankParticipants($this->participants);
+		$service->rank($this->participants);
 		foreach($this->participants as $participantId => $participant)
 			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
 	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Utilities
+	///////////////////////////////////////////////////////////////////////////
 	
 	private function roundName($round, $losersBracket=false, $plural=false)
 	{

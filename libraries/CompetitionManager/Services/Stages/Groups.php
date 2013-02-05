@@ -189,6 +189,11 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 		list($group, $round) = $this->findMatch($match->matchId);
 		$match->fetchParticipants();
 		$this->fetchParticipants();
+
+		if($this->parameters['isFreeForAll'])
+			$pointsByRank = $this->parameters['scoringSystem']->points;
+		else
+			$pointsByRank = array($this->parameters['pointsForWin'], $this->parameters['pointsForLoss']);
 		
 		foreach($match->participants as $matchResult)
 		{
@@ -199,19 +204,13 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 			{
 				if($rank === null)
 					continue;
-				
-				if($this->parameters['isFreeForAll'])
-					$pointsByRank = $this->parameters['scoringSystem']->points;
-				else
-					$pointsByRank = array($this->parameters['pointsForWin'], $this->parameters['pointsForLoss']);
-				
 				$stageResult->score->points += $pointsByRank[$rank-1];
 			}
 		}
 		
 		$groupParticipants = array_intersect_key($this->participants, array_flip($this->parameters['groupParticipants'][$group]));
 		$service = new \CompetitionManager\Services\ParticipantService();
-		$service->rankParticipants($groupParticipants);
+		$service->rank($groupParticipants);
 		foreach($groupParticipants as $participantId => $participant)
 			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
 		
@@ -221,7 +220,38 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 	
 	function onEnd()
 	{
+		$this->fetchParticipants();
 		
+		$service = new \CompetitionManager\Services\ParticipantService();
+		$stageService = new \CompetitionManager\Services\StageService();
+		
+		$nextStage = $stageService->get($this->nextId);
+		$qualifiedPerGroup = floor($nextStage->maxSlots / $this->parameters['numberOfGroups']);
+		
+		foreach($this->parameters['groupParticipants'] as $group => $participantIds)
+		{
+			$groupParticipants = array_intersect_key($this->participants, array_flip($participantIds));
+			$service->rank($groupParticipants);
+			$service->breakTies($groupParticipants, $qualifiedPerGroup);
+			foreach($groupParticipants as $participantId => $participant)
+			{
+				$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
+				if($participant->rank <= $qualifiedPerGroup)
+				{
+					$service->setStageQualification($this->stageId, $participantId, Constants\Qualified::YES);
+					// hack to get right seeds in next stage, rank must not be updated in DB!!
+					$participant->rank = ($participant->rank-1) * $this->parameters['numberOfGroups'] + $group + 1;
+				}
+				else if($participant->rank === null)
+					$service->setStageQualification($this->stageId, $participantId, Constants\Qualified::LEAVED);
+				else
+				{
+					$service->setStageQualification($this->stageId, $participantId, Constants\Qualified::NO);
+					// hack to avoid qualification for next stage, rank must not be updated in DB!!
+					$participant->rank = $nextStage->maxSlots + 1;
+				}
+			}
+		}
 	}
 	
 	///////////////////////////////////////////////////////////////////////////

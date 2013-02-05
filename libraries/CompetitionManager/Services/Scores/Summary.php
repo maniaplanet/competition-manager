@@ -9,59 +9,16 @@
 
 namespace CompetitionManager\Services\Scores;
 
-class Summary extends \CompetitionManager\Services\Score
+class Summary extends Composed
 {
-	/** @var \CompetitionManager\Services\Score */
-	public $main;
 	/** @var int[] */
 	public $summary = array();
-	
-	function isVisible()
-	{
-		return $this->main->isVisible();
-	}
-	
-	function isNull()
-	{
-		return $this->main->isNull();
-	}
-	
-	function compareTo(Summary $score)
-	{
-		return $this->main->compareTo($score->main);
-	}
 	
 	function add(Summary $score)
 	{
 		$sum = parent::add($score);
-		$sum->main = $this->main->add($score->main);
 		$sum->summary = array_merge($this->summary, $score->summary);
 		return $sum;
-	}
-	
-	function __toString()
-	{
-		return (string) $this->main;
-	}
-	
-	function __get($name)
-	{
-		return $this->main->$name;
-	}
-	
-	function __set($name, $value)
-	{
-		return $this->main->$name = $value;
-	}
-	
-	function _json_sleep()
-	{
-		$this->main = \CompetitionManager\Services\JSON::serialize($this->main);
-	}
-	
-	function _json_wakeup()
-	{
-		$this->main = \CompetitionManager\Services\JSON::unserialize($this->main);
 	}
 }
 

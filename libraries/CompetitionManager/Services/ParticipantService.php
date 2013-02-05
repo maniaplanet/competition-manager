@@ -414,22 +414,54 @@ class ParticipantService extends \DedicatedManager\Services\AbstractService
 	/**
 	 * @param Participant[] $participants
 	 */
-	function rankParticipants($participants)
+	function rank(&$participants)
 	{
 		uasort($participants, function($p1, $p2) { return $p1->score->compareTo($p2->score); });
 		
 		$rank = $realRank = 1;
 		$lastScore = null;
-		foreach($participants as $login => $player)
+		foreach($participants as $participant)
 		{
-			if($lastScore == null || $player->score->compareTo($lastScore))
+			if($lastScore == null || $participant->score->compareTo($lastScore))
 			{
 				$realRank = $rank;
-				$lastScore = $player->score;
+				$lastScore = $participant->score;
 			}
-			$participants[$login]->rank = $realRank;
-			$rank++;
+			if($participant->score->isNull())
+				$participant->rank = null;
+			else
+			{
+				$participant->rank = $realRank;
+				$rank++;
+			}
 		}
+	}
+	
+	/**
+	 * @param Participant[] $participants
+	 * @param int $limit
+	 */
+	function breakTies(&$participants, $limit)
+	{
+		$byRank = array();
+		foreach($participants as $participant)
+			if($participant->rank <= $limit)
+			{
+				$byRank[$participant->rank][] = $participant;
+				--$limit;
+			}
+		
+		if($limit < 0)
+		{
+			ksort($byRank);
+			$tied = end($byRank);
+			$diff = count($tied) + $limit;
+			shuffle($tied);
+			foreach(array_slice($tied, $diff) as $participant)
+				$participant->rank += $diff;
+		}
+		
+		uasort($participants, function($p1, $p2) { return $p1->rank - $p2->rank; });
 	}
 }
 

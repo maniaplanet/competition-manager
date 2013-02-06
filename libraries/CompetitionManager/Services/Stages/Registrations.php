@@ -9,13 +9,15 @@
 
 namespace CompetitionManager\Services\Stages;
 
-use CompetitionManager\Constants\State;
+use CompetitionManager\Constants;
+use CompetitionManager\Services\ParticipantService;
+use CompetitionManager\Services\StageService;
 
 class Registrations extends \CompetitionManager\Services\Stage implements FirstCompliant, IntermediateCompliant
 {
 	function __construct()
 	{
-		$this->type = \CompetitionManager\Constants\StageType::REGISTRATIONS;
+		$this->type = Constants\StageType::REGISTRATIONS;
 		$this->schedule = new \CompetitionManager\Services\Schedules\Range();
 		$this->parameters['unregisterEndTime'] = null;
 	}
@@ -60,8 +62,8 @@ class Registrations extends \CompetitionManager\Services\Stage implements FirstC
 	{
 		if($this->endTime < new \DateTime())
 		{
-			$service = new \CompetitionManager\Services\StageService();
-			$service->setState($this->stageId, State::OVER);
+			$service = new StageService();
+			$service->setState($this->stageId, Constants\State::OVER);
 		}
 	}
 	
@@ -78,15 +80,15 @@ class Registrations extends \CompetitionManager\Services\Stage implements FirstC
 	
 	function onRegistration($participantId)
 	{
-		$service = new \CompetitionManager\Services\StageService();
+		$service = new StageService();
 		$service->assignParticipants($this->stageId, array($participantId), $this->getDefaultScore());
-		$service = new \CompetitionManager\Services\ParticipantService();
+		$service = new ParticipantService();
 		$service->updateStageInfo($this->stageId, $participantId, rand(1, $this->maxSlots ?: 1337), $this->getDefaultScore());
 	}
 	
 	function onUnregistration($participantId)
 	{
-		$service = new \CompetitionManager\Services\StageService();
+		$service = new StageService();
 		$service->excludeParticipants($this->stageId, array($participantId));
 	}
 	

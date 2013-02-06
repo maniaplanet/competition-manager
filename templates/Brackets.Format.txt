@@ -1,0 +1,6 @@
+<format>
+	<description>A competition with only brackets</description>
+	<stages>
+		<brackets/>
+	</stages>
+</format>

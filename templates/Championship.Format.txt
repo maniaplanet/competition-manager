@@ -1,0 +1,6 @@
+<format>
+	<description>A competition with only a championship</description>
+	<stages>
+		<championship/>
+	</stages>
+</format>

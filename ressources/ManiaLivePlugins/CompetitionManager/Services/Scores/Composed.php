@@ -24,11 +24,6 @@ abstract class Composed extends \ManiaLivePlugins\CompetitionManager\Services\Sc
 		return $this->main->isNull();
 	}
 	
-	function compareTo(Detailed $score)
-	{
-		return $this->main->compareTo($score->main);
-	}
-	
 	function add(Detailed $score)
 	{
 		$sum = parent::add($score);

@@ -9,15 +9,20 @@
 
 namespace CompetitionManager\Services\Stages;
 
-use CompetitionManager\Constants\Qualified;
-use CompetitionManager\Constants\State;
+use CompetitionManager\Constants;
+use CompetitionManager\Services\MapService;
+use CompetitionManager\Services\Match;
+use CompetitionManager\Services\MatchService;
+use CompetitionManager\Services\ParticipantService;
 use CompetitionManager\Services\Scores;
+use CompetitionManager\Services\ServerService;
+use CompetitionManager\Services\StageService;
 
 class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompliant, IntermediateCompliant, LastCompliant
 {
 	function __construct()
 	{
-		$this->type = \CompetitionManager\Constants\StageType::OPEN_STAGE;
+		$this->type = Constants\StageType::OPEN_STAGE;
 		$this->schedule = new \CompetitionManager\Services\Schedules\Range();
 	}
 	
@@ -73,11 +78,11 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 	function onCreate()
 	{
 		$this->matches = array();
-		$service = new \CompetitionManager\Services\MatchService();
-		$mapService = new \CompetitionManager\Services\MapService();
+		$service = new MatchService();
+		$mapService = new MapService();
 		foreach($this->maps as $map)
 		{
-			$match = new \CompetitionManager\Services\Match();
+			$match = new Match();
 			$match->name = 'Qualifier on '.$mapService->get($map)->name;
 			$match->stageId = $this->stageId;
 			$match->startTime = $this->schedule->startTime;
@@ -93,11 +98,11 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 	{
 		$this->participants = $participants;
 		$score = $this->rules->getDefaultScore();
-		$service = new \CompetitionManager\Services\MatchService();
+		$service = new MatchService();
 		foreach($this->matches as $matchId)
 		{
 			$service->assignParticipants($matchId, $this->participants, $score);
-			$service->setState($matchId, State::READY);
+			$service->setState($matchId, Constants\State::READY);
 			\CompetitionManager\Services\WebServicesProxy::onMatchReady($matchId);
 		}
 	}
@@ -106,7 +111,7 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 	{
 		foreach($this->matches as $match)
 		{
-			$service = new \CompetitionManager\Services\ServerService();
+			$service = new ServerService();
 			$server = $service->getByMatch($match->matchId);
 			if($server)
 			{
@@ -150,12 +155,12 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 	{
 		$this->fetchParticipants();
 		
-		$service = new \CompetitionManager\Services\ParticipantService();
+		$service = new ParticipantService();
 		$service->rank($this->participants);
 		
 		if($this->nextId)
 		{
-			$stageService = new \CompetitionManager\Services\StageService();
+			$stageService = new StageService();
 			$nextStage = $stageService->get($this->nextId);
 			
 			$service->breakTies($this->participants, $nextStage->maxSlots);
@@ -188,8 +193,8 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 	
 	function onMatchOver($match)
 	{
-		$service = new \CompetitionManager\Services\MatchService();
-		$service->setState($match->matchId, State::ARCHIVED);
+		$service = new MatchService();
+		$service->setState($match->matchId, Constants\State::ARCHIVED);
 	}
 	
 	function onEnd()
@@ -209,18 +214,18 @@ class OpenStage extends \CompetitionManager\Services\Stage implements FirstCompl
 		$matchDetails = $this->rules->getDefaultScore();
 		$stageDetails = $this->getDefaultScore();
 		
-		$service = new \CompetitionManager\Services\StageService();
-		$service->assignParticipants($this->stageId, array($participantId), $stageDetails, Qualified::NO);
-		$service = new \CompetitionManager\Services\MatchService();
+		$service = new StageService();
+		$service->assignParticipants($this->stageId, array($participantId), $stageDetails, Constants\Qualified::NO);
+		$service = new MatchService();
 		foreach($this->matches as $matchId)
 			$service->assignParticipants($matchId, array($participantId), $matchDetails);
 	}
 	
 	function onUnregistration($participantId)
 	{
-		$service = new \CompetitionManager\Services\StageService();
+		$service = new StageService();
 		$service->excludeParticipants($this->stageId, array($participantId));
-		$service = new \CompetitionManager\Services\MatchService();
+		$service = new MatchService();
 		foreach($this->matches as $matchId)
 			$service->excludeParticipants($matchId, array($participantId));
 	}

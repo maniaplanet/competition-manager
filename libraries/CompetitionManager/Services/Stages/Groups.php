@@ -9,13 +9,18 @@
 
 namespace CompetitionManager\Services\Stages;
 
+use CompetitionManager\Constants;
+use CompetitionManager\Services\Match;
+use CompetitionManager\Services\MatchService;
+use CompetitionManager\Services\ParticipantService;
 use CompetitionManager\Services\Scores;
+use CompetitionManager\Services\StageService;
 
 class Groups extends \CompetitionManager\Services\Stage implements IntermediateCompliant
 {
 	function __construct()
 	{
-		$this->type = \CompetitionManager\Constants\StageType::GROUPS;
+		$this->type = Constants\StageType::GROUPS;
 		$this->schedule = new \CompetitionManager\Services\Schedules\MultiSimple();
 		$this->parameters['isFreeForAll'] = false;
 		$this->parameters['numberOfRounds'] = 1;
@@ -68,6 +73,7 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 	{
 		$score = new Scores\Summary();
 		$score->main = new Scores\Points();
+		$score->summary = array_fill(0, $this->getRoundsCount(), null);
 		return $score;
 	}
 	
@@ -78,14 +84,14 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 			if($this->parameters['isFreeForAll'])
 			{
 				foreach($groupRounds as $round => $matchOrId)
-					if(($matchOrId instanceof \CompetitionManager\Services\Match && $matchOrId->matchId == $matchId) || $matchOrId == $matchId)
+					if(($matchOrId instanceof Match && $matchOrId->matchId == $matchId) || $matchOrId == $matchId)
 						return array($group, $round);
 			}
 			else
 			{
 				foreach($groupRounds as $round => $roundMatches)
 					foreach($roundMatches as $matchOrId)
-						if(($matchOrId instanceof \CompetitionManager\Services\Match && $matchOrId->matchId == $matchId) || $matchOrId == $matchId)
+						if(($matchOrId instanceof Match && $matchOrId->matchId == $matchId) || $matchOrId == $matchId)
 							return array($group, $round);
 			}
 		}
@@ -94,7 +100,7 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 	function onCreate()
 	{
 		$this->matches = array();
-		$service = new \CompetitionManager\Services\MatchService();
+		$service = new MatchService();
 		$slotsPerGroup = ceil($this->maxSlots / $this->parameters['numberOfGroups']);
 		
 		if($this->parameters['isFreeForAll'])
@@ -116,9 +122,9 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 		}
 	}
 	
-	private function createMatch($service, $round)
+	protected function createMatch($service, $round)
 	{
-		$match = new \CompetitionManager\Services\Match();
+		$match = new Match();
 		$match->name = sprintf(_('Round #%d'), $round+1);
 		$match->stageId = $this->stageId;
 		if(isset($this->schedule->startTimes[$round]))
@@ -132,11 +138,11 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 	{
 		// Dispatch in groups
 		$this->parameters['groupParticipants'] = array();
-		foreach($participants as $index => $participant)
-			$this->parameters['groupParticipants'][$index%$this->parameters['numberOfGroups']][] = $participant->participantId;
+		foreach(array_values($participants) as $index => $participant)
+			$this->parameters['groupParticipants'][$index%$this->parameters['numberOfGroups']][] = (int) $participant->participantId;
 		
-		$matchService = new \CompetitionManager\Services\MatchService();
-		$stageService = new \CompetitionManager\Services\StageService();
+		$matchService = new MatchService();
+		$stageService = new StageService();
 		$stageService->update($this);
 		
 		if($this->parameters['isFreeForAll'])
@@ -151,14 +157,14 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 			$nbParticipants = count($participants);
 			if($nbParticipants < $this->maxSlots)
 			{
-				foreach($this->matches as &$groupMatches)
-					foreach(array_splice($groupMatches, -$this->getRoundsCount()) as $matchId)
-						$matchService->delete($matchId);
 				foreach($this->matches as $group => &$groupMatches)
 				{
+					foreach(array_splice($groupMatches, $this->getRoundsCount($nbParticipants)) as $roundMatches)
+						foreach($roundMatches as $matchId)
+							$matchService->delete($matchId);
 					$nbMatchesPerRound = count($this->parameters['groupParticipants'][$group])>>1;
 					foreach($groupMatches as &$roundMatches)
-						foreach(array_splice($roundMatches, -$nbMatchesPerRound) as $matchId)
+						foreach(array_splice($roundMatches, $nbMatchesPerRound) as $matchId)
 							$matchService->delete($matchId);
 				}
 				unset($groupMatches);
@@ -178,7 +184,7 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 					foreach($roundMatches as $index => $matchId)
 						$matchService->assignParticipants($matchId, array($homeParticipants[$index], $awayParticipants[$index]), $this->rules->getDefaultScore());
 					array_unshift($homeParticipants, array_shift($awayParticipants));
-					array_splice($awayParticipants, -1, 0, array_pop($homeParticipants));
+					array_splice($awayParticipants, -1, 0, array(array_pop($homeParticipants)));
 				}
 			}
 		}
@@ -187,43 +193,48 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 	function onMatchOver($match)
 	{
 		list($group, $round) = $this->findMatch($match->matchId);
-		$match->fetchParticipants();
+		$this->updateScores($match, $round);
+		
+		$groupParticipants = array_intersect_key($this->participants, array_flip($this->parameters['groupParticipants'][$group]));
+		$service = new ParticipantService();
+		$service->rank($groupParticipants);
+		foreach($groupParticipants as $participantId => $participant)
+			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
+		
+		$service = new MatchService();
+		$service->setState($match->matchId, Constants\State::ARCHIVED);
+	}
+	
+	protected function updateScores($match, $round)
+	{
 		$this->fetchParticipants();
-
+		$match->fetchParticipants();
+		
 		if($this->parameters['isFreeForAll'])
-			$pointsByRank = $this->parameters['scoringSystem']->points;
+			$pointsByRank = $this->parameters['scoringSystem']['points'];
 		else
 			$pointsByRank = array($this->parameters['pointsForWin'], $this->parameters['pointsForLoss']);
 		
 		foreach($match->participants as $matchResult)
 		{
-			$stageResult = $this->participants[$matchResult->participantId];
-			$stageResult->score->summary[$round] = $matchResult->rank;
-			$stageResult->score->points = null;
-			foreach($stageResult->score->summary as $rank)
+			$participant = $this->participants[$matchResult->participantId];
+			$participant->score->summary[$round] = intval($matchResult->rank) ?: null;
+			$participant->score->points = null;
+			foreach($participant->score->summary as $rank)
 			{
 				if($rank === null)
 					continue;
-				$stageResult->score->points += $pointsByRank[$rank-1];
+				$participant->score->points += $pointsByRank[min($rank, count($pointsByRank))-1];
 			}
 		}
-		
-		$groupParticipants = array_intersect_key($this->participants, array_flip($this->parameters['groupParticipants'][$group]));
-		$service = new \CompetitionManager\Services\ParticipantService();
-		$service->rank($groupParticipants);
-		foreach($groupParticipants as $participantId => $participant)
-			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
-		
-		$service = new \CompetitionManager\Services\MatchService();
-		$service->setState($match->matchId, State::ARCHIVED);
 	}
 	
 	function onEnd()
 	{
 		$this->fetchParticipants();
 		
-		$service = new \CompetitionManager\Services\ParticipantService();
-		$stageService = new \CompetitionManager\Services\StageService();
+		$service = new ParticipantService();
+		$stageService = new StageService();
 		
 		$nextStage = $stageService->get($this->nextId);
 		$qualifiedPerGroup = floor($nextStage->maxSlots / $this->parameters['numberOfGroups']);

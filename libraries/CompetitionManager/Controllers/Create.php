@@ -408,52 +408,76 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 	
 	function doCreate()
 	{
-		// Competition
-		$competitionService = new \CompetitionManager\Services\CompetitionService();
-		$competitionService->create($this->competition);
-		
-		// Stages
-		$stageService = new \CompetitionManager\Services\StageService();
-		$lastStageId = null;
-		$teamSize = 0;
-		foreach($this->competition->stages as $stageIndex => $stage)
+		\ManiaLib\Database\Connection::getInstance()->beginTransaction();
+		try
 		{
-			$stage->competitionId = $this->competition->competitionId;
-			$stage->previousId = $lastStageId;
-			if($stage instanceof Stages\Registrations || $stage instanceof Stages\Lobby)
+			// Competition
+			$competitionService = new \CompetitionManager\Services\CompetitionService();
+			$competitionService->create($this->competition);
+
+			// Stages
+			$stageService = new \CompetitionManager\Services\StageService();
+			$lastStageId = null;
+			$teamSize = 0;
+			foreach($this->competition->stages as $stageIndex => $stage)
 			{
-				$stage->minSlots = $this->competition->stages[$stageIndex+1]->minSlots;
-				$stage->maxSlots = $this->competition->stages[$stageIndex+1]->maxSlots;
+				$stage->competitionId = $this->competition->competitionId;
+				$stage->previousId = $lastStageId;
+				if($stage instanceof Stages\Registrations || $stage instanceof Stages\Lobby)
+				{
+					$stage->minSlots = $this->competition->stages[$stageIndex+1]->minSlots;
+					$stage->maxSlots = $this->competition->stages[$stageIndex+1]->maxSlots;
+				}
+				if($this->competition->isScheduled())
+					list($stage->startTime, $stage->endTime) = $stage->schedule->getTimesLimit();
+				$stageService->create($stage);
+
+				if(!($stage instanceof Stages\Registrations))
+				{
+					$stageService->assignMaps($stage->stageId, $stage->maps);
+					$stage->onCreate();
+					$stageService->update($stage);
+
+					if($stage instanceof Stages\Lobby)
+						$competitionService->setLobby($this->competition->competitionId, reset($stage->matches));
+
+					$teamSize = max($teamSize, $stage->rules->getTeamSize());
+				}
+				if(!$stage->previousId)
+				{
+					$stageService->setState($stage->stageId, State::READY);
+					$stage->onReady(array());
+				}
+
+				$lastStageId = $stage->stageId;
 			}
-			if($this->competition->isScheduled())
-				list($stage->startTime, $stage->endTime) = $stage->schedule->getTimesLimit();
-			$stageService->create($stage);
-			
-			if(!($stage instanceof Stages\Registrations))
-			{
-				$stageService->assignMaps($stage->stageId, $stage->maps);
-				$stage->onCreate();
-				$stageService->update($stage);
-				
-				if($stage instanceof Stages\Lobby)
-					$competitionService->setLobby($this->competition->competitionId, reset($stage->matches));
-				
-				$teamSize = max($teamSize, $stage->rules->getTeamSize());
-			}
-			if(!$stage->previousId)
-			{
-				$stageService->setState($stage->stageId, State::READY);
-				$stage->onReady(array());
-			}
-			
-			$lastStageId = $stage->stageId;
+			$competitionService->setTeamSize($this->competition->competitionId, $teamSize);
+			$competitionService->setState($this->competition->competitionId, State::READY);
+			\ManiaLib\Database\Connection::getInstance()->commitTransaction();
+
+			$this->session->set('success', _('Competition has been successfully created!'));
 		}
-		$competitionService->setTeamSize($this->competition->competitionId, $teamSize);
-		$competitionService->setState($this->competition->competitionId, State::READY);
+		catch(\Exception $e)
+		{
+			\ManiaLib\Database\Connection::getInstance()->rollbackTransaction();
+			\ManiaLib\Application\ErrorHandling::logException($e);
+			$this->session->set('error', _('Error occured while trying to create competition'));
+			$this->request->redirectArgList('../preview');
+		}
+
 		if($this->competition->remoteId)
-			\CompetitionManager\Services\WebServicesProxy::onCreate($this->competition->competitionId);
+		{
+			try
+			{
+				\CompetitionManager\Services\WebServicesProxy::onCreate($this->competition->competitionId);
+			}
+			catch(\Exception $e)
+			{
+				\ManiaLib\Application\ErrorHandling::logException($e);
+				$this->session->set('warning', _('Automatic competition registration on ManiaPlanet failed.'));
+			}
+		}
 		
-		$this->session->set('success', _('Competition has been successfully created!'));
 		$this->goHome();
 	}
 	

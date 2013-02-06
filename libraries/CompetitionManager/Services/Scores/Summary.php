@@ -14,6 +14,11 @@ class Summary extends Composed
 	/** @var int[] */
 	public $summary = array();
 	
+	function compareTo(Summary $score)
+	{
+		return $this->main->compareTo($score->main);
+	}
+	
 	function add(Summary $score)
 	{
 		$sum = parent::add($score);

@@ -14,6 +14,11 @@ class Detailed extends Composed
 	/** @var \CompetitionManager\Services\Score[] */
 	public $details = array();
 	
+	function compareTo(Detailed $score)
+	{
+		return $this->main->compareTo($score->main);
+	}
+	
 	function add(Detailed $score)
 	{
 		$sum = parent::add($score);

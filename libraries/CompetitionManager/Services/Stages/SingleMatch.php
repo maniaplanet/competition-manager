@@ -10,6 +10,10 @@
 namespace CompetitionManager\Services\Stages;
 
 use CompetitionManager\Constants;
+use CompetitionManager\Services\Match;
+use CompetitionManager\Services\MatchService;
+use CompetitionManager\Services\ParticipantService;
+use CompetitionManager\Services\StageService;
 
 class SingleMatch extends \CompetitionManager\Services\Stage implements IntermediateCompliant, LastCompliant
 {
@@ -51,11 +55,11 @@ class SingleMatch extends \CompetitionManager\Services\Stage implements Intermed
 	function onCreate()
 	{
 		$this->matches = array();
-		$match = new \CompetitionManager\Services\Match();
+		$match = new Match();
 		$match->stageId = $this->stageId;
 		$match->name = $this->rules->getName().' Match';
 		$match->startTime = $this->schedule->startTime;
-		$service = new \CompetitionManager\Services\MatchService();
+		$service = new MatchService();
 		$service->create($match);
 		
 		$this->matches[] = $match->matchId;
@@ -64,7 +68,7 @@ class SingleMatch extends \CompetitionManager\Services\Stage implements Intermed
 	function onReady($participants)
 	{
 		$this->participants = $participants;
-		$service = new \CompetitionManager\Services\MatchService();
+		$service = new MatchService();
 		$service->assignParticipants(reset($this->matches), $this->participants, $this->rules->getDefaultScore());
 		$service->setState(reset($this->matches), Constants\State::READY);
 		\CompetitionManager\Services\WebServicesProxy::onMatchReady(reset($this->matches));
@@ -73,11 +77,11 @@ class SingleMatch extends \CompetitionManager\Services\Stage implements Intermed
 	function onMatchOver($match)
 	{
 		$match->fetchParticipants();
-		$service = new \CompetitionManager\Services\ParticipantService();
+		$service = new ParticipantService();
 		foreach($match->participants as $participantId => $participant)
 			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
 		
-		$service = new \CompetitionManager\Services\MatchService();
+		$service = new MatchService();
 		$service->setState($match->matchId, Constants\State::ARCHIVED);
 	}
 	
@@ -85,11 +89,11 @@ class SingleMatch extends \CompetitionManager\Services\Stage implements Intermed
 	{
 		$this->fetchParticipants();
 		
-		$service = new \CompetitionManager\Services\ParticipantService();
+		$service = new ParticipantService();
 		$service->rank($this->participants);
 		if($this->nextId)
 		{
-			$stageService = new \CompetitionManager\Services\StageService();
+			$stageService = new StageService();
 			$nextStage = $stageService->get($this->nextId);
 			
 			$service->breakTies($this->participants, $nextStage->maxSlots);

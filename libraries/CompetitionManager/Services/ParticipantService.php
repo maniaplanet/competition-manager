@@ -444,18 +444,19 @@ class ParticipantService extends \DedicatedManager\Services\AbstractService
 	function breakTies(&$participants, $limit)
 	{
 		$byRank = array();
+		$qualified = $limit;
 		foreach($participants as $participant)
 			if($participant->rank <= $limit)
 			{
 				$byRank[$participant->rank][] = $participant;
-				--$limit;
+				--$qualified;
 			}
 		
-		if($limit < 0)
+		if($qualified < 0)
 		{
 			ksort($byRank);
 			$tied = end($byRank);
-			$diff = count($tied) + $limit;
+			$diff = count($tied) + $qualified;
 			shuffle($tied);
 			foreach(array_slice($tied, $diff) as $participant)
 				$participant->rank += $diff;

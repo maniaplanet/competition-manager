@@ -9,19 +9,24 @@
 
 namespace CompetitionManager\Services\Stages;
 
-use CompetitionManager\Constants\State;
+use CompetitionManager\Constants;
+use CompetitionManager\Services\Match;
+use CompetitionManager\Services\MatchService;
+use CompetitionManager\Services\ParticipantService;
+use CompetitionManager\Services\Player;
+use CompetitionManager\Services\StageService;
 
 class Lobby extends \CompetitionManager\Services\Stage implements FirstCompliant, IntermediateCompliant
 {
 	function __construct()
 	{
-		$this->type = \CompetitionManager\Constants\StageType::LOBBY;
+		$this->type = Constants\StageType::LOBBY;
 		$this->schedule = new \CompetitionManager\Services\Schedules\Simple();
 	}
 	
 	function getName()
 	{
-		if($this->state < \CompetitionManager\Constants\State::STARTED)
+		if($this->state < Constants\State::STARTED)
 			return _('Lobby');
 		return _('Registrations');
 	}
@@ -43,7 +48,7 @@ class Lobby extends \CompetitionManager\Services\Stage implements FirstCompliant
 	
 	function getAction()
 	{
-		if($this->state > State::STARTED)
+		if($this->state > Constants\State::STARTED)
 			return 'registrations';
 		return 'lobby';
 	}
@@ -51,11 +56,11 @@ class Lobby extends \CompetitionManager\Services\Stage implements FirstCompliant
 	function onCreate()
 	{
 		$this->matches = array();
-		$match = new \CompetitionManager\Services\Match();
+		$match = new Match();
 		$match->stageId = $this->stageId;
 		$match->name = 'Lobby';
 		$match->startTime = $this->schedule->startTime;
-		$service = new \CompetitionManager\Services\MatchService();
+		$service = new MatchService();
 		$service->create($match);
 		
 		$this->matches[] = $match->matchId;
@@ -63,16 +68,16 @@ class Lobby extends \CompetitionManager\Services\Stage implements FirstCompliant
 	
 	function onReady($participants)
 	{
-		$service = new \CompetitionManager\Services\MatchService();
-		$service->setState($this->matches[0], State::READY);
+		$service = new MatchService();
+		$service->setState($this->matches[0], Constants\State::READY);
 	}
 	
 	function onRun() { /* Done in ManiaLive plugin */ }
 	
 	function onMatchOver($match)
 	{
-		$service = new \CompetitionManager\Services\MatchService();
-		$service->setState($match->matchId, State::ARCHIVED);
+		$service = new MatchService();
+		$service->setState($match->matchId, Constants\State::ARCHIVED);
 	}
 	
 	function onEnd() {}
@@ -83,11 +88,11 @@ class Lobby extends \CompetitionManager\Services\Stage implements FirstCompliant
 	
 	function onRegistration($participantId)
 	{
-		$service = new \CompetitionManager\Services\StageService();
+		$service = new StageService();
 		$service->assignParticipants($this->stageId, array($participantId), $this->getDefaultScore());
-		$service = new \CompetitionManager\Services\MatchService();
+		$service = new MatchService();
 		$service->assignParticipants(reset($this->matches), array($participantId), $this->rules->getDefaultScore());
-		$service = new \CompetitionManager\Services\ParticipantService();
+		$service = new ParticipantService();
 		$service->updateStageInfo($this->stageId, $participantId, rand(1, $this->maxSlots), $this->getDefaultScore());
 		$participant = $service->get($participantId);
 		
@@ -99,7 +104,7 @@ class Lobby extends \CompetitionManager\Services\Stage implements FirstCompliant
 			{
 				$server->openConnection();
 				
-				if($participant instanceof \CompetitionManager\Services\Player)
+				if($participant instanceof Player)
 					$server->connection->addGuest($participant->login);
 				else
 				{

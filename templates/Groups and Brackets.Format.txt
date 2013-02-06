@@ -1,0 +1,7 @@
+<format>
+	<description>A competition with a group stage qualifying for a bracket</description>
+	<stages>
+		<groups/>
+		<brackets/>
+	</stages>
+</format>

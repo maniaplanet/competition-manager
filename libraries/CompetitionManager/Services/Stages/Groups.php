@@ -85,14 +85,14 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 			{
 				foreach($groupRounds as $round => $matchOrId)
 					if(($matchOrId instanceof Match && $matchOrId->matchId == $matchId) || $matchOrId == $matchId)
-						return array($group, $round);
+						return array($group, $round, null);
 			}
 			else
 			{
 				foreach($groupRounds as $round => $roundMatches)
-					foreach($roundMatches as $matchOrId)
+					foreach($roundMatches as $offset => $matchOrId)
 						if(($matchOrId instanceof Match && $matchOrId->matchId == $matchId) || $matchOrId == $matchId)
-							return array($group, $round);
+							return array($group, $round, $offset);
 			}
 		}
 	}
@@ -105,14 +105,14 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 		
 		if($this->parameters['isFreeForAll'])
 		{
-			for($group=0; $group<$this->parameters['numberOfGroups']; ++$group)
-				for($round=0; $round<$this->getRoundsCount(); ++$round)
+			for($round=0; $round<$this->getRoundsCount(); ++$round)
+				for($group=0; $group<$this->parameters['numberOfGroups']; ++$group)
 					$this->matches[$group][] = $this->createMatch($service, $round)->matchId;
 		}
 		else
 		{
-			for($group=0; $group<$this->parameters['numberOfGroups']; ++$group)
-				for($round=0; $round<$this->getRoundsCount(); ++$round)
+			for($round=0; $round<$this->getRoundsCount(); ++$round)
+				for($group=0; $group<$this->parameters['numberOfGroups']; ++$group)
 				{
 					$roundMatches = array();
 					for($i=0; $i<$slotsPerGroup>>1; ++$i)
@@ -148,8 +148,11 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 		if($this->parameters['isFreeForAll'])
 		{
 			foreach($this->matches as $groupMatches)
+			{
 				foreach($groupMatches as $matchId)
 					$matchService->assignParticipants($matchId, $participants, $this->rules->getDefaultScore());
+				$matchService->setState($groupMatches[0], Constants\State::READY);
+			}
 		}
 		else
 		{
@@ -186,13 +189,15 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 					array_unshift($homeParticipants, array_shift($awayParticipants));
 					array_splice($awayParticipants, -1, 0, array(array_pop($homeParticipants)));
 				}
+				foreach($groupMatches[0] as $matchId)
+					$matchService->setState($matchId, Constants\State::READY);
 			}
 		}
 	}
 	
 	function onMatchOver($match)
 	{
-		list($group, $round) = $this->findMatch($match->matchId);
+		list($group, $round, $offset) = $this->findMatch($match->matchId);
 		$this->updateScores($match, $round);
 		
 		$groupParticipants = array_intersect_key($this->participants, array_flip($this->parameters['groupParticipants'][$group]));
@@ -202,6 +207,49 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
 		
 		$service = new MatchService();
+		if(isset($this->matches[$group][$round+1]))
+		{
+			if($this->parameters['isFreeForAll'])
+				$service->setState($this->matches[$group][$round+1], Constants\State::READY);
+			else
+			{
+				$offsetMax = (count($groupParticipants) >> 1) - 1;
+				$isOdd = count($groupParticipants) & 1;
+				// FIXME ? the following code is relying on how players are assigned to their matches
+				switch($offset)
+				{
+					case 0:
+						if($service->getState($this->matches[$group][$round][$offset+1]) == Constants\State::ARCHIVED)
+							$service->setState($this->matches[$group][$round+1][$offset], Constants\State::READY);
+						break;
+					case 1:
+						if($service->getState($this->matches[$group][$round][$offset-1]) == Constants\State::ARCHIVED)
+							$service->setState($this->matches[$group][$round+1][$offset-1], Constants\State::READY);
+						break;
+					default:
+						if($service->getState($this->matches[$group][$round][$offset-2]) == Constants\State::ARCHIVED)
+							$service->setState($this->matches[$group][$round+1][$offset-1], Constants\State::READY);
+						break;
+				}
+				switch($offsetMax - $offset)
+				{
+					case 0:
+						if(!$isOdd && $service->getState($this->matches[$group][$round][$offset-1]) == Constants\State::ARCHIVED)
+							$service->setState($this->matches[$group][$round+1][$offset], Constants\State::READY);
+						break;
+					case 1:
+						if($isOdd)
+							$service->setState($this->matches[$group][$round+1][$offset+1], Constants\State::READY);
+						else if($service->getState($this->matches[$group][$round][$offset+1]) == Constants\State::ARCHIVED)
+							$service->setState($this->matches[$group][$round+1][$offset+1], Constants\State::READY);
+						break;
+					default:
+						if($service->getState($this->matches[$group][$round][$offset+2]) == Constants\State::ARCHIVED)
+							$service->setState($this->matches[$group][$round+1][$offset+1], Constants\State::READY);
+						break;
+				}
+			}
+		}
 		$service->setState($match->matchId, Constants\State::ARCHIVED);
 	}
 	

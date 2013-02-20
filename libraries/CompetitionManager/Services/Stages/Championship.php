@@ -56,14 +56,14 @@ class Championship extends Groups implements LastCompliant
 		{
 			foreach($this->matches as $round => $matchOrId)
 				if(($matchOrId instanceof Match && $matchOrId->matchId == $matchId) || $matchOrId == $matchId)
-					return $round;
+					return array($round, null);
 		}
 		else
 		{
 			foreach($this->matches as $round => $roundMatches)
-				foreach($roundMatches as $matchOrId)
+				foreach($roundMatches as $offset => $matchOrId)
 					if(($matchOrId instanceof Match && $matchOrId->matchId == $matchId) || $matchOrId == $matchId)
-						return $round;
+						return array($round, $offset);
 		}
 	}
 	
@@ -96,6 +96,7 @@ class Championship extends Groups implements LastCompliant
 		{
 			foreach($this->matches as $matchId)
 				$matchService->assignParticipants($matchId, $participants, $this->rules->getDefaultScore());
+			$matchService->setState($this->matches[0], Constants\State::READY);
 		}
 		else
 		{
@@ -126,12 +127,14 @@ class Championship extends Groups implements LastCompliant
 				array_unshift($homeParticipants, array_shift($awayParticipants));
 				array_splice($awayParticipants, -1, 0, array(array_pop($homeParticipants)));
 			}
+			foreach($this->matches[0] as $matchId)
+				$matchService->setState($matchId, Constants\State::READY);
 		}
 	}
 	
 	function onMatchOver($match)
 	{
-		$round = $this->findMatch($match->matchId);
+		list($round, $offset) = $this->findMatch($match->matchId);
 		$this->updateScores($match, $round);
 		
 		$service = new ParticipantService();
@@ -140,6 +143,49 @@ class Championship extends Groups implements LastCompliant
 			$service->updateStageInfo($this->stageId, $participantId, $participant->rank, $participant->score);
 		
 		$service = new MatchService();
+		if(isset($this->matches[$round+1]))
+		{
+			if($this->parameters['isFreeForAll'])
+				$service->setState($this->matches[$round+1], Constants\State::READY);
+			else
+			{
+				$offsetMax = (count($this->participants) >> 1) - 1;
+				$isOdd = count($this->participants) & 1;
+				// FIXME ? the following code is relying on how players are assigned to their matches
+				switch($offset)
+				{
+					case 0:
+						if($service->getState($this->matches[$round][$offset+1]) == Constants\State::ARCHIVED)
+							$service->setState($this->matches[$round+1][$offset], Constants\State::READY);
+						break;
+					case 1:
+						if($service->getState($this->matches[$round][$offset-1]) == Constants\State::ARCHIVED)
+							$service->setState($this->matches[$round+1][$offset-1], Constants\State::READY);
+						break;
+					default:
+						if($service->getState($this->matches[$round][$offset-2]) == Constants\State::ARCHIVED)
+							$service->setState($this->matches[$round+1][$offset-1], Constants\State::READY);
+						break;
+				}
+				switch($offsetMax - $offset)
+				{
+					case 0:
+						if(!$isOdd && $service->getState($this->matches[$round][$offset-1]) == Constants\State::ARCHIVED)
+							$service->setState($this->matches[$round+1][$offset], Constants\State::READY);
+						break;
+					case 1:
+						if($isOdd)
+							$service->setState($this->matches[$round+1][$offset+1], Constants\State::READY);
+						else if($service->getState($this->matches[$round][$offset+1]) == Constants\State::ARCHIVED)
+							$service->setState($this->matches[$round+1][$offset+1], Constants\State::READY);
+						break;
+					default:
+						if($service->getState($this->matches[$round][$offset+2]) == Constants\State::ARCHIVED)
+							$service->setState($this->matches[$round+1][$offset+1], Constants\State::READY);
+						break;
+				}
+			}
+		}
 		$service->setState($match->matchId, Constants\State::ARCHIVED);
 	}
 	

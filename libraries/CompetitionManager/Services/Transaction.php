@@ -25,6 +25,8 @@ class Transaction extends AbstractObject
 	/** @var string */
 	public $login;
 	/** @var int */
+	public $teamId;
+	/** @var int */
 	public $amount;
 	/** @var int */
 	public $type;

@@ -14,6 +14,7 @@ use CompetitionManager\Filters;
 use CompetitionManager\Services\CompetitionService;
 use CompetitionManager\Services\WebServicesProxy;
 use CompetitionManager\Services\Stages;
+use CompetitionManager\Services\Transaction;
 use CompetitionManager\Views\Competition\Index;
 
 class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\Application\Filterable
@@ -287,40 +288,36 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		$this->openStage();
 	}
 	
-	function brackets($bracket=Stages\Brackets::WINNERS_BRACKET, $m=null)
+	function brackets($bracket=Stages\Brackets::WINNERS_BRACKET)
 	{
+		// forcing bracket if a match display has been requested in URL
+		if($this->matchDisplay->isPrepared())
+			list($bracket, $round, $offset) = $this->stage->findMatch($this->request->get('m'));
+		
 		$bracketMatches = $this->stage->matches[$bracket];
+		// forcing match display if there's only one
 		if(count($bracketMatches) == 1)
 		{
+			$round = $offset = 0;
 			$this->matchDisplay->prepare($bracketMatches[0][0]);
-			$this->matchDisplay->emptyLabels = array();
-			if($bracketMatches[0][0]->state > State::UNKNOWN)
-				$this->matchDisplay->emptyLabels = _('BYE');
-			else
-				$this->matchDisplay->emptyLabels = $this->stage->getEmptyLabels($bracket, 0, 0);
-			$this->matchDisplay->linesToShow = min(16, $this->stage->parameters['slotsPerMatch']);
-			$this->response->bracket = $bracket;
-			return;
 		}
-		
-		if($m)
+		// or adding close link if there's a match to display
+		else if($this->matchDisplay->isPrepared())
 		{
-			list($bracket, $round, $offset) = $this->stage->findMatch($m);
-			$bracketMatches = $this->stage->matches[$bracket];
-			if(isset($bracketMatches[$round][$offset]))
-			{
-				$this->matchDisplay->prepare($bracketMatches[$round][$offset]);
-				$this->matchDisplay->emptyLabels = array();
-				$this->matchDisplay->linesToShow = $this->stage->parameters['slotsPerMatch'];
-				if($bracketMatches[$round][$offset]->state > State::UNKNOWN)
-					$this->matchDisplay->emptyLabels = 'BYE';
-				else
-					$this->matchDisplay->emptyLabels = $this->stage->getEmptyLabels($bracket, $round, $offset);
-			}
-			
 			$this->request->delete('m');
 			$this->matchDisplay->card->setCloseLink($this->request->createLink());
 			$this->request->restore('m');
+		}
+		
+		// configuring match display
+		if($this->matchDisplay->isPrepared())
+		{
+			$this->matchDisplay->linesToShow = min($this->stage->parameters['slotsPerMatch'], 16);
+			$this->matchDisplay->emptyLabels = array();
+			if($bracketMatches[$round][$offset]->state > State::UNKNOWN)
+				$this->matchDisplay->emptyLabels = _('BYE');
+			else
+				$this->matchDisplay->emptyLabels = $this->stage->getEmptyLabels($bracket, $round, $offset);
 		}
 		
 		$this->response->bracket = $bracket;
@@ -346,7 +343,23 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	
 	function groups($group=null)
 	{
+		$this->stage->fetchParticipants();
 		
+		if($group === null)
+		{
+			$groups = array();
+			foreach($this->stage->parameters['groupParticipants'] as $groupParticipants)
+				$groups[] = array_intersect_key($this->stage->participants, array_flip($groupParticipants));
+			
+			if(count($groups) > 9)
+			{
+				$this->response->multipageList = new \CompetitionManager\Utils\MultipageList(count($groups), 9, 'groups');
+				list($offset, $length) = $this->response->multipageList->getLimit();
+				$this->response->groups = array_slice($groups, $offset, $length, true);
+			}
+			else
+				$this->response->groups = $groups;
+		}
 	}
 	
 	function rules($details=0, $external=0)
@@ -553,9 +566,38 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		{
 			$service = new CompetitionService();
 			$service->alterPlanetsPool($this->competition->competitionId, -$this->competition->registrationCost);
-			if($this->session->login != \CompetitionManager\Config::getInstance()->paymentLogin)
+			
+			$service = new \CompetitionManager\Services\TransactionService();
+			$baseRefund = new Transaction();
+			$baseRefund->competitionId = $this->competitionId;
+			$baseRefund->type = Transaction::REGISTRATION | Transaction::REFUND;
+			if($this->competition->isTeam)
 			{
-				// TODO reimboursement
+				$teams = WebServicesProxy::getUserTeams();
+				$transactions = $service->getByParticipant($this->competition->competitionId, $teams[$team]->participantId);
+				$baseRefund->teamId = $teams[$team]->teamId;
+				$baseRefund->message = sprintf('Refund registration of $<%s$> in $<%s$> (reason: unregistered)', $teams[$team]->name, $this->competition->name);
+			}
+			else
+			{
+				$transactions = $service->getByParticipant($this->competition->competitionId, WebServicesProxy::getUser()->participantId);
+				$baseRefund->message = sprintf('Refund registration in $<%s$> (reason: unregistered)', $this->competition->name);
+			}
+			
+			$transactions = array_filter($transactions, function($t) { return $t->type & Transaction::REGISTRATION; });
+			$amounts = array_reduce($transactions, function(&$v, $t) {
+					@$v[$t->login] += $t->amount * ($t & Transaction::REFUND ? -1 : 1);
+					return $v;
+				}, array());
+			foreach($amounts as $login => $amount)
+			{
+				if($login != \CompetitionManager\Config::getInstance()->paymentLogin && $amount > 0)
+				{
+					$refund = clone $baseRefund;
+					$refund->login = $login;
+					$refund->amount = $amount;
+					$service->registerOutcome($refund);
+				}
 			}
 		}
 	}

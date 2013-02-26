@@ -221,10 +221,10 @@ class Competition extends AbstractObject
 					switch($refund->type ^ Transaction::REFUND)
 					{
 						case Transaction::REGISTRATION:
-							$refund->message = sprintf('Refund of registration in $<%s$> (reason: competition cancelled)', $this->name);
+							$refund->message = sprintf('Refund registration in $<%s$> (reason: competition cancelled)', $this->name);
 							break;
 						case Transaction::SPONSOR:
-							$refund->message = sprintf('Refund of sponsoring $<%s$> (reason: competition cancelled)', $this->name);
+							$refund->message = sprintf('Refund sponsoring of $<%s$> (reason: competition cancelled)', $this->name);
 							break;
 					}
 					$service->registerOutcome($refund);

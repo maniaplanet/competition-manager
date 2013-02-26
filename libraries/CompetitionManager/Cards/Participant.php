@@ -71,9 +71,7 @@ class Participant extends Frame
 	function setScore($score)
 	{
 		$this->score->label->setText($score);
-		// FIXME score width
-//		if($isTime)
-//			$this->score->setSizeX(2*$this->sizeY);
+		$this->score->setSizeX(ceil(strlen($score)/4) * $this->sizeY);
 	}
 	
 	function setTeamLink($teamId)

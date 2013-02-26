@@ -162,8 +162,7 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 		}
 		
 		$emptyLabels = array();
-		reset($previousMatches);
-		while(list($match, $offset) = current($previousMatches))
+		while(list($match, $offset) = array_shift($previousMatches))
 		{
 			if($match->state < Constants\State::OVER)
 			{
@@ -178,7 +177,6 @@ class Brackets extends \CompetitionManager\Services\Stage implements LastComplia
 					for($i=1; $i<=$nbQualified; ++$i)
 						$emptyLabels[] = '#'.($i+$offset).' of '.$match->name;
 			}
-			next($previousMatches);
 		}
 		return $emptyLabels;
 	}

@@ -97,9 +97,33 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 		}
 	}
 	
+	function getEmptyLabels($group, $round=null, $offset=null)
+	{
+		$service = new StageService();
+		$previousStage = $service->get($this->previousId);
+		
+		$emptyLabels = array();
+		foreach(range($group+1, $this->maxSlots, $this->parameters['numberOfGroups']) as $rank)
+			$emptyLabels[] = $previousStage->getPlaceholder($rank, $this->maxSlots);
+		
+		if($round === null || $this->parameters['isFreeForAll'])
+			return $emptyLabels;
+		
+		if(count($emptyLabels) & 1)
+			$emptyLabels[] = null;
+		list($home, $away) = array_chunk($emptyLabels, count($emptyLabels)>>1);
+		while($round-- > 0)
+		{
+			array_unshift($home, array_shift($away));
+			array_splice($away, -1, 0, array(array_pop($home)));
+		}
+		return array($home[$offset], $away[$offset]);
+	}
+	
 	function onCreate()
 	{
 		$this->matches = array();
+		$this->parameters['groupParticipants'] = array_fill(0, $this->parameters['numberOfGroups'], array());
 		$service = new MatchService();
 		$slotsPerGroup = ceil($this->maxSlots / $this->parameters['numberOfGroups']);
 		

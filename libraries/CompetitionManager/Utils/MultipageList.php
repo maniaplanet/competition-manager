@@ -16,20 +16,20 @@ use ManiaLib\Gui\Elements\Label;
 class MultipageList
 {
 	private $size;
-	private $lines;
+	private $perPage;
 	private $page;
 	private $maxPage;
 	
 	private $prefix;
 
-	function __construct($size, $lines, $prefix='')
+	function __construct($size, $perPage, $prefix='')
 	{
 		$this->size = $size;
-		$this->lines = $lines;
+		$this->perPage = $perPage;
 		$this->prefix = $prefix ? $prefix.'-' : '';
 		
 		$request = \ManiaLib\Application\Request::getInstance();
-		$this->maxPage = ceil($this->size / $this->lines);
+		$this->maxPage = ceil($this->size / $this->perPage);
 		$this->page = (int) $request->get($this->prefix.'page', 1);
 		if($this->page < 1)
 			$this->page = 1;
@@ -42,8 +42,8 @@ class MultipageList
 	 */
 	function getLimit()
 	{
-		$offset = ($this->page - 1) * $this->lines;
-		$length = $this->lines;
+		$offset = ($this->page - 1) * $this->perPage;
+		$length = $this->perPage;
 		return array($offset, $length);
 	}
 

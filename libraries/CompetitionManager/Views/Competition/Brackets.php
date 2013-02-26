@@ -100,7 +100,7 @@ class Brackets extends \ManiaLib\Application\View
 			$card->addParticipant($participant, false, $match->state >= Constants\State::STARTED && $participant->score->isVisible(), false);
 		
 		if($match->state > Constants\State::UNKNOWN)
-			$emptyLabels = 'BYE';
+			$emptyLabels = _('BYE');
 		else
 			$emptyLabels = $this->response->stage->getEmptyLabels($this->response->bracket, $this->response->baseRound+$round, $this->response->baseOffset+$offset);
 		for($i=count($match->participants); $i<$this->response->stage->parameters['slotsPerMatch']; ++$i)

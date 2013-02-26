@@ -14,6 +14,8 @@ abstract class UI
 	const PIXEL = .166666667;
 	
 	const MATCH_WIDTH = 45;
+	const GROUP_WIDTH = 60;
+	const MEDIUM_WIDTH = 100;
 	const EVENT_WIDTH = 100;
 	const DIALOG_WIDTH = 120;
 	const STANDARD_WIDTH = 150;

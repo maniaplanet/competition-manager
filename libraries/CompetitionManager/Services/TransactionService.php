@@ -23,6 +23,29 @@ class TransactionService extends \DedicatedManager\Services\AbstractService
 	
 	/**
 	 * @param int $competitionId
+	 * @param int $participantId
+	 * @return Transaction[]
+	 */
+	function getByParticipant($competitionId, $participantId)
+	{
+		$service = new ParticipantService();
+		$participant = $service->get($participantId);
+		if($participant instanceof Player)
+			$result = $this->db()->execute(
+					'SELECT * FROM Transactions WHERE competitionId=%d AND login=%s',
+					$competitionId,
+					$participant->login
+				);
+		else
+			$result = $this->db()->execute(
+					'SELECT * FROM Transactions WHERE competitionId=%d AND teamId=%d',
+					$competitionId,
+					$participant->teamId
+				);
+	}
+	
+	/**
+	 * @param int $competitionId
 	 * @return int
 	 */
 	function getCompetitionBalance($competitionId)
@@ -51,10 +74,11 @@ class TransactionService extends \DedicatedManager\Services\AbstractService
 	function registerIncome(Transaction $transaction)
 	{
 		$this->db()->execute(
-				'INSERT INTO Transactions(remoteId, competitionId, login, amount, type, message) VALUES (%d, %d, %s, %d, %d, %s)',
+				'INSERT INTO Transactions(remoteId, competitionId, login, teamId, amount, type, message) VALUES (%d, %d, %s, %s, %d, %d, %s)',
 				$transaction->remoteId,
 				$transaction->competitionId,
 				$this->db()->quote($transaction->login),
+				intval($transaction->teamId) ?: 'NULL',
 				$transaction->amount,
 				$transaction->type,
 				$this->db()->quote($transaction->message)
@@ -67,9 +91,10 @@ class TransactionService extends \DedicatedManager\Services\AbstractService
 	function registerOutcome(Transaction $transaction)
 	{
 		$this->db()->execute(
-				'INSERT INTO Transactions(competitionId, login, amount, type, message) VALUES (%d, %s, %d, %d, %s)',
+				'INSERT INTO Transactions(competitionId, login, teamId, amount, type, message) VALUES (%d, %s, %s, %d, %d, %s)',
 				$transaction->competitionId,
 				$this->db()->quote($transaction->login),
+				intval($transaction->teamId) ?: 'NULL',
 				$transaction->amount,
 				$transaction->type,
 				$this->db()->quote($transaction->message)

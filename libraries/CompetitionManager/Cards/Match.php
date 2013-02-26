@@ -20,15 +20,16 @@ class Match extends Frame
 	/** @var Bgs1InRace */
 	private $shadow;
 	/** @var Quad */
-	private $background;
+	protected $background;
 	/** @var Frame */
-	private $content;
+	protected $content;
 	/** @var int */
 	private $lines = 0;
 	
 	function __construct()
 	{
 		parent::__construct(Constants\UI::MATCH_WIDTH, -Constants\UI::PIXEL);
+		$this->setLayout(new \ManiaLib\Gui\Layouts\Spacer($this->sizeX, $this->sizeY));
 		
 		// Background
 		$this->shadow = new Bgs1InRace();

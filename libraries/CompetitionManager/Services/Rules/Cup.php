@@ -27,6 +27,12 @@ class Cup extends \CompetitionManager\Services\Rules
 	public $scoringSystem = null;
 	/** @setting bool Allow or forbid respawn */
 	public $disableRespawn = false;
+	private $title;
+	
+	function __construct($title)
+	{
+		$this->title = $title;
+	}
 	
 	function getName()
 	{
@@ -45,7 +51,7 @@ class Cup extends \CompetitionManager\Services\Rules
 	
 	function getTitle()
 	{
-		return 'TMCanyon';
+		return $this->title;
 	}
 	
 	function getDefaultScore()

@@ -25,7 +25,8 @@ abstract class Rules
 			switch($title)
 			{
 //				case 'TMCanyon':
-//					return array(new Rules\Team());
+//				case 'TMStadium':
+//					return array(new Rules\Team($title));
 //				case 'SMStorm':
 //					return array(new Rules\BattleWaves());
 				case 'SMStormElite@nadeolabs':
@@ -41,9 +42,10 @@ abstract class Rules
 			switch($title)
 			{
 				case 'TMCanyon':
+				case 'TMStadium':
 					return array(
-						new Rules\LobbyTMTimeAttack(),
-						new Rules\LobbyRounds()
+						new Rules\LobbyTMTimeAttack($title),
+						new Rules\LobbyRounds($title)
 					);
 				case 'SMStorm':
 //				case 'SMStormElite@nadeolabs':
@@ -65,7 +67,8 @@ abstract class Rules
 			switch($title)
 			{
 //				case 'TMCanyon':
-//					return array(new Rules\AsynchronousTMTimeAttack());
+//				case 'TMStadium':
+//					return array(new Rules\AsynchronousTMTimeAttack($title));
 //				case 'SMStorm':
 //					return array(new Rules\AsynchronousSMTimeAttack());
 			}
@@ -75,13 +78,14 @@ abstract class Rules
 			switch($title)
 			{
 				case 'TMCanyon':
+				case 'TMStadium':
 					return array(
-//						new Rules\CumulativeTMTimeAttack(),
-//						new Rules\TMTimeAttackDuel(),
-//						new Rules\CumulativeRounds(),
-//						new Rules\RoundsDuel(),
-						new Rules\Laps(),
-//						new Rules\Cup()
+//						new Rules\CumulativeTMTimeAttack($title),
+//						new Rules\TMTimeAttackDuel($title),
+//						new Rules\CumulativeRounds($title),
+//						new Rules\RoundsDuel($title),
+						new Rules\Laps($title),
+//						new Rules\Cup($title)
 					);
 				case 'SMStorm':
 					return array(

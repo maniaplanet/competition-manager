@@ -58,16 +58,30 @@ class Groups extends \ManiaLib\Application\View
 					foreach($emptyLabels as $emptyLabel)
 						$card->addEmpty($emptyLabel);
 				}
+				
+				$this->request->set('group', $group);
+				$card->setManialink($this->request->createLink());
+				
 				$lineFrame->add($card);
 				$lineHeight = max($card->getRealSizeY(), $lineHeight);
 			}
 		}
+		$this->request->restore('group');
+		
 		$frame->setSizeY(self::getColumnHeight($lineHeight, count($groups)));
 		$layout->setMarginHeight(self::getColumnMargin($lineHeight, count($groups)));
 		foreach($lineFrames as $lineFrame)
 			$lineFrame->setSizeY($lineHeight);
 		
 		$frame->save();
+		
+		if($this->response->multipageList)
+		{
+			$navigator = $this->response->multipageList->createNavigator();
+			$navigator->setPosition(40, -80, -5);
+			$navigator->setHalign('center');
+			$navigator->save();
+		}
 	}
 	
 	private static function getColumnHeight($lineHeight, $nbLines)

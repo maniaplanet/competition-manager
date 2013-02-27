@@ -48,6 +48,8 @@ $r = ManiaLib\Application\Request::getInstance();
 							<optgroup label="<?php echo _('Official titles'); ?>">
 								<option value="TMCanyon" <?php echo $competition->title == 'TMCanyon' ? 'selected="selected"' : ''; ?>
 										class="solo-compliant team-not-compliant openqualifiers-not-compliant">TrackMania Canyon</option>
+								<option value="TMStadium" <?php echo $competition->title == 'TMStadium' ? 'selected="selected"' : ''; ?>
+										class="solo-compliant team-not-compliant openqualifiers-not-compliant">TrackMania Stadium</option>
 								<option value="SMStorm" <?php echo $competition->title == 'SMStorm' ? 'selected="selected"' : ''; ?>
 										class="solo-compliant team-not-compliant">ShootMania Storm</option>
 							</optgroup>

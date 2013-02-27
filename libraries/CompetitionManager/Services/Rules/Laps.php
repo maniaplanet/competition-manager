@@ -25,6 +25,12 @@ class Laps extends \CompetitionManager\Services\Rules
 	public $finishTimeLimit = 1;
 	/** @setting bool Allow or forbid respawn */
 	public $disableRespawn = false;
+	private $title;
+	
+	function __construct($title)
+	{
+		$this->title = $title;
+	}
 	
 	function getName()
 	{
@@ -48,7 +54,7 @@ class Laps extends \CompetitionManager\Services\Rules
 	
 	function getTitle()
 	{
-		return 'TMCanyon';
+		return $this->title;
 	}
 	
 	function getDefaultScore()

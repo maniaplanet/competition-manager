@@ -270,7 +270,7 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 	
 	function chooseMaps()
 	{
-		$environment = $this->stage->rules->getTitle() == 'TMCanyon' ? 'Canyon' : 'Storm';
+		$environment = \CompetitionManager\Services\WebServicesProxy::getTitleEnvironment($this->stage->rules->getTitle());
 
 		if($this->stage->rules->gameMode == GameInfos::GAMEMODE_SCRIPT)
 		{

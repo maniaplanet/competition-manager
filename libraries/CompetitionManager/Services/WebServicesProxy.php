@@ -193,6 +193,8 @@ abstract class WebServicesProxy
 		{
 			case 'TMCanyon':
 				return 'TrackMania Canyon';
+			case 'TMStadium':
+				return 'TrackMania Stadium';
 			case 'SMStorm':
 				return 'ShootMania Storm';
 			case 'SMStormElite@nadeolabs':
@@ -205,6 +207,25 @@ abstract class WebServicesProxy
 				return 'Joust';
 			case 'SMStormRoyal@nadeolabs':
 				return 'Royal';
+		}
+	}
+	
+	// FIXME use Ws when available instead of hardcoding...
+	static function getTitleEnvironment($title)
+	{
+		switch($title)
+		{
+			case 'TMCanyon':
+				return 'Canyon';
+			case 'TMStadium':
+				return 'Stadium';
+			case 'SMStorm':
+			case 'SMStormElite@nadeolabs':
+			case 'SMStormEliteExperimental@nadeolabs':
+			case 'SMStormHeroes@nadeolabs':
+			case 'SMStormJoust@nadeolabs':
+			case 'SMStormRoyal@nadeolabs':
+				return 'Storm';
 		}
 	}
 	

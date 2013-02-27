@@ -16,6 +16,12 @@ use ManiaLib\Gui\Elements\Icons128x32_1;
 abstract class Rounds extends \CompetitionManager\Services\Rules
 {
 	public $gameMode = GameInfos::GAMEMODE_ROUNDS;
+	private $title;
+	
+	function __construct($title)
+	{
+		$this->title = $title;
+	}
 	
 	function getIcon()
 	{
@@ -24,7 +30,7 @@ abstract class Rounds extends \CompetitionManager\Services\Rules
 	
 	function getTitle()
 	{
-		return 'TMCanyon';
+		return $this->title;
 	}
 }
 

@@ -10,10 +10,12 @@
 namespace CompetitionManager\Filters;
 
 use CompetitionManager\Constants\State;
+use CompetitionManager\Cards\GroupFull;
 use CompetitionManager\Cards\MatchFull;
+use CompetitionManager\Cards\RankingFull;
 use CompetitionManager\Utils\Formatting;
 
-class MatchDisplay extends \ManiaLib\Application\AdvancedFilter
+class RankingDisplay extends \ManiaLib\Application\AdvancedFilter
 {
 	/** @var MatchFull */
 	public $card = null;
@@ -40,43 +42,93 @@ class MatchDisplay extends \ManiaLib\Application\AdvancedFilter
 			return;
 		}
 		
-		$this->prepare($match);
+		$this->prepareMatch($match);
 	}
 	
-	function prepare($obj)
+	/**
+	 * @param \CompetitionManager\Services\Match $match
+	 */
+	function prepareMatch($match)
 	{
 		$this->card = new MatchFull();
-		
-		$service = new \CompetitionManager\Services\ParticipantService();
+		$this->card->setName($match->name);
+		$this->card->setState($match->state);
+		$this->autoTime($match);
+		$this->autoButton($match);
+		$this->showScores = $match->state >= State::STARTED && $this->participants && reset($this->participants)->score->isVisible();
 		
 		// Participants
-		if($obj instanceof \CompetitionManager\Services\Stage)
-			$nbSlots = $service->countByStage($obj->stageId);
-		else
-			$nbSlots = $service->countByMatch($obj->matchId);
+		$service = new \CompetitionManager\Services\ParticipantService();
+		$nbSlots = $service->countByMatch($match->matchId);
 		$offset = $length = 0;
 		if($nbSlots > 16)
 		{
 			$this->multipage = new \CompetitionManager\Utils\MultipageList($nbSlots, 16);
 			list($offset, $length) = $this->multipage->getLimit();
 		}
-		if($obj instanceof \CompetitionManager\Services\Stage)
+		$this->participants = $service->getByMatch($match->matchId, $offset, $length);
+	}
+	
+	/**
+	 * @param \CompetitionManager\Services\Stage $stage
+	 */
+	function prepareBasic($stage)
+	{
+		$this->card = new RankingFull();
+		$this->card->setName($stage->getName());
+		$this->card->setState($stage->state);
+		$this->autoTime($stage);
+		$this->showScores = $stage->state >= State::STARTED && $this->participants && reset($this->participants)->score->isVisible();
+		
+		// Participants
+		$service = new \CompetitionManager\Services\ParticipantService();
+		$nbSlots = $service->countByStage($stage->matchId);
+		$offset = $length = 0;
+		if($nbSlots > 16)
 		{
-			$this->card->setName($obj->getName());
-			$this->participants = $service->getByStage($obj->stageId, $offset, $length);
+			$this->multipage = new \CompetitionManager\Utils\MultipageList($nbSlots, 16);
+			list($offset, $length) = $this->multipage->getLimit();
+		}
+		$this->participants = $service->getByStage($stage->matchId, $offset, $length);
+	}
+	
+	/**
+	 * @param \CompetitionManager\Services\Stage $stage
+	 */
+	function prepareGroup($stage, $group=null)
+	{
+		$this->card = new GroupFull();
+		$this->card->setState($stage->state);
+		$this->autoTime($stage);
+		$this->showScores = $stage->state >= State::STARTED && $this->participants && reset($this->participants)->score->isVisible();
+		
+		// Participants
+		$service = new \CompetitionManager\Services\ParticipantService();
+		$offset = $length = 0;
+		if($group === null)
+		{
+			$this->card->setName($stage->getName());
+			$nbSlots = $service->countByStage($stage->matchId);
+			if($nbSlots > 16)
+			{
+				$this->multipage = new \CompetitionManager\Utils\MultipageList($nbSlots, 16);
+				list($offset, $length) = $this->multipage->getLimit();
+			}
+			$this->participants = $service->getByStage($stage->matchId, $offset, $length);
 		}
 		else
 		{
-			$this->card->setName($obj->name);
-			$this->participants = $service->getByMatch($obj->matchId, $offset, $length);
+			$this->card->setName(sprintf(_('Group %s'), \CompetitionManager\Services\Stages\Groups::getGroupLetter($group)));
+			$nbSlots = count($stage->parameters['groupParticipants'][$group]);
+			if($nbSlots > 16)
+			{
+				$this->multipage = new \CompetitionManager\Utils\MultipageList($nbSlots, 16);
+				list($offset, $length) = $this->multipage->getLimit();
+			}
+			$this->participants = $service->getByStage($stage->matchId);
+			$this->participants = array_intersect_key($this->participants, array_flip($stage->parameters['groupParticipants'][$group]));
+			$this->participants = array_slice($this->participants, $offset, $length, true);
 		}
-		
-		$this->autoTime($obj);
-		$this->autoButton($obj);
-		$this->card->setCloseLink(null);
-		$this->card->setState($obj->state);
-		
-		$this->showScores = $obj->state >= State::STARTED && $this->participants && reset($this->participants)->score->isVisible();
 	}
 	
 	function autoTime($obj)

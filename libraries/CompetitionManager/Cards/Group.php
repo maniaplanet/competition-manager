@@ -11,15 +11,14 @@ namespace CompetitionManager\Cards;
 
 use CompetitionManager\Constants;
 
-class Group extends Match
+class Group extends Ranking
 {
 	/** @var HighlightedLabel */
 	protected $title;
 	
 	function __construct()
 	{
-		parent::__construct();
-		$this->setSize(Constants\UI::GROUP_WIDTH, Constants\UI::TITLE_HEIGHT/2);
+		parent::__construct(Constants\UI::GROUP_WIDTH, Constants\UI::TITLE_HEIGHT/2);
 		
 		$this->title = new HighlightedLabel($this->sizeX, Constants\UI::TITLE_HEIGHT/2);
 		$this->title->highlight->setBgcolor('ff05');
@@ -28,7 +27,7 @@ class Group extends Match
 		$this->title->label->setPosX(2);
 		$this->content->add($this->title);
 		
-		$this->background->setId('group:'.uniqid());
+		$this->background->setId($this->getId().':tooltip');
 		$this->background->setScriptEvents();
 		\ManiaLib\ManiaScript\UI::tooltip($this->background->getId(), _('See details'));
 	}

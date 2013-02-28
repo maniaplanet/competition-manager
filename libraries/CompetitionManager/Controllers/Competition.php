@@ -28,7 +28,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	/** @var \CompetitionManager\Services\Team[] */
 	private $unregistrableTeams;
 	
-	/** @var Filters\MatchDisplay */
+	/** @var Filters\RankingDisplay */
 	private $matchDisplay;
 	/** @var Filters\NextUserEvent */
 	private $nextUserEvent;
@@ -40,7 +40,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		$this->addFilter(new Filters\NextPageMessage());
 		$this->addFilter(new Filters\IncomeLogger());
 		$this->addFilter($this);
-		$this->addFilter($this->matchDisplay = new Filters\MatchDisplay());
+		$this->addFilter($this->matchDisplay = new Filters\RankingDisplay());
 		$this->addFilter($this->nextUserEvent = new Filters\NextUserEvent());
 	}
 	
@@ -227,7 +227,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	function registrations()
 	{
 		$this->stage->fetchParticipants();
-		$this->matchDisplay->prepare($this->stage);
+		$this->matchDisplay->prepareBasic($this->stage);
 		$this->matchDisplay->showRanks = false;
 		$this->matchDisplay->showScores = false;
 		$this->matchDisplay->linesToShow = 1;
@@ -237,7 +237,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	function lobby()
 	{
 		$this->stage->fetchParticipants();
-		$this->matchDisplay->prepare($this->stage);
+		$this->matchDisplay->prepareBasic($this->stage);
 		$this->matchDisplay->autoButton(reset($this->stage->matches));
 		$this->matchDisplay->showRanks = false;
 		$this->matchDisplay->showScores = false;
@@ -249,7 +249,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	
 	function match()
 	{
-		$this->matchDisplay->prepare(reset($this->stage->matches));
+		$this->matchDisplay->prepareMatch(reset($this->stage->matches));
 		$this->matchDisplay->linesToShow = 1;
 		$this->matchDisplay->emptyLabels = _('Waiting for previous stage to end...');
 	}
@@ -262,9 +262,9 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		if(!$this->matchDisplay->isPrepared())
 		{
 			if(count($this->stage->matches) == 1)
-				$this->matchDisplay->prepare($this->stage->matches[0]);
+				$this->matchDisplay->prepareMatch($this->stage->matches[0]);
 			else
-				$this->matchDisplay->prepare($this->stage);
+				$this->matchDisplay->prepareBasic($this->stage);
 			$this->matchDisplay->card->setName(_('Global ranking'));
 		}
 		if(count($this->stage->matches) > 5)
@@ -299,7 +299,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		if(count($bracketMatches) == 1)
 		{
 			$round = $offset = 0;
-			$this->matchDisplay->prepare($bracketMatches[0][0]);
+			$this->matchDisplay->prepareMatch($bracketMatches[0][0]);
 		}
 		// or adding close link if there's a match to display
 		else if($this->matchDisplay->isPrepared())
@@ -371,7 +371,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	
 	function results()
 	{
-		$this->matchDisplay->prepare(end($this->competition->stages));
+		$this->matchDisplay->prepareBasic(end($this->competition->stages));
 		$this->matchDisplay->card->setName(_('Results'));
 		$this->matchDisplay->card->setTime(null);
 		$this->matchDisplay->showScores = false;

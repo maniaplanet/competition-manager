@@ -10,14 +10,11 @@
 namespace CompetitionManager\Cards;
 
 use ManiaLib\Gui\Elements\Bgs1;
-use ManiaLib\Gui\Elements\Bgs1InRace;
-use ManiaLib\Gui\Elements\Frame;
 use ManiaLib\Gui\Elements\Label;
-use ManiaLib\Gui\Elements\Quad;
 use ManiaLib\ManiaScript;
 use CompetitionManager\Constants;
 
-class Dialog extends Frame
+class Dialog extends Window
 {
 	const ERROR = 0;
 	const WARNING = 1;
@@ -25,14 +22,8 @@ class Dialog extends Frame
 	
 	/** @var Bgs1 */
 	private $blur;
-	/** @var HighlightedLabel */
-	private $title;
-	/** @var Bgs1InRace */
-	private $shadow;
-	/** @var Quad */
-	private $background;
 	/** @var Label */
-	private $content;
+	private $message;
 	/** @var HighlightedLabel */
 	private $button;
 	/** @var mixed[][] */
@@ -43,7 +34,8 @@ class Dialog extends Frame
 		parent::__construct($sizeX, $sizeY);
 		$this->setRelativeAlign('center', 'center');
 		$this->setAlign('center', 'center');
-		$this->setId('dialog:'.uniqid());
+		
+		$this->background->setBgcolor('eee');
 		
 		$this->blur = new Bgs1(320, 180);
 		$this->blur->setSubStyle(Bgs1::BgDialogBlur);
@@ -52,27 +44,13 @@ class Dialog extends Frame
 		$this->blur->setId($this->getId().':blur');
 		$this->blur->setScriptEvents();
 		
-		$this->title = new HighlightedLabel($sizeX, Constants\UI::TITLE_HEIGHT);
-		$this->title->setPosZ(.1);
-		$this->title->label->setRelativeHalign('center');
-		$this->title->label->setHalign('center');
-		
-		$this->shadow = new Bgs1InRace($sizeX+11, $sizeY+11);
-		$this->shadow->setSubStyle(Bgs1InRace::BgButtonShadow);
-		$this->shadow->setRelativeAlign('center', 'center');
-		$this->shadow->setAlign('center', 'center');
-		
-		$this->background = new Quad($sizeX, $sizeY - Constants\UI::TITLE_HEIGHT);
-		$this->background->setPosition(0, -Constants\UI::TITLE_HEIGHT, .1);
-		$this->background->setBgcolor('eee');
-		
-		$this->content = new Label(($sizeX - 20) / 1.3, 0);
-		$this->content->setStyle(Label::TextTips);
-		$this->content->setRelativeAlign('center', 'center');
-		$this->content->setAlign('center', 'center2');
-		$this->content->setPosZ(.2);
-		$this->content->setScale(1.3);
-		$this->content->enableAutonewline();
+		$this->message = new Label(($sizeX - 20) / 1.3, 0);
+		$this->message->setStyle(Label::TextTips);
+		$this->message->setRelativeAlign('center', 'center');
+		$this->message->setAlign('center', 'center2');
+		$this->message->setPosition(0, 3, .2);
+		$this->message->setScale(1.3);
+		$this->message->enableAutonewline();
 		
 		$this->button = new HighlightedLabel(35, 7);
 		$this->button->setRelativeAlign('center', 'bottom');
@@ -85,29 +63,22 @@ class Dialog extends Frame
 		$this->button->highlight->setScriptEvents();
 		
 		$this->add($this->blur);
-		$this->add($this->title);
-		$this->add($this->shadow);
-		$this->add($this->background);
-		$this->add($this->content);
-		$this->add($this->button);
+		$this->content->add($this->message);
+		$this->content->add($this->button);
 	}
 	
 	function setType($type)
 	{
 		static $bgColors = array(self::ERROR => 'c20', self::WARNING => 'd90', self::SUCCESS => '290');
-		$this->title->highlight->setBgcolor($bgColors[$type]);
+		
+		$this->setTitleBackground($bgColors[$type]);
 		$this->button->highlight->setBgcolor($bgColors[$type].'a');
 		$this->button->highlight->setBgcolorFocus($bgColors[$type]);
 	}
 	
-	function setTitle($title)
-	{
-		$this->title->label->setText($title);
-	}
-	
 	function setContent($content)
 	{
-		$this->content->setText($content);
+		$this->message->setText($content);
 	}
 	
 	function addCustomAction(array $action)
@@ -118,7 +89,6 @@ class Dialog extends Frame
 	function setAsExternal()
 	{
 		$this->blur->setVisibility(false);
-		$this->shadow->setStyle(Bgs1InRace::Bgs1InRace);
 		$this->button->highlight->setAction(0);
 		$this->button->highlight->setId(null);
 		$this->button->highlight->setScriptEvents(0);

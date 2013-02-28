@@ -24,6 +24,19 @@ abstract class UI
 	const TITLE_HEIGHT = 12;
 	const DIALOG_HEIGHT = 45;
 	const ACCORDION_HEIGHT = 120;
+	
+	static function STATE_COLOR($state, $focus=false)
+	{
+		static $colors = array(
+			State::UNKNOWN   => '044',
+			State::READY     => '088',
+			State::STARTED   => '08f',
+			State::OVER      => '00f',
+			State::ARCHIVED  => '008',
+			State::CANCELLED => '000',
+		);
+		return $colors[$state].($focus ? '9' : '5');
+	}
 }
 
 ?>

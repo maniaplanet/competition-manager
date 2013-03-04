@@ -97,14 +97,14 @@ class OpenStage extends \ManiaLib\Application\View
 			}
 			\ManiaLib\Gui\Manialink::endFrame();
 			
-			$ui = $this->response->matchCard;
+			$ui = $this->response->rankingCard;
 			$ui->computeSize();
 			$ui->setPosition(-15, $ui->getSizeY() / 2, -5);
 			$ui->save();
 		}
 		else
 		{
-			$ui = $this->response->matchCard;
+			$ui = $this->response->rankingCard;
 			$ui->setAlign('center', 'center');
 			$ui->setPosition(40);
 			$ui->save();

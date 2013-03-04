@@ -26,7 +26,7 @@ class Brackets extends \ManiaLib\Application\View
 		else
 			$this->displayBracket();
 		
-		if($this->response->matchCard)
+		if($this->response->rankingCard)
 		{
 			$ui = new Bgs1(240, 180);
 			$ui->setSubStyle(Bgs1::BgDialogBlur);
@@ -41,7 +41,7 @@ class Brackets extends \ManiaLib\Application\View
 	
 	private function displaySingle()
 	{
-		$ui = $this->response->matchCard;
+		$ui = $this->response->rankingCard;
 		$ui->setAlign('center', 'center');
 		$ui->setPosition(40, 0, 2);
 		$ui->save();

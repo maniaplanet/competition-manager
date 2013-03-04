@@ -15,7 +15,7 @@ class Lobby extends \ManiaLib\Application\View
 	{
 		$this->renderSubView('_Menu');
 		
-		$ui = $this->response->matchCard;
+		$ui = $this->response->rankingCard;
 		$ui->setAlign('center', 'center');
 		$ui->setPosition(40);
 		$ui->save();

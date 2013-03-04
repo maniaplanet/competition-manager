@@ -29,7 +29,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	private $unregistrableTeams;
 	
 	/** @var Filters\RankingDisplay */
-	private $matchDisplay;
+	private $rankingDisplay;
 	/** @var Filters\NextUserEvent */
 	private $nextUserEvent;
 	
@@ -40,7 +40,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		$this->addFilter(new Filters\NextPageMessage());
 		$this->addFilter(new Filters\IncomeLogger());
 		$this->addFilter($this);
-		$this->addFilter($this->matchDisplay = new Filters\RankingDisplay());
+		$this->addFilter($this->rankingDisplay = new Filters\RankingDisplay());
 		$this->addFilter($this->nextUserEvent = new Filters\NextUserEvent());
 	}
 	
@@ -62,7 +62,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 			$this->stage->fetchMatches();
 		}
 		
-		$this->matchDisplay->userId = $this->getUserParticipation() ? $this->getUserParticipation()->participantId : 0;
+		$this->rankingDisplay->userId = $this->getUserParticipation() ? $this->getUserParticipation()->participantId : 0;
 		$this->nextUserEvent->userId = $this->getUserParticipation() ? $this->getUserParticipation()->participantId : 0;
 		$this->nextUserEvent->competition = $this->competition;
 		$this->nextUserEvent->showNotification = $this->request->getAction('index') != 'index';
@@ -227,31 +227,31 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	function registrations()
 	{
 		$this->stage->fetchParticipants();
-		$this->matchDisplay->prepareBasic($this->stage);
-		$this->matchDisplay->showRanks = false;
-		$this->matchDisplay->showScores = false;
-		$this->matchDisplay->linesToShow = 1;
-		$this->matchDisplay->emptyLabels = _('No one registered yet...');
+		$this->rankingDisplay->prepareBasic($this->stage);
+		$this->rankingDisplay->showRanks = false;
+		$this->rankingDisplay->showScores = false;
+		$this->rankingDisplay->linesToShow = 1;
+		$this->rankingDisplay->emptyLabels = _('No one registered yet...');
 	}
 	
 	function lobby()
 	{
 		$this->stage->fetchParticipants();
-		$this->matchDisplay->prepareBasic($this->stage);
-		$this->matchDisplay->autoButton(reset($this->stage->matches));
-		$this->matchDisplay->showRanks = false;
-		$this->matchDisplay->showScores = false;
+		$this->rankingDisplay->prepareBasic($this->stage);
+		$this->rankingDisplay->autoButton(reset($this->stage->matches));
+		$this->rankingDisplay->showRanks = false;
+		$this->rankingDisplay->showScores = false;
 		if(!$this->getUserParticipation())
-			$this->matchDisplay->card->setButton(_('Play!'), $this->request->createLinkArgList('../register', 'c', 'external'));
-		$this->matchDisplay->linesToShow = 1;
-		$this->matchDisplay->emptyLabels = _('No one registered yet...');
+			$this->rankingDisplay->card->setButton(_('Play!'), $this->request->createLinkArgList('../register', 'c', 'external'));
+		$this->rankingDisplay->linesToShow = 1;
+		$this->rankingDisplay->emptyLabels = _('No one registered yet...');
 	}
 	
 	function match()
 	{
-		$this->matchDisplay->prepareMatch(reset($this->stage->matches));
-		$this->matchDisplay->linesToShow = 1;
-		$this->matchDisplay->emptyLabels = _('Waiting for previous stage to end...');
+		$this->rankingDisplay->prepareMatch(reset($this->stage->matches));
+		$this->rankingDisplay->linesToShow = 1;
+		$this->rankingDisplay->emptyLabels = _('Waiting for previous stage to end...');
 	}
 	
 	protected function openStage()
@@ -259,18 +259,18 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		$this->response->resetViews();
 		$this->response->registerView('CompetitionManager\\Views\\Competition\\OpenStage');
 		
-		if(!$this->matchDisplay->isPrepared())
+		if(!$this->rankingDisplay->isPrepared())
 		{
 			if(count($this->stage->matches) == 1)
-				$this->matchDisplay->prepareMatch($this->stage->matches[0]);
+				$this->rankingDisplay->prepareMatch($this->stage->matches[0]);
 			else
-				$this->matchDisplay->prepareBasic($this->stage);
-			$this->matchDisplay->card->setName(_('Global ranking'));
+				$this->rankingDisplay->prepareBasic($this->stage);
+			$this->rankingDisplay->card->setName(_('Global ranking'));
 		}
 		if(count($this->stage->matches) > 5)
 			$this->response->matchOffset = $this->request->get('offset');
 		
-		$this->matchDisplay->linesToShow = min($this->stage->maxSlots ?: 16, 16);
+		$this->rankingDisplay->linesToShow = min($this->stage->maxSlots ?: 16, 16);
 	}
 	
 	function qualifiers()
@@ -291,7 +291,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	function brackets($bracket=Stages\Brackets::WINNERS_BRACKET)
 	{
 		// forcing bracket if a match display has been requested in URL
-		if($this->matchDisplay->isPrepared())
+		if($this->rankingDisplay->isPrepared())
 			list($bracket, $round, $offset) = $this->stage->findMatch($this->request->get('m'));
 		
 		$bracketMatches = $this->stage->matches[$bracket];
@@ -299,25 +299,25 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		if(count($bracketMatches) == 1)
 		{
 			$round = $offset = 0;
-			$this->matchDisplay->prepareMatch($bracketMatches[0][0]);
+			$this->rankingDisplay->prepareMatch($bracketMatches[0][0]);
 		}
 		// or adding close link if there's a match to display
-		else if($this->matchDisplay->isPrepared())
+		else if($this->rankingDisplay->isPrepared())
 		{
 			$this->request->delete('m');
-			$this->matchDisplay->card->setCloseLink($this->request->createLink());
+			$this->rankingDisplay->card->setCloseLink($this->request->createLink());
 			$this->request->restore('m');
 		}
 		
 		// configuring match display
-		if($this->matchDisplay->isPrepared())
+		if($this->rankingDisplay->isPrepared())
 		{
-			$this->matchDisplay->linesToShow = min($this->stage->parameters['slotsPerMatch'], 16);
-			$this->matchDisplay->emptyLabels = array();
+			$this->rankingDisplay->linesToShow = min($this->stage->parameters['slotsPerMatch'], 16);
+			$this->rankingDisplay->emptyLabels = array();
 			if($bracketMatches[$round][$offset]->state > State::UNKNOWN)
-				$this->matchDisplay->emptyLabels = _('BYE');
+				$this->rankingDisplay->emptyLabels = _('BYE');
 			else
-				$this->matchDisplay->emptyLabels = $this->stage->getEmptyLabels($bracket, $round, $offset);
+				$this->rankingDisplay->emptyLabels = $this->stage->getEmptyLabels($bracket, $round, $offset);
 		}
 		
 		$this->response->bracket = $bracket;
@@ -336,12 +336,20 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		}
 	}
 	
-	function championship()
+	function championship($round=null)
 	{
+		$this->rankingDisplay->prepareChampionship($this->stage);
+		if($this->stage->state == State::UNKNOWN)
+		{
+			$this->rankingDisplay->emptyLabels = $this->stage->getEmptyLabels();
+			$this->rankingDisplay->linesToShow = count($this->rankingDisplay->emptyLabels);
+		}
 		
+		$this->stage->fetchMatches();
+		$this->prepareChampionshipMatches($this->stage->matches, $round);
 	}
 	
-	function groups($group=null)
+	function groups($group=null, $round=null)
 	{
 		$this->stage->fetchParticipants();
 		
@@ -360,6 +368,52 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 			else
 				$this->response->groups = $groups;
 		}
+		else
+		{
+			$this->response->resetViews();
+			$this->response->registerView('\\CompetitionManager\\Views\\Competition\\Championship');
+			
+			$this->rankingDisplay->prepareChampionship($this->stage, $group);
+			if($this->stage->state == State::UNKNOWN)
+			{
+				$this->rankingDisplay->emptyLabels = $this->stage->getEmptyLabels($group);
+				$this->rankingDisplay->linesToShow = count($this->rankingDisplay->emptyLabels);
+			}
+			
+			$this->stage->fetchMatches();
+			$this->prepareChampionshipMatches($this->stage->matches[$group], $round);
+		}
+	}
+	
+	private function prepareChampionshipMatches($matches, $round)
+	{
+		if($this->stage->parameters['isFreeForAll'])
+		{
+			$slotsPerMatch = min(8, max($this->rankingDisplay->linesToShow, count($this->rankingDisplay->participants)));
+			$matchesPerPage = intval(24 / $slotsPerMatch);
+			if(count($matches) > $matchesPerPage)
+			{
+				$this->response->matchesMultipage = new \CompetitionManager\Utils\MultipageList(count($matches), $matchesPerPage, 'matches');
+				list($offset, $length) = $this->response->matchesMultipage->getLimit();
+				$this->response->matches = array_slice($matches, $offset, $length, true);
+			}
+			else
+				$this->response->matches = $matches;
+		}
+		else
+		{
+			$this->response->round = $round = (int) $round;
+			$this->response->maxRound = count($matches)-1;
+			
+			if(count($matches[$round]) > 10)
+			{
+				$this->response->matchesMultipage = new \CompetitionManager\Utils\MultipageList(count($matches[$round]), 10, 'matches');
+				list($offset, $length) = $this->response->matchesMultipage->getLimit();
+				$this->response->matches = array_slice($matches[$round], $offset, $length, true);
+			}
+			else
+				$this->response->matches = $matches[$round];
+		}
 	}
 	
 	function rules($details=0, $external=0)
@@ -371,10 +425,10 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	
 	function results()
 	{
-		$this->matchDisplay->prepareBasic(end($this->competition->stages));
-		$this->matchDisplay->card->setName(_('Results'));
-		$this->matchDisplay->card->setTime(null);
-		$this->matchDisplay->showScores = false;
+		$this->rankingDisplay->prepareBasic(end($this->competition->stages));
+		$this->rankingDisplay->card->setName(_('Results'));
+		$this->rankingDisplay->card->setTime(null);
+		$this->rankingDisplay->showScores = false;
 	}
 	
 	/**

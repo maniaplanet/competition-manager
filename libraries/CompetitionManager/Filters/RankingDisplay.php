@@ -74,7 +74,10 @@ class RankingDisplay extends \ManiaLib\Application\AdvancedFilter
 	 */
 	function prepareBasic($stage)
 	{
-		$this->card = new RankingFull();
+		if($stage instanceof \CompetitionManager\Services\Stages\Championship)
+			$this->card = new GroupFull();
+		else
+			$this->card = new RankingFull();
 		$this->card->setName($stage->getName());
 		$this->card->setState($stage->state);
 		$this->autoTime($stage);
@@ -82,22 +85,23 @@ class RankingDisplay extends \ManiaLib\Application\AdvancedFilter
 		
 		// Participants
 		$service = new \CompetitionManager\Services\ParticipantService();
-		$nbSlots = $service->countByStage($stage->matchId);
+		$nbSlots = $service->countByStage($stage->stageId);
 		$offset = $length = 0;
 		if($nbSlots > 16)
 		{
 			$this->multipage = new \CompetitionManager\Utils\MultipageList($nbSlots, 16);
 			list($offset, $length) = $this->multipage->getLimit();
 		}
-		$this->participants = $service->getByStage($stage->matchId, $offset, $length);
+		$this->participants = $service->getByStage($stage->stageId, $offset, $length);
 	}
 	
 	/**
 	 * @param \CompetitionManager\Services\Stage $stage
 	 */
-	function prepareGroup($stage, $group=null)
+	function prepareChampionship($stage, $group)
 	{
 		$this->card = new GroupFull();
+		$this->card->setName(sprintf(_('Group %s'), \CompetitionManager\Services\Stages\Groups::getGroupLetter($group)));
 		$this->card->setState($stage->state);
 		$this->autoTime($stage);
 		$this->showScores = $stage->state >= State::STARTED && $this->participants && reset($this->participants)->score->isVisible();
@@ -105,30 +109,15 @@ class RankingDisplay extends \ManiaLib\Application\AdvancedFilter
 		// Participants
 		$service = new \CompetitionManager\Services\ParticipantService();
 		$offset = $length = 0;
-		if($group === null)
+		$nbSlots = count($stage->parameters['groupParticipants'][$group]);
+		if($nbSlots > 16)
 		{
-			$this->card->setName($stage->getName());
-			$nbSlots = $service->countByStage($stage->matchId);
-			if($nbSlots > 16)
-			{
-				$this->multipage = new \CompetitionManager\Utils\MultipageList($nbSlots, 16);
-				list($offset, $length) = $this->multipage->getLimit();
-			}
-			$this->participants = $service->getByStage($stage->matchId, $offset, $length);
+			$this->multipage = new \CompetitionManager\Utils\MultipageList($nbSlots, 16);
+			list($offset, $length) = $this->multipage->getLimit();
 		}
-		else
-		{
-			$this->card->setName(sprintf(_('Group %s'), \CompetitionManager\Services\Stages\Groups::getGroupLetter($group)));
-			$nbSlots = count($stage->parameters['groupParticipants'][$group]);
-			if($nbSlots > 16)
-			{
-				$this->multipage = new \CompetitionManager\Utils\MultipageList($nbSlots, 16);
-				list($offset, $length) = $this->multipage->getLimit();
-			}
-			$this->participants = $service->getByStage($stage->matchId);
-			$this->participants = array_intersect_key($this->participants, array_flip($stage->parameters['groupParticipants'][$group]));
-			$this->participants = array_slice($this->participants, $offset, $length, true);
-		}
+		$this->participants = $service->getByStage($stage->stageId);
+		$this->participants = array_intersect_key($this->participants, array_flip($stage->parameters['groupParticipants'][$group]));
+		$this->participants = array_slice($this->participants, $offset, $length, true);
 	}
 	
 	function autoTime($obj)
@@ -201,7 +190,7 @@ class RankingDisplay extends \ManiaLib\Application\AdvancedFilter
 		if($this->multipage)
 			$this->card->addPageNavigator($this->multipage->createNavigator());
 		
-		$this->response->matchCard = $this->card;
+		$this->response->rankingCard = $this->card;
 	}
 }
 

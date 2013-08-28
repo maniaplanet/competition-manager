@@ -60,7 +60,9 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 		// FIXME last API doesn't handle well TM at the moment...
 		if(!($this->match->rules instanceof \ManiaLivePlugins\CompetitionManager\Services\Rules\Script))
 			$this->connection->setApiVersion('2011-10-06');
-		$this->match->rules->configure($this->connection);
+		
+		$this->match->rules->configureWarmup($this->connection);
+		
 		if($this->match->stage->competition->isTeam)
 		{
 			$team1 = reset($this->match->participants);
@@ -166,16 +168,10 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	
 	function onEndMatch($rankings, $winnerTeamOrMap)
 	{
-		static $firstCall = true;
-		
-		if(!$firstCall)
-		{
-			if($this->isInWarmUp)
-				$this->isInWarmUp = false;
-			$this->match->rules->onEndMatch($rankings, $winnerTeamOrMap);
-		}
-		
-		$firstCall = false;
+		\ManiaLive\Utilities\Logger::debug('onEndMatch');
+		if($this->isInWarmUp)
+			$this->isInWarmUp = false;
+		$this->match->rules->onEndMatch($rankings, $winnerTeamOrMap);
 	}
 	
 	function onModeScriptCallback($param1, $param2)
@@ -194,16 +190,19 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	
 	function onRulesEndRound()
 	{
+		\ManiaLive\Utilities\Logger::debug('onRulesEndRound');
 		$this->connection->forceEndRound();
 	}
 	
 	function onRulesEndMap()
 	{
+		\ManiaLive\Utilities\Logger::debug('onRulesEndMap');
 		$this->connection->nextMap(true);
 	}
 	
 	function onRulesEndMatch()
 	{
+		\ManiaLive\Utilities\Logger::debug('onRulesEndMatch');
 		$this->over();
 	}
 	
@@ -290,7 +289,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 			$this->connection->spectatorReleasePlayerSlot($player->login);
 	}
 	
-	function onPlayerDisconnect($login)
+	function onPlayerDisconnect($login, $disconnectionReason)
 	{
 		if(!isset($this->players[$login]))
 			return;
@@ -329,6 +328,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 			$this->connection->chatSendServerMessage(self::PREFIX.'Match is starting!');
 			$this->connection->restartMap();
 			$isStarted = true;
+			$this->match->rules->configure($this->connection);
 		}
 		else
 			$this->connection->chatSendServerMessage(self::PREFIX.'Match is now playing again.');

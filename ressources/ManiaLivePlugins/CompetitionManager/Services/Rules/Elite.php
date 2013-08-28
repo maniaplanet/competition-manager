@@ -45,6 +45,19 @@ class Elite extends Script
 		$settings['S_UseDraft'] = (bool) $this->useDraft;
 		$settings['S_DraftBanNb'] = (int) -1;
 		$settings['S_DraftPickNb'] = (int) 2*$this->mapsLimit-1;
+		$settings['S_UseScriptCallbacks'] = true;
+		$settings['S_UseLobby'] = false;
+		$settings['S_MatchmakingSleep'] = 15;
+		$settings['S_UsePlayerClublinks'] = 1;
+		$dedicated->setModeScriptSettings($settings);
+		
+		$dedicated->restartMap();
+	}
+	
+	function configureWarmup(\DedicatedApi\Connection $dedicated)
+	{
+		$settings = $dedicated->getModeScriptSettings();
+		$settings['S_UseLobby'] = 1;
 		$dedicated->setModeScriptSettings($settings);
 	}
 	
@@ -63,6 +76,19 @@ class Elite extends Script
 				$param2 = json_decode($param2);
 				$mapScores = array($param2->Clan1RoundScore, $param2->Clan2RoundScore);
 				break;
+			
+			case 'EndMatch':
+				$param2 = json_decode($param2);
+				$winnerTeam = $param2->MatchWinnerClan-1;
+				$match = \ManiaLivePlugins\CompetitionManager\Services\Match::getInstance();
+				$teamIds = array_keys($match->participants);
+				if(isset($teamIds[$winnerTeam]))
+				{
+					$match->participants[$teamIds[$winnerTeam]]->rank = 1;
+					$match->participants[$teamIds[1 - $winnerTeam]]->rank = 2;
+				}
+				Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
+				break;
 				
 			case 'EndMap':
 				$param2 = json_decode($param2);
@@ -77,14 +103,6 @@ class Elite extends Script
 						$mapScore = new Scores\Points();
 						$mapScore->points = $points;
 						$match->participants[$teamIds[$index]]->score->details[] = $mapScore;
-					}
-					
-					if(++$match->participants[$teamIds[$winnerTeam]]->score->points == $this->mapsLimit)
-					{
-						$match->participants[$teamIds[$winnerTeam]]->rank = 1;
-						$match->participants[$teamIds[1 - $winnerTeam]]->rank = 2;
-						$match->participants[$teamIds[1 - $winnerTeam]]->score->points |= 0;
-						Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
 					}
 				}
 		}

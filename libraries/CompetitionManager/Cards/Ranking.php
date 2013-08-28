@@ -20,6 +20,9 @@ class Ranking extends Shadowed
 	/** @var int */
 	private $lines = 0;
 	
+	/** @var \CompetitionManager\Services\Participant */
+	protected $lastParticipant;
+	
 	function __construct($sizeX=0, $sizeY=0)
 	{
 		parent::__construct($sizeX, $sizeY);

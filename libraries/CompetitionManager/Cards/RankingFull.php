@@ -27,7 +27,7 @@ class RankingFull extends Shadowed
 	/** @var \CompetitionManager\Services\Participant */
 	private $lastParticipant;
 	
-	function __construct($sizeX=0, $sizeY=0)
+	function __construct($sizeX=Constants\UI::MEDIUM_WIDTH, $sizeY=0)
 	{
 		parent::__construct($sizeX, $sizeY);
 		
@@ -56,6 +56,8 @@ class RankingFull extends Shadowed
 		$this->content->add($this->title);
 		$this->title->add($this->name);
 		$this->title->add($this->time);
+		
+		$this->setSizeY($this->sizeY + Constants\UI::TITLE_HEIGHT - $sizeY);
 	}
 	
 	function setName($name)
@@ -97,7 +99,10 @@ class RankingFull extends Shadowed
 		$ui->setCustomization($isUser, $participant->qualified);
 		
 		$this->content->add($ui);
+		\ManiaLib\Utils\Logger::info($this->getSizeY());
 		$this->setSizeY($this->sizeY + 7 + Constants\UI::PIXEL);
+		\ManiaLib\Utils\Logger::info($this->getSizeY());
+		\ManiaLib\Utils\Logger::info('--');
 		$this->lastParticipant = $participant;
 	}
 	

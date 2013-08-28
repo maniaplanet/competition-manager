@@ -129,7 +129,7 @@ class _NextUserEventView extends \ManiaLib\Application\View
 		$frame->setHalign('right');
 		$frame->setPosition(161, 84);
 		
-		if($this->response->nextUserEvent->blink)
+		if(true /* $this->response->nextUserEvent->blink */)
 		{
 			$ui = new Icons128x128_Blink();
 			$ui->setSubStyle(Icons128x128_Blink::ShareBlink);

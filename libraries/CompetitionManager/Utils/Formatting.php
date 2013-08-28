@@ -89,7 +89,7 @@ abstract class Formatting
 		elseif($timestamp >= 3600)
 		{
 			$value = floor($timestamp / 3600);
-			return sprintf(ngettext('in %d hour ', 'in %d hours', $value), $value);
+			return sprintf(ngettext('in %d hour', 'in %d hours', $value), $value);
 		}
 		elseif($timestamp >= 60)
 		{

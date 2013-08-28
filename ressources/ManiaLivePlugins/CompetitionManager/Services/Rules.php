@@ -26,9 +26,22 @@ abstract class Rules
 		return 0;
 	}
 	
+	/**
+	 * Called to configure the settings of the server
+	 * @param \DedicatedApi\Connection $dedicated
+	 */
 	function configure(\DedicatedApi\Connection $dedicated)
 	{
 		// Often, it should be already configured in match settings
+	}
+	
+	/**
+	 * Called to configure the server before the match really starts
+	 * @param \DedicatedApi\Connection $dedicated
+	 */
+	function configureWarmup(\DedicatedApi\Connection $dedicated)
+	{
+		
 	}
 	
 	function getNeededEvents()

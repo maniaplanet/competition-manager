@@ -144,7 +144,7 @@ class Index extends \ManiaLib\Application\View
 				$this->progressAddButton(_('Register'), $this->request->createLinkArgList('../register', 'c', 'external'));
 			else if($this->response->registrableTeams)
 			{
-				$this->progressAddLabel(_('These are the teams you can register!'));
+				$this->progressAddLabel(_('These are the teams you can register:'));
 				foreach($this->response->registrableTeams as $uniqId => $team)
 				{
 					$this->request->set('team', $uniqId);
@@ -162,7 +162,7 @@ class Index extends \ManiaLib\Application\View
 				$this->progressAddButton(_('Unregister'), $this->request->createLinkArgList('../unregister', 'c', 'external'));
 			else if($this->response->unregistrableTeams)
 			{
-				$this->progressAddLabel(_('You still have time to unregister the following teams.'));
+				$this->progressAddLabel(_('You still have time to unregister the following teams:'));
 				foreach($this->response->unregistrableTeams as $uniqId => $team)
 				{
 					$this->request->set('team', $uniqId);

@@ -53,7 +53,7 @@ class CompetitionHandling extends Cron
 		foreach($stageService->getRunning() as $stage)
 		{
 			$stage->onRun();
-			$this->debug('Stage #'.$stage->stageId.' updated');
+			$this->debug(sprintf('Stage #%d updated (competition %d)', $stage->stageId, $stage->competitionId));
 		}
 		$this->endSection();
 		
@@ -146,6 +146,7 @@ class CompetitionHandling extends Cron
 				catch(\Exception $e)
 				{
 					$this->debug('Error while starting match #'.$match->matchId.' using account `'.$account->login.'`');
+					\ManiaLib\Application\ErrorHandling::logException($e);
 				}
 			}
 		}

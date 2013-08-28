@@ -346,7 +346,7 @@ class Groups extends \CompetitionManager\Services\Stage implements IntermediateC
 		$qualifiedPerGroup = floor($max / $this->parameters['numberOfGroups']);
 		$qualified = $qualifiedPerGroup * $this->parameters['numberOfGroups'];
 		if($rank > $qualified)
-			return _('BYE');
+			return _('-');
 		
 		$group = floor(($rank-1) / $qualifiedPerGroup);
 		$groupRank = (($rank-1) % $qualifiedPerGroup) + 1;

@@ -154,6 +154,10 @@ class Participant extends Frame
 		$this->name->highlight->setBgcolor($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER : self::BG_COLOR]);
 		$this->name->highlight->setBgcolorFocus($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER_FOCUS : self::BG_COLOR_FOCUS]);
 		$this->score->highlight->setBgcolor($customizations[$this->qualified][$this->isUser ? self::BG_COLOR_USER : self::BG_COLOR]);
+		if ($this->qualified)
+		{
+			$this->name->label->setTextPrefix('$o');
+		}
 	}
 	
 	private function getNameWidth()

@@ -9,6 +9,7 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
+use ManiaLive\DedicatedApi\Callback;
 use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\CompetitionManager\Event;
 
@@ -31,11 +32,13 @@ class Joust extends Script
 		$settings['S_RoundPointsGap'] = (int) $this->hitsGap;
 		$settings['S_RoundPointsLimit'] = (int) $this->hitsMax;
 		$settings['S_MatchPointsToWin'] = (int) $this->roundsLimit;
+		$settings['S_UseScriptCallbacks'] = true;
 		$dedicated->setModeScriptSettings($settings);
 	}
 	
 	function onEndMatch($rankings, $winnerTeamOrMap)
 	{
+		\ManiaLib\Utils\Logger::info($rankings);
 		$match = \ManiaLivePlugins\CompetitionManager\Services\Match::getInstance();
 		$logins = array_keys($match->participants);
 		if( ($loginIndex = array_search($rankings[0]['Login'], $logins)) !== false )

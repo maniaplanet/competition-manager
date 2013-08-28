@@ -60,7 +60,7 @@ class Header extends \ManiaLib\Application\View
 		}
 		
 		$ui = new \ManiaLib\Gui\Elements\IncludeManialink();
-		$ui->setUrl('http://files.maniaplanet.com/manialinks/maniascript/manialib2.xml');
+		$ui->setUrl('http://files.maniaplanet.com/manialinks/maniascript/manialib.804.xml');
 		$ui->save();
 
 		\ManiaLib\ManiaScript\Main::begin();

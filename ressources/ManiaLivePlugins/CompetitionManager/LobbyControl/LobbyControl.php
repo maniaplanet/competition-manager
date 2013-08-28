@@ -79,7 +79,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 			unset($this->quitters[$login]);
 	}
 	
-	function onPlayerDisconnect($login)
+	function onPlayerDisconnect($login, $disconnectionReason)
 	{
 		$this->quitters[$login] = 0;
 	}

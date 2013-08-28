@@ -182,7 +182,8 @@ class Match extends \CompetitionManager\Services\AbstractObject
 		$server->rpcPort = $service->start('competition.match-'.$this->matchId, 'competition.match-'.$this->matchId, false);
 		$server->rpcPassword = 'SuperAdmin';
 		
-		sleep(5);
+		sleep(10);
+		
 		$service->register($server);
 		$service->useAccount($account->login, $server->rpcHost, $server->rpcPort);
 		$service->assignMatch($server->rpcHost, $server->rpcPort, $this->matchId);

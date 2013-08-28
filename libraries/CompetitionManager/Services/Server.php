@@ -45,6 +45,7 @@ class Server extends \DedicatedManager\Services\Server
 		$config->database->database = $dbConfig->database;
 		$config->wsapi->username = $wsConfig->username;
 		$config->wsapi->password = $wsConfig->password;
+		$config->config->logsPrefix = 'match-'.$this->matchId;
 
 		$config->plugins[] = $isLobby ? 'CompetitionManager\\LobbyControl' : 'CompetitionManager\\MatchControl';
 		$config->__other = <<<CONFIG

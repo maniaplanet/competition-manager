@@ -111,7 +111,10 @@ class Lobby extends \CompetitionManager\Services\Stage implements FirstCompliant
 					// TODO
 				}
 			}
-			catch(\Exception $e) {}
+			catch(\Exception $e) 
+			{
+				\ManiaLib\Application\ErrorHandling::logException($e);
+			}
 			
 			$server->closeConnection();
 		}

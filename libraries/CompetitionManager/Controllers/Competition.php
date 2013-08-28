@@ -315,7 +315,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 			$this->rankingDisplay->linesToShow = min($this->stage->parameters['slotsPerMatch'], 16);
 			$this->rankingDisplay->emptyLabels = array();
 			if($bracketMatches[$round][$offset]->state > State::UNKNOWN)
-				$this->rankingDisplay->emptyLabels = _('BYE');
+				$this->rankingDisplay->emptyLabels = _('-');
 			else
 				$this->rankingDisplay->emptyLabels = $this->stage->getEmptyLabels($bracket, $round, $offset);
 		}
@@ -623,7 +623,7 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 			
 			$service = new \CompetitionManager\Services\TransactionService();
 			$baseRefund = new Transaction();
-			$baseRefund->competitionId = $this->competitionId;
+			$baseRefund->competitionId = $this->competition->competitionId;
 			$baseRefund->type = Transaction::REGISTRATION | Transaction::REFUND;
 			if($this->competition->isTeam)
 			{

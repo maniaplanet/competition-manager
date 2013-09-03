@@ -89,6 +89,19 @@ abstract class WebServicesProxy
 	}
 	
 	/**
+	 * @return Ws\Titles
+	 */
+	static private function titles()
+	{
+		static $titles = null;
+		
+		if(!$titles)
+			$titles = new Ws\Titles();
+		
+		return $titles;
+	}
+	
+	/**
 	 * @return Player
 	 */
 	static function getUser()
@@ -126,7 +139,16 @@ abstract class WebServicesProxy
 			$service = new ParticipantService();
 			$teams = array();
 			
-			foreach(self::oAuth()->getTeams() as $rawTeam)
+			$teamsAdmin = self::oAuth()->getTeams();
+			$teamsContract = self::oAuth()->getContracts();
+			
+			$rawTeams = array();
+			foreach ($teamsAdmin as $team)
+				$rawTeams[$team->id] = $team;
+			foreach ($teamsContract as $contract)
+				$rawTeams[$contract->team->id] = $contract->team;
+			
+			foreach($rawTeams as $rawTeam)
 			{
 				$team = new Team();
 				$team->teamId = $rawTeam->id;
@@ -145,6 +167,30 @@ abstract class WebServicesProxy
 		}
 		
 		return $teams;
+	}
+	
+	static function getUserTeam($uniqId)
+	{
+		$teams = static::getUserTeams();
+		
+		if (array_key_exists($uniqId, $teams))
+		{
+			return $teams[$uniqId];
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	static function resetUserTeams()
+	{
+		if (self::session()->exists('teams'))
+		{
+			self::session()->delete('teams');
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -186,28 +232,9 @@ abstract class WebServicesProxy
 		return array_map(function($p) { return $p->login; }, $players);
 	}
 	
-	// FIXME use Ws when available instead of hardcoding...
 	static function getTitleName($title)
 	{
-		switch($title)
-		{
-			case 'TMCanyon':
-				return 'TrackMania Canyon';
-			case 'TMStadium':
-				return 'TrackMania Stadium';
-			case 'SMStorm':
-				return 'ShootMania Storm';
-			case 'SMStormElite@nadeolabs':
-				return 'Elite';
-			case 'SMStormEliteExperimental@nadeolabs':
-				return 'Elite (experimental)';
-			case 'SMStormHeroes@nadeolabs':
-				return 'Heroes';
-			case 'SMStormJoust@nadeolabs':
-				return 'Joust';
-			case 'SMStormRoyal@nadeolabs':
-				return 'Royal';
-		}
+		return self::titles()->get($title)->name;
 	}
 	
 	// FIXME use Ws when available instead of hardcoding...
@@ -278,7 +305,6 @@ abstract class WebServicesProxy
 		}
 		else if(!$competition->isTeam)
 		{
-			return; // TODO put back
 			self::publisher()->postPersonalNotification(
 					'registered in $<'.$competition->name.'$>',
 					$participant->login,
@@ -300,9 +326,8 @@ abstract class WebServicesProxy
 		$service = new ParticipantService();
 		$participant = $service->get($participantId);
 		
-		// TODO update SDK external with upcoming tag before putting uncommenting
-//		if($competition->remoteId)
-//			self::competitions()->removeTeam($competition->remoteId, $participant->teamId);
+		if($competition->remoteId)
+			self::competitions()->removeTeam($competition->remoteId, $participant->teamId);
 	}
 	
 	/**
@@ -321,7 +346,6 @@ abstract class WebServicesProxy
 		if(!$competition->isScheduled() || $competition->isTeam || !$match->participants)
 			return;
 		
-		return; // TODO put back
 		self::publisher()->postPrivateEvent(
 				$match->name,
 				$match->startTime->getTimestamp(),
@@ -353,7 +377,6 @@ abstract class WebServicesProxy
 		}
 		else if(!$competition->isTeam)
 		{
-			return; // TODO put back
 			foreach($lastStage->participants as $participant)
 			{
 				self::publisher()->postPersonalNotification(

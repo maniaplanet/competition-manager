@@ -142,17 +142,23 @@ class Index extends \ManiaLib\Application\View
 		{
 			if(!$this->response->competition->isTeam)
 				$this->progressAddButton(_('Register'), $this->request->createLinkArgList('../register', 'c', 'external'));
-			else if($this->response->registrableTeams)
+			else 
 			{
-				$this->progressAddLabel(_('These are the teams you can register:'));
-				foreach($this->response->registrableTeams as $uniqId => $team)
+				if($this->response->registrableTeams)
 				{
-					$this->request->set('team', $uniqId);
-					$this->progressAddButton(
-							sprintf(_('Register %s'), '$<'.$team->name.'$>'),
-							$this->request->createLinkArgList('../register', 'c', 'team', 'external')
-						);
+					$this->progressAddLabel(_('These are the teams you can register:'));
+					foreach($this->response->registrableTeams as $uniqId => $team)
+					{
+						$this->request->set('team', $uniqId);
+						$this->progressAddButton(
+								sprintf(_('Register %s'), '$<'.$team->name.'$>'),
+								$this->request->createLinkArgList('../register', 'c', 'team', 'external')
+							);
+					}
 				}
+				$this->progressAddLabel(sprintf('$iyour team is not showing? $h[%s]refresh the list$h or $h[%s]manage your teams$h', 
+						$this->request->createLinkArgList('../refresh-teams', 'c'),
+						$this->request->createAbsoluteLinkArgList('livemenu?url=http%3A%2F%2Fplayer.maniaplanet.com%2Fteams&authentication=1&ml-forcepathinfo=%2Fmanialink-home%2Fgateway%2F')));
 			}
 			
 		}
@@ -227,13 +233,13 @@ class Index extends \ManiaLib\Application\View
 		$this->progressCard->setSizeY($this->progressCard->getSizeY() + 8);
 	}
 	
-	private function progressAddButton($text, $link)
+	private function progressAddButton($text, $link, $color = '0606', $colorFocus = '060a')
 	{
 		$ui = new Cards\HighlightedLabel(80, 8);
 		$ui->setRelativeHalign('center');
 		$ui->setHalign('center');
-		$ui->highlight->setBgcolor('0606');
-		$ui->highlight->setBgcolorFocus('060a');
+		$ui->highlight->setBgcolor($color);
+		$ui->highlight->setBgcolorFocus($colorFocus);
 		$ui->highlight->setManialink($link);
 		$ui->label->setRelativeHalign('center');
 		$ui->label->setHalign('center');

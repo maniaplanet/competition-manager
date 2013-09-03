@@ -26,7 +26,6 @@ class MapService extends \DedicatedManager\Services\MapService
 			}
 			catch(\InvalidArgumentException $e)
 			{
-				// TODO
 			}
 		}
 		return $maps;

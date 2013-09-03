@@ -133,7 +133,9 @@ class Match extends \CompetitionManager\Services\AbstractObject
 			$system->forceIpAddress = 'LAN';
 		$system->title = $this->rules->getTitle();
 
-		$service->save('competition.match-'.$this->matchId, $options, $account, $system);
+		$filename = $service->save('competition.match-'.$this->matchId, $options, $account, $system);
+		
+		\CompetitionManager\Utils\UnixPermission::fix($filename);
 	}
 	
 	private function createGuestList()
@@ -150,7 +152,9 @@ class Match extends \CompetitionManager\Services\AbstractObject
 				$logins = array_merge($logins, $participant->players);
 		}
 
-		$service->save('competition.match-'.$this->matchId, $logins);
+		$filename = $service->save('competition.match-'.$this->matchId, $logins);
+		
+		\CompetitionManager\Utils\UnixPermission::fix($filename);
 	}
 	
 	private function createMatchSettings()
@@ -164,7 +168,9 @@ class Match extends \CompetitionManager\Services\AbstractObject
 		$this->fetchMaps();
 		$maps = array_map(function ($m) { return $m->path.$m->filename; }, $this->maps);
 
-		$service->save('competition.match-'.$this->matchId, $gameInfos, $maps);
+		$filename = $service->save('competition.match-'.$this->matchId, $gameInfos, $maps);
+		
+		\CompetitionManager\Utils\UnixPermission::fix($filename);
 	}
 	
 	/**

@@ -164,7 +164,7 @@ class Competition extends AbstractObject
 				if(!$amount)
 					continue;
 				
-				// TODO who get planets?
+				
 			}
 		}
 		else
@@ -200,10 +200,10 @@ class Competition extends AbstractObject
 				$type = $transaction->type | Transaction::REFUND;
 				$amount = $transaction->isIncome() ? $transaction->amount : -$transaction->amount;
 
-				if(!isset($transaction[$transaction->login][$type]))
-					$transaction[$transaction->login][$type] = $amount;
+				if(!isset($refunds[$transaction->login][$type]))
+					$refunds[$transaction->login][$type] = $amount;
 				else
-					$transaction[$transaction->login][$type] += $amount;
+					$refunds[$transaction->login][$type] += $amount;
 			}
 		}
 		// Create transactions if necessary

@@ -32,6 +32,8 @@ class Transaction extends AbstractObject
 	public $type;
 	/** @var string */
 	public $message;
+	/** @var \DateTime */
+	public $date;
 	
 	/**
 	 * @return bool
@@ -47,6 +49,12 @@ class Transaction extends AbstractObject
 	function isPaid()
 	{
 		return (bool) $this->remoteId;
+	}
+	
+	function onFetchObject()
+	{
+		if ($this->date)
+			$this->date = new \DateTime($this->date);
 	}
 }
 

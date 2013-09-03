@@ -180,6 +180,8 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 			$this->request->redirectArgList('..', 'c', 'external');
 		}
 		
+		$teamObject = WebServicesProxy::getUserTeam($team);
+		
 		$config = \CompetitionManager\Config::getInstance();
 		if($this->competition->registrationCost && $this->session->login != $config->paymentLogin && $config->arePaymentsConfigured())
 		{
@@ -191,9 +193,14 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 				$transaction->amount = $this->competition->registrationCost;
 				$transaction->type = \CompetitionManager\Services\Transaction::REGISTRATION;
 				if($team)
-					$transaction->message = 'Registration of $<'.$team->name.'$> in $<'.$this->competition->name.'$> by $<'.$this->session->nickname.'$>';
+				{
+					$transaction->teamId = $teamObject->teamId;
+					$transaction->message = 'Registration of $<'.$teamObject->name.'$> in $<'.$this->competition->name.'$> by $<'.$this->session->nickname.'$>';
+				}
 				else
+				{
 					$transaction->message = 'Registration of $<'.$this->session->nickname.'$> in $<'.$this->competition->name.'$>';
+				}
 				
 				$service = new \CompetitionManager\Services\TransactionService();
 				if($service->create($transaction))
@@ -511,6 +518,12 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		return $canRegister = $service->countByStage($first->stageId) < $first->maxSlots;
 	}
 	
+	public function refreshTeams()
+	{
+		WebServicesProxy::resetUserTeams();
+		$this->request->redirectArgList('../index', 'c');
+	}
+	
 	private function canUnregister($team=null)
 	{
 		static $canUnregister = null;
@@ -568,15 +581,15 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 	{
 		if($this->competition->isTeam)
 		{
-			$teams = WebServicesProxy::getUserTeams();
-			reset($this->competition->stages)->onRegistration($teams[$team]->participantId);
-			WebServicesProxy::onRegistration($this->competition->competitionId, $teams[$team]->participantId);
+			$team = WebServicesProxy::getUserTeam($team);
+			reset($this->competition->stages)->onRegistration($team->participantId);
+			WebServicesProxy::onRegistration($this->competition->competitionId, $team->participantId);
 			
-			$teams[$team]->updatePlayers();
-			if(count($teams[$team]->players) < $this->competition->teamSize)
+			$team->updatePlayers();
+			if(count($team->players) < $this->competition->teamSize)
 				Filters\NextPageMessage::warning(_('This team does not have enough players. It will be disqualified if this does not change when competition starts.'));
 			else
-				Filters\NextPageMessage::success(sprintf(_('%s has been successfully registered!'), '$<$i'.$teams[$team]->name.'$>'));
+				Filters\NextPageMessage::success(sprintf(_('%s has been successfully registered!'), '$<$i'.$team->name.'$>'));
 		}
 		else
 		{
@@ -637,20 +650,22 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 				$transactions = $service->getByParticipant($this->competition->competitionId, WebServicesProxy::getUser()->participantId);
 				$baseRefund->message = sprintf('Refund registration in $<%s$> (reason: unregistered)', $this->competition->name);
 			}
-			
-			$transactions = array_filter($transactions, function($t) { return $t->type & Transaction::REGISTRATION; });
-			$amounts = array_reduce($transactions, function(&$v, $t) {
-					@$v[$t->login] += $t->amount * ($t & Transaction::REFUND ? -1 : 1);
-					return $v;
-				}, array());
-			foreach($amounts as $login => $amount)
+			if ($transactions)
 			{
-				if($login != \CompetitionManager\Config::getInstance()->paymentLogin && $amount > 0)
+				$transactions = array_filter($transactions, function($t) { return $t->type & Transaction::REGISTRATION; });
+				$amounts = array_reduce($transactions, function(&$v, $t) {
+						@$v[$t->login] += $t->amount * ($t & Transaction::REFUND ? -1 : 1);
+						return $v;
+					}, array());
+				foreach($amounts as $login => $amount)
 				{
-					$refund = clone $baseRefund;
-					$refund->login = $login;
-					$refund->amount = $amount;
-					$service->registerOutcome($refund);
+					if($login != \CompetitionManager\Config::getInstance()->paymentLogin && $amount > 0)
+					{
+						$refund = clone $baseRefund;
+						$refund->login = $login;
+						$refund->amount = $amount;
+						$service->registerOutcome($refund);
+					}
 				}
 			}
 		}

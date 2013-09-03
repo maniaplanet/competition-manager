@@ -41,8 +41,9 @@ class GuestListFileService extends \DedicatedManager\Services\DedicatedFileServi
 		
 		foreach($logins as $login)
 			$guestlist->addChild('player')->addChild('login', (string) $login);
-		
-		$guestlist->asXML($this->directory.$filename.'.txt');
+		$filename = $this->directory.$filename.'.txt';
+		$guestlist->asXML($filename);
+		return $filename;
 	}
 }
 

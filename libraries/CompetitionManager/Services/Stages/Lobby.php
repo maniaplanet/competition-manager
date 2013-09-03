@@ -109,6 +109,8 @@ class Lobby extends \CompetitionManager\Services\Stage implements FirstCompliant
 				else
 				{
 					// TODO
+					\ManiaLib\Utils\Logger::info('unknown participant type:');
+					\ManiaLib\Utils\Logger::info($participant);
 				}
 			}
 			catch(\Exception $e) 

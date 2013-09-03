@@ -14,18 +14,12 @@ use CompetitionManager\Filters\UserAgentAdapt;
 use CompetitionManager\Services\CompetitionService;
 use CompetitionManager\Services\MapService;
 
-class Manager extends \DedicatedManager\Controllers\AbstractController
+class Manager extends \DedicatedManager\Controllers\AbstractController 
 {
-	protected function onConstruct()
+	function preFilter()
 	{
-		parent::onConstruct();
+		parent::preFilter();
 		
-		$this->addFilter(new UserAgentAdapt(UserAgentAdapt::WEB_BROWSER));
-	}
-	
-	function index()
-	{
-		$this->request->registerReferer();
 		$config = \CompetitionManager\Config::getInstance();
 		$currentDir = getcwd();
 		
@@ -88,6 +82,18 @@ class Manager extends \DedicatedManager\Controllers\AbstractController
 		{
 			$this->session->set('error', $errors);
 		}
+	}
+	
+	protected function onConstruct()
+	{
+		parent::onConstruct();
+		
+		$this->addFilter(new UserAgentAdapt(UserAgentAdapt::WEB_BROWSER));
+	}
+	
+	function index()
+	{
+		$this->request->registerReferer();
 		
 		$header = \CompetitionManager\Helpers\Header::getInstance();
 		$header->leftLink = null;

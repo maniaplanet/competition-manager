@@ -42,6 +42,8 @@ class TransactionService extends \DedicatedManager\Services\AbstractService
 					$competitionId,
 					$participant->teamId
 				);
+		
+		return Transaction::arrayFromRecordSet($result);
 	}
 	
 	/**

@@ -9,13 +9,18 @@
 
 namespace CompetitionManager;
 
-class Config extends \DedicatedManager\Config
+/**
+ * @method \CompetitionManager\Config getInstance()
+ **/
+class Config extends \DedicatedManager\Config 
 {
 	public $manialinkName;
 	
 	public $paymentLogin;
 	public $paymentPassword;
 	public $paymentCode;
+	
+	public $filesGroup;
 	
 	protected function __construct()
 	{

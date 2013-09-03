@@ -52,8 +52,16 @@ class CompetitionHandling extends Cron
 		$this->beginSection();
 		foreach($stageService->getRunning() as $stage)
 		{
-			$stage->onRun();
-			$this->debug(sprintf('Stage #%d updated (competition %d)', $stage->stageId, $stage->competitionId));
+			if ($stage->endTime < new \DateTime)
+			{
+				$stageService->setState($stage->stageId, State::OVER);
+				$this->debug(sprintf('Stage #%d OVER (competition %d)', $stage->stageId, $stage->competitionId));
+			}
+			else
+			{
+				$stage->onRun();
+				$this->debug(sprintf('Stage #%d updated (competition %d)', $stage->stageId, $stage->competitionId));
+			}
 		}
 		$this->endSection();
 		

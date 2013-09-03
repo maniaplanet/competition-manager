@@ -99,10 +99,7 @@ class RankingFull extends Shadowed
 		$ui->setCustomization($isUser, $participant->qualified);
 		
 		$this->content->add($ui);
-		\ManiaLib\Utils\Logger::info($this->getSizeY());
 		$this->setSizeY($this->sizeY + 7 + Constants\UI::PIXEL);
-		\ManiaLib\Utils\Logger::info($this->getSizeY());
-		\ManiaLib\Utils\Logger::info('--');
 		$this->lastParticipant = $participant;
 	}
 	

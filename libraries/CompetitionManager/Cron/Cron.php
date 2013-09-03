@@ -30,7 +30,7 @@ abstract class Cron extends \ManiaLib\Utils\Singleton
 		}
 	}
 
-	final protected function debug($message, $log=false)
+	final protected function debug($message, $log=true)
 	{
 		if($log)
 			Logger::log(str_repeat('    ', $this->sectionCount).$message, $this->logName);

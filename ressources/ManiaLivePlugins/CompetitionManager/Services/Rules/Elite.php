@@ -46,7 +46,7 @@ class Elite extends Script
 		$settings['S_DraftBanNb'] = (int) -1;
 		$settings['S_DraftPickNb'] = (int) 2*$this->mapsLimit-1;
 		$settings['S_UseScriptCallbacks'] = true;
-		$settings['S_UseLobby'] = false;
+		$settings['S_UseLobby'] = 1;
 		$settings['S_MatchmakingSleep'] = 15;
 		$settings['S_UsePlayerClublinks'] = 1;
 		$dedicated->setModeScriptSettings($settings);
@@ -57,7 +57,7 @@ class Elite extends Script
 	function configureWarmup(\DedicatedApi\Connection $dedicated)
 	{
 		$settings = $dedicated->getModeScriptSettings();
-		$settings['S_UseLobby'] = 1;
+		$settings['S_UseLobby'] = 0;
 		$dedicated->setModeScriptSettings($settings);
 	}
 	

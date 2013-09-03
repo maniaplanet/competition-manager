@@ -385,8 +385,8 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 		if($this->match->stage->competition->isTeam)
 		{
 			$missing = $this->getMissing();
-			$presentRecipients = call_user_func_array('array_merge', array_map(function ($t) { return $t->getPresent(); }, array_diff_key($this->match->participants, $missing)));
-			$missingRecipients = call_user_func_array('array_merge', array_map(function ($t) { return $t->getPresent(); }, $missing));
+			$presentRecipients = array_map(function ($t) { return $t->getPresent(); }, array_diff_key($this->match->participants, $missing));
+			$missingRecipients = array_map(function ($t) { return $t->getPresent(); }, $missing);
 			$otherRecipients = array_diff(array_keys($this->storage->spectators), $presentRecipients, $missingRecipients);
 			
 			if($presentRecipients)

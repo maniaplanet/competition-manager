@@ -21,8 +21,8 @@ class Elite extends Script
 	public $timeLimit = 60;
 	public $timePole = 15;
 	public $captureLimit = 1.5;
-	public $roundsLimit = 6;
-	public $roundsMax = 8;
+	public $roundsLimit = 9;
+	public $roundsMax = 9;
 	public $deciderRoundsMax = 16;
 	public $mapsLimit = 2;
 	public $useDraft = false;
@@ -34,6 +34,10 @@ class Elite extends Script
 	
 	function configure(\DedicatedApi\Connection $dedicated)
 	{
+	}
+	
+	function configureWarmup(\DedicatedApi\Connection $dedicated)
+	{
 		$settings = $dedicated->getModeScriptSettings();
 		$settings['S_TimeLimit'] = (int) $this->timeLimit;
 		$settings['S_TimePole'] = (int) $this->timePole;
@@ -43,21 +47,12 @@ class Elite extends Script
 		$settings['S_DeciderTurnLimit'] = (int) $this->deciderRoundsMax;
 		$settings['S_MapWin'] = (int) $this->mapsLimit;
 		$settings['S_UseDraft'] = (bool) $this->useDraft;
-		$settings['S_DraftBanNb'] = (int) -1;
+		$settings['S_DraftBanNb'] = (int) 3;
 		$settings['S_DraftPickNb'] = (int) 2*$this->mapsLimit-1;
 		$settings['S_UseScriptCallbacks'] = true;
-		$settings['S_UseLobby'] = 1;
+		$settings['S_UseLobby'] = false;
 		$settings['S_MatchmakingSleep'] = 15;
-		$settings['S_UsePlayerClublinks'] = 1;
-		$dedicated->setModeScriptSettings($settings);
-		
-		$dedicated->restartMap();
-	}
-	
-	function configureWarmup(\DedicatedApi\Connection $dedicated)
-	{
-		$settings = $dedicated->getModeScriptSettings();
-		$settings['S_UseLobby'] = 0;
+		$settings['S_UsePlayerClublinks'] = true;
 		$dedicated->setModeScriptSettings($settings);
 	}
 	

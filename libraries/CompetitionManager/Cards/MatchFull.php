@@ -76,7 +76,7 @@ class MatchFull extends RankingFull
 						Formatting::timeIn($this->serverStartTime->getTimestamp()+120)
 					));
 			else
-				\ManiaLib\ManiaScript\UI::tooltip('match-full:button', _('Server will be available soon'));
+				\ManiaLib\ManiaScript\UI::tooltip('match-full:button', _('Server will be available soon (please refresh)'));
 		}
 	}
 	

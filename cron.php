@@ -1,6 +1,7 @@
 <?php
-define('COMPETITION_MANAGER_CRON_VERSION', '0.1');
+define('COMPETITION_MANAGER_CRON_VERSION', '0.2');
 
+require_once __DIR__.'/functions.php';
 require_once __DIR__.'/libraries/autoload.php';
 
 \CompetitionManager\Cron\Setup::getInstance()->run();

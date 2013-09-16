@@ -7,11 +7,13 @@ $r = ManiaLib\Application\Request::getInstance();
 	<?php echo CompetitionManager\Helpers\Header::save(); ?>
 	<?php echo DedicatedManager\Helpers\Box\Box::detect(); ?>
 	<div data-role="content">
-	<?php if($isAdmin): ?>
-		<a href="<?php echo $r->createLinkArgList('/create'); ?>" data-ajax="false" data-role="button" data-icon="plus"><?php echo _('Create a new competition'); ?></a>
-		<a href="<?php echo $r->createLinkArgList('/manager/servers'); ?>" data-ajax="false" data-role="button" data-icon="grid"><?php echo _('Servers'); ?></a>
-		<a href="<?php echo $r->createLinkArgList('/manager/maps'); ?>" data-ajax="false" data-role="button" data-icon="grid"><?php echo _('Maps'); ?></a>
-	<?php endif; ?>
+		<?php if(!$errors): ?>
+			<?php if($isAdmin): ?>
+				<a href="<?php echo $r->createLinkArgList('/create'); ?>" data-ajax="false" data-role="button" data-icon="plus"><?php echo _('Create a new competition'); ?></a>
+				<a href="<?php echo $r->createLinkArgList('/manager/servers'); ?>" data-ajax="false" data-role="button" data-icon="grid"><?php echo _('Servers'); ?></a>
+				<a href="<?php echo $r->createLinkArgList('/manager/maps'); ?>" data-ajax="false" data-role="button" data-icon="grid"><?php echo _('Maps'); ?></a>
+			<?php endif; ?>
+		<?php endif; ?>
 		<ul data-role="listview" data-inset="true" data-x-filter="true" id="competitions-filter"></ul>
 		<div data-role="collapsible-group">
 			<div data-role="collapsible" data-collapsed="false" data-theme="b">

@@ -38,7 +38,6 @@ class Joust extends Script
 	
 	function onEndMatch($rankings, $winnerTeamOrMap)
 	{
-		\ManiaLib\Utils\Logger::info($rankings);
 		$match = \ManiaLivePlugins\CompetitionManager\Services\Match::getInstance();
 		$logins = array_keys($match->participants);
 		if( ($loginIndex = array_search($rankings[0]['Login'], $logins)) !== false )

@@ -33,11 +33,18 @@ class Server extends \DedicatedManager\Services\Server
 		$service = new \DedicatedManager\Services\ManialiveFileService();
 		$matchService = new MatchService();
 		$isLobby = $matchService->isLobby($this->matchId);
+		
+		$competitionManagerConfig = \ManiaLib\Application\Config::getInstance();
 
 		$dbConfig = \ManiaLib\Database\Config::getInstance();
 		$wsConfig = \ManiaLib\WebServices\Config::getInstance();
 		$mlConfig = \ManiaLib\Application\Config::getInstance();
+		
 		$config = new \DedicatedManager\Services\ManialiveConfig();
+		if ($competitionManagerConfig->debug)
+		{
+			$config->config->debug = true;
+		}
 		$config->database->enable = true;
 		$config->database->host = $dbConfig->host;
 		$config->database->username = $dbConfig->user;

@@ -75,7 +75,15 @@ class Manager extends \DedicatedManager\Controllers\AbstractController
 		if(!$service->isRunning())
 		{
 			$service->start();
-			$this->session->set('warning', _('Cron was not running, it has been restarted but current competitions may have some delay.'));
+			sleep(3);
+			if (!$service->isRunning())
+			{
+				$errors[] = 'Cron tried to start... but failed. Check logs folder.';
+			}
+			else
+			{
+				$this->session->set('warning', _('Cron was not running, it has been restarted but current competitions may have some delay.'));
+			}
 		}
 
 		if($errors)

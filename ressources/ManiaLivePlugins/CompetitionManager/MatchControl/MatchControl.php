@@ -251,7 +251,9 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 				$this->connection->forcePlayerTeam($login, $this->players[$login]);
 			}
 			else
+			{
 				$this->players[$login] = -1;
+			}
 			if($this->state < self::PREPARE)
 			{
 				if($this->isEverybodyHere())
@@ -308,10 +310,23 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 			}
 		}
 		
-		switch(count($this->getMissing()))
+		switch ($this->state)
 		{
-			case 1: $this->waitForfeit(); break;
-			case 2: $this->waitCancel(); break;
+			case self::WAIT:
+				//nobreak
+			case self::PREPARE:
+				//do nothing!
+				break;
+			default:
+				switch(count($this->getMissing()))
+				{
+					case 1: 
+						$this->waitForfeit(); 
+						break;
+					case 2:
+						$this->waitCancel(); 
+						break;
+				}
 		}
 	}
 	
@@ -321,6 +336,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	
 	private function play()
 	{
+		\ManiaLive\Utilities\Logger::debug('play()');
 		static $isStarted = false;
 		
 		if(!$isStarted)
@@ -344,6 +360,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	
 	private function wait()
 	{
+		\ManiaLive\Utilities\Logger::debug('wait()');
 		$this->state = self::WAIT;
 		$this->updateStatus();
 		$this->nextTick = new \DateTime('2 minutes');
@@ -355,9 +372,11 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	
 	private function waitForfeit()
 	{
+		\ManiaLive\Utilities\Logger::debug('waitForfeit()');
 		switch($this->state)
 		{
 			case self::READY:
+				//nobreak
 			case self::PLAY:
 				$this->nextTick = new \DateTime('5 minutes');
 				$countdown = Windows\CountDown::Create();
@@ -410,6 +429,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	
 	private function waitCancel()
 	{
+		\ManiaLive\Utilities\Logger::debug('waitCancel');
 		switch($this->state)
 		{
 			case self::READY:
@@ -445,6 +465,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	
 	private function allowForfeit()
 	{
+		\ManiaLive\Utilities\Logger::debug('allowForfeit()');
 		Windows\CountDown::Create()->hide();
 		if($this->match->stage->competition->isTeam)
 		{
@@ -480,6 +501,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	
 	function confirmForfeit($login)
 	{
+		\ManiaLive\Utilities\Logger::debug('confirmForfeit:'.$login);
 		if(!isset($this->players[$login]))
 			return;
 		
@@ -511,6 +533,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	
 	private function cancel()
 	{
+		\ManiaLive\Utilities\Logger::debug('cancel()');
 		$this->state = self::CANCELLED;
 		
 		Windows\CountDown::EraseAll();
@@ -525,6 +548,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	
 	private function over()
 	{
+		\ManiaLive\Utilities\Logger::debug('over()');
 		$this->state = self::OVER;
 		
 		Windows\CountDown::EraseAll();
@@ -622,19 +646,19 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 				$status->set('Waiting', 'fa08');
 				break;
 			case self::WAIT:
-				$status->set('Waiting', 'ff08');
+				$status->set('Waiting', 'ff08', 'Waiting for the scheduled date');
 				break;
 			case self::PREPARE:
-				$status->set('Preparing', '08f8');
+				$status->set('Preparing', '08f8', 'Preparing the server for the next match');
 				break;
 			case self::READY:
 				$status->set('Preparing', '08f8');
 				break;
 			case self::PLAY:
-				$status->set('Playing', '0a08');
+				$status->set('Playing', '0a08', 'Stay until the status "Over"');
 				break;
 			case self::OVER:
-				$status->set('Over', 'f008');
+				$status->set('Over', 'f008', 'Server will be closed soon');
 				break;
 			case self::CANCELLED:
 				$status->set('Cancelled', 'f008');

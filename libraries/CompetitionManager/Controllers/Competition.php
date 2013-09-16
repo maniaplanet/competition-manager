@@ -582,14 +582,18 @@ class Competition extends \ManiaLib\Application\Controller implements \ManiaLib\
 		if($this->competition->isTeam)
 		{
 			$team = WebServicesProxy::getUserTeam($team);
-			reset($this->competition->stages)->onRegistration($team->participantId);
-			WebServicesProxy::onRegistration($this->competition->competitionId, $team->participantId);
-			
+
 			$team->updatePlayers();
 			if(count($team->players) < $this->competition->teamSize)
-				Filters\NextPageMessage::warning(_('This team does not have enough players. It will be disqualified if this does not change when competition starts.'));
+			{
+				Filters\NextPageMessage::error(_('This team does not have enough players.'));
+			}
 			else
+			{
+				reset($this->competition->stages)->onRegistration($team->participantId);
+				WebServicesProxy::onRegistration($this->competition->competitionId, $team->participantId);
 				Filters\NextPageMessage::success(sprintf(_('%s has been successfully registered!'), '$<$i'.$team->name.'$>'));
+			}
 		}
 		else
 		{

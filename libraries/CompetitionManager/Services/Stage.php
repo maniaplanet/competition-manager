@@ -45,7 +45,7 @@ abstract class Stage extends AbstractObject
 	
 	/** @var Participant[] */
 	public $participants = array();
-	/** @var Map[] */
+	/** @var \DedicatedManager\Services\Map[] */
 	public $maps = array();
 	
 	/** @var bool */

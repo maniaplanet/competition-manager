@@ -36,7 +36,7 @@ class CronService extends \DedicatedManager\Services\AbstractService
 	 */
 	function isRunning()
 	{
-		return (bool) $this->db()->execute('SELECT DATE_ADD(lastExecution, INTERVAL 5 MINUTE) > NOW() FROM Cron')->fetchSingleValue(false);
+		return (bool) $this->db()->execute('SELECT DATE_ADD(lastExecution, INTERVAL 1 MINUTE) > NOW() FROM Cron')->fetchSingleValue(false);
 	}
 }
 

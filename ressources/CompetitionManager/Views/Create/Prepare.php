@@ -60,9 +60,7 @@ $r = ManiaLib\Application\Request::getInstance();
 										class="solo-compliant">ShootMania Storm Joust</option>
 								<option value="SMStormElite@nadeolabs" <?php echo $competition->title == 'SMStormElite@nadeolabs' ? 'selected="selected"' : ''; ?>
 										class="team-compliant remote-compliant">ShootMania Storm Elite</option>
-<!--								<option value="SMStormEliteExperimental@nadeolabs" <?php echo $competition->title == 'SMStormEliteExperimental@nadeolabs' ? 'selected="selected"' : ''; ?>
-										class="team-compliant">ShootMania Storm Elite (experimental)</option>
-								<option value="SMStormHeroes@nadeolabs" <?php echo $competition->title == 'SMStormHeroes@nadeolabs' ? 'selected="selected"' : ''; ?>
+<!--							<option value="SMStormHeroes@nadeolabs" <?php echo $competition->title == 'SMStormHeroes@nadeolabs' ? 'selected="selected"' : ''; ?>
 										class="team-compliant">ShootMania Storm Heroes</option>-->
 							</optgroup>
 						</select>
@@ -73,20 +71,22 @@ $r = ManiaLib\Application\Request::getInstance();
 							<i><?php echo _('Whether servers will be accessible on LAN only'); ?></i>
 						</label>
 						<select id="isLan" name="isLan" data-role="slider">
-							<option value="0" <?php echo !$competition->isTeam ? 'selected="selected"' : ''; ?>><?php echo _('Online'); ?></option>
-							<option value="1" <?php echo $competition->isTeam ? 'selected="selected"' : ''; ?>><?php echo _('LAN'); ?></option>
+							<option value="0" <?php echo !$competition->isLan ? 'selected="selected"' : ''; ?>><?php echo _('Online'); ?></option>
+							<option value="1" <?php echo $competition->isLan ? 'selected="selected"' : ''; ?>><?php echo _('LAN'); ?></option>
 						</select>
 					</li>
+					<!--
 					<li data-role="fieldcontain">
 						<label for="useRemote">
 							<strong><?php echo _('Interface with ManiaPlanet'); ?></strong><br/>
-							<i><?php echo _(''); ?></i>
+							<i><?php echo _('Your competition will be listed in ManiaPlanet competition list'); ?></i>
 						</label>
 						<select id="useRemote" name="useRemote" data-role="slider">
 							<option value="0" <?php echo !$competition->remoteId ? 'selected="selected"' : ''; ?>><?php echo _('No'); ?></option>
 							<option value="1" <?php echo $competition->remoteId ? 'selected="selected"' : ''; ?>><?php echo _('Yes'); ?></option>
 						</select>
 					</li>
+					-->
 				</ul>
 			</fieldset>
 			<fieldset data-role="collapsible" data-collapsed="false" data-theme="b">

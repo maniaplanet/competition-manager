@@ -148,7 +148,8 @@ class Match extends \CompetitionManager\Services\AbstractObject
 		{
 			if($participant instanceof Player)
 				$logins[] = $participant->login;
-			else
+			elseif ($participant instanceof Team)
+				$participant->updatePlayers();
 				$logins = array_merge($logins, $participant->players);
 		}
 

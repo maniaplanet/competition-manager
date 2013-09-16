@@ -32,13 +32,22 @@ class Header extends \ManiaLib\Application\View
 		if($appConfig->manialink)
 		{
 			\ManiaLib\Gui\Manialink::beginFrame(110, -81);
-			$ui = new \ManiaLib\Gui\Elements\IncludeManialink();
-			$this->request->set('url', $appConfig->manialink);
-			$this->request->set('name', $config->manialinkName);
-			$ui->setUrl($this->request->createAbsoluteLinkArgList('http://maniahome.maniaplanet.com/add/', 'url', 'name'));
-			$this->request->restore('url');
-			$this->request->restore('name');
-			$ui->save();
+			{
+				$ui = new \ManiaLib\Gui\Elements\Label(49);
+				$ui->setText(_('Powered by ManiaPlanet Competition Manager'));
+				$ui->setStyle(\ManiaLib\Gui\Elements\Label::TextButtonSmall);
+				$ui->setPosition(0, 3);
+				$ui->setUrl('http://maniaplanet.github.io/documentation/tools/competition.html');
+				$ui->save();
+		
+				$ui = new \ManiaLib\Gui\Elements\IncludeManialink();
+				$this->request->set('url', $appConfig->manialink);
+				$this->request->set('name', $config->manialinkName);
+				$ui->setUrl($this->request->createAbsoluteLinkArgList('http://maniahome.maniaplanet.com/add/', 'url', 'name'));
+				$this->request->restore('url');
+				$this->request->restore('name');
+				$ui->save();
+			}
 			\ManiaLib\Gui\Manialink::endFrame();
 		}
 		

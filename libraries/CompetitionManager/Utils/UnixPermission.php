@@ -18,5 +18,10 @@ class UnixPermission
 		}
 		@chmod($filename, 0775);
 	}
+	
+	public static function check($filename)
+	{
+		
+	}
 }
 ?>

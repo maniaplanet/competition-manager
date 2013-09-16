@@ -23,7 +23,7 @@ abstract class UI
 	const EVENT_HEIGHT = 8;
 	const TITLE_HEIGHT = 12;
 	const DIALOG_HEIGHT = 45;
-	const ACCORDION_HEIGHT = 120;
+	const ACCORDION_HEIGHT = 140;
 	
 	static function STATE_COLOR($state, $focus=false)
 	{

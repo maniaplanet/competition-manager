@@ -14,7 +14,7 @@ abstract class CSS
 	static function jQueryMobile()
 	{
 		$mediaUrl = \ManiaLib\Application\Config::getInstance()->getMediaURL();
-		self::stylesheet($mediaUrl.'jquery/jquery.mobile-1.2.0.min.css');
+		self::stylesheet($mediaUrl.'jquery/jquery.mobile-1.2.1.min.css');
 		self::stylesheet($mediaUrl.'css/jqm-utils.css');
 	}
 	

@@ -12,7 +12,7 @@ namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\CompetitionManager\Event;
 
-class Heroes extends Script
+class Heroes extends NadeoTeamScript
 {
 	public $name = 'Heroes.Script.txt';
 	public $fixedSlots = 2;
@@ -32,6 +32,8 @@ class Heroes extends Script
 	
 	function configure(\DedicatedApi\Connection $dedicated)
 	{
+		parent::configure($dedicated);
+		
 		$settings = $dedicated->getModeScriptSettings();
 		$settings['S_TimeLimit'] = (int) $this->timeLimit;
 		$settings['S_TimePole'] = (int) $this->capturableLimit;
@@ -42,22 +44,6 @@ class Heroes extends Script
 		$settings['S_WinRoundLimit'] = (int) $this->roundsMax;
 		$settings['S_WinMap'] = (int) $this->mapsLimit;
 		$dedicated->setModeScriptSettings($settings);
-	}
-	
-	function onEndMatch($rankings, $winnerTeamOrMap)
-	{
-		$match = \ManiaLivePlugins\CompetitionManager\Services\Match::getInstance();
-		$teamIds = array_keys($match->participants);
-		if(isset($teamIds[$winnerTeamOrMap]))
-		{
-			if(++$match->participants[$teamIds[$winnerTeamOrMap]]->score->points == $this->mapsLimit)
-			{
-				$match->participants[$teamIds[$winnerTeamOrMap]]->rank = 1;
-				$match->participants[$teamIds[1 - $winnerTeamOrMap]]->rank = 2;
-				$match->participants[$teamIds[1 - $winnerTeamOrMap]]->score->points |= 0;
-				Dispatcher::dispatch(new Event(Event::ON_RULES_END_MATCH));
-			}
-		}
 	}
 	
 	function onForfeit($winner, $forfeit)

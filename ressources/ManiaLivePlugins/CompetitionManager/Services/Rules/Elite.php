@@ -93,6 +93,10 @@ class Elite extends Script
 				$teamIds = array_keys($match->participants);
 				if(isset($teamIds[$winnerTeam]))
 				{
+					if ($match->participants[$teamIds[$winnerTeam]]->score->main->points === null)
+						$match->participants[$teamIds[$winnerTeam]]->score->main->points = 1;
+					else
+						$match->participants[$teamIds[$winnerTeam]]->score->main->points++;
 					foreach($mapScores as $index => $points)
 					{
 						$mapScore = new Scores\Points();
@@ -100,6 +104,7 @@ class Elite extends Script
 						$match->participants[$teamIds[$index]]->score->details[] = $mapScore;
 					}
 				}
+				break;
 		}
 	}
 	

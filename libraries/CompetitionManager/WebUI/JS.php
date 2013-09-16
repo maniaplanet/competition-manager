@@ -15,7 +15,7 @@ abstract class JS
 	{
 		$mediaUrl = \ManiaLib\Application\Config::getInstance()->getMediaURL();
 		self::script($mediaUrl.'jquery/jquery-1.8.2.min.js');
-		self::script($mediaUrl.'jquery/jquery.mobile-1.2.0.min.js');
+		self::script($mediaUrl.'jquery/jquery.mobile-1.2.1.min.js');
 		self::script($mediaUrl.'jquery/jquery.mousewheel.min.js');
 		self::script($mediaUrl.'js/jqm-utils.js');
 	}

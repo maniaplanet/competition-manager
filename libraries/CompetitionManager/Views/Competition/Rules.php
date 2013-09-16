@@ -53,6 +53,13 @@ class Rules extends \ManiaLib\Application\View
 			{
 				$bulletList = $ui->selectTab();
 				$infoList = $stage->getInfo();
+				$stage->fetchMaps();
+				$maps = array_map(function ($map) { return $map->name; }, $stage->maps);
+				if ($maps)
+				{
+					$infoList[] = _('Maps:');
+					$infoList[] = $maps;
+				}
 			}
 			
 			$last = $stage->stageId;

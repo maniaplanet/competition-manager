@@ -357,7 +357,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 		else if($this->registrationsPaused)
 			$status->set('Waiting', 'f508');
 		else
-			$status->set('Preparing', '08f8');
+			$status->set('Waiting', '08f8');
 		$status->redraw();
 	}
 }

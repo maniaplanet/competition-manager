@@ -27,12 +27,13 @@ abstract class Rules
 //				case 'TMCanyon':
 //				case 'TMStadium':
 //					return array(new Rules\Team($title));
-//				case 'SMStorm':
-//					return array(new Rules\BattleWaves());
+				case 'SMStorm':
+					return array(
+						new Rules\BattleWaves(),
+						new Rules\Siege(),
+					);
 				case 'SMStormElite@nadeolabs':
 					return array(new Rules\Elite());
-//				case 'SMStormEliteExperimental@nadeolabs':
-//					return array(new Rules\EliteExperimental());
 //				case 'SMStormHeroes@nadeolabs':
 //					return array(new Rules\Heroes());
 			}
@@ -49,7 +50,6 @@ abstract class Rules
 					);
 				case 'SMStorm':
 //				case 'SMStormElite@nadeolabs':
-//				case 'SMStormEliteExperimental@nadeolabs':
 //				case 'SMStormHeroes@nadeolabs':
 					return array(
 						new Rules\Melee(),
@@ -77,6 +77,7 @@ abstract class Rules
 		{
 			switch($title)
 			{
+				case 'TMValley':
 				case 'TMCanyon':
 				case 'TMStadium':
 					return array(

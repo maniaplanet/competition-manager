@@ -242,13 +242,14 @@ abstract class WebServicesProxy
 	{
 		switch($title)
 		{
+			case 'TMValley':
+				return 'Valley';
 			case 'TMCanyon':
 				return 'Canyon';
 			case 'TMStadium':
 				return 'Stadium';
 			case 'SMStorm':
 			case 'SMStormElite@nadeolabs':
-			case 'SMStormEliteExperimental@nadeolabs':
 			case 'SMStormHeroes@nadeolabs':
 			case 'SMStormJoust@nadeolabs':
 			case 'SMStormRoyal@nadeolabs':
@@ -303,10 +304,10 @@ abstract class WebServicesProxy
 					))
 				);
 		}
-		else if(!$competition->isTeam)
+		else if(!$competition->isTeam && \CompetitionManager\Config::getInstance()->postToManiaHome)
 		{
 			self::publisher()->postPersonalNotification(
-					'registered in $<'.$competition->name.'$>',
+					'You are registered in $<'.$competition->name.'$>',
 					$participant->login,
 					$competition->getManialink(),
 					Icons128x128_1::Icons128x128_1,
@@ -346,12 +347,15 @@ abstract class WebServicesProxy
 		if(!$competition->isScheduled() || $competition->isTeam || !$match->participants)
 			return;
 		
-		self::publisher()->postPrivateEvent(
-				$match->name,
-				$match->startTime->getTimestamp(),
-				array_values(\ManiaLib\Utils\Arrays::getProperty($match->participants, 'login')),
-				$match->getManialink()
-			);
+		if (\CompetitionManager\Config::getInstance()->postToManiaHome)
+		{
+			self::publisher()->postPrivateEvent(
+					$match->name,
+					$match->startTime->getTimestamp(),
+					array_values(\ManiaLib\Utils\Arrays::getProperty($match->participants, 'login')),
+					$match->getManialink()
+				);
+		}
 	}
 	
 	/**
@@ -375,7 +379,7 @@ abstract class WebServicesProxy
 
 			self::competitions()->registerResults($competition->remoteId, $results);
 		}
-		else if(!$competition->isTeam)
+		else if(!$competition->isTeam && \CompetitionManager\Config::getInstance()->postToManiaHome)
 		{
 			foreach($lastStage->participants as $participant)
 			{

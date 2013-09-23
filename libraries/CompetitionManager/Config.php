@@ -16,6 +16,8 @@ class Config extends \DedicatedManager\Config
 {
 	public $manialinkName;
 	
+	public $postToManiaHome = false;
+	
 	public $paymentLogin;
 	public $paymentPassword;
 	public $paymentCode;

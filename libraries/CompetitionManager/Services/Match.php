@@ -147,10 +147,14 @@ class Match extends \CompetitionManager\Services\AbstractObject
 		foreach($this->participants as $participant)
 		{
 			if($participant instanceof Player)
+			{
 				$logins[] = $participant->login;
+			}
 			elseif ($participant instanceof Team)
+			{
 				$participant->updatePlayers();
 				$logins = array_merge($logins, $participant->players);
+			}
 		}
 
 		$filename = $service->save('competition.match-'.$this->matchId, $logins);

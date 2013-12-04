@@ -276,8 +276,8 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 
 		if($this->stage->rules->gameMode == GameInfos::GAMEMODE_SCRIPT)
 		{
-			$service = new \DedicatedManager\Services\MatchSettingsFileService();
-			$type = $service->getScriptMapType($this->stage->rules->name, $this->competition->title);
+			$service = new \DedicatedManager\Services\ScriptService();
+			$type = $service->getFileMapType($this->stage->rules->name, $this->competition->title);
 		}
 		else
 		{

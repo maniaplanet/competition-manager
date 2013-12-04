@@ -49,8 +49,8 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 	function onLoad()
 	{
 		// FIXME last API doesn't handle well TM at the moment...
-		if(!($this->lobby->rules instanceof \ManiaLivePlugins\CompetitionManager\Services\Rules\Script))
-			$this->connection->setApiVersion('2011-10-06');
+//		if(!($this->lobby->rules instanceof \ManiaLivePlugins\CompetitionManager\Services\Rules\Script))
+//			$this->connection->setApiVersion('2011-10-06');
 		$this->lobby->rules->configure($this->connection);
 		$this->connection->setHideServer(0);
 		
@@ -122,7 +122,7 @@ class LobbyControl extends \ManiaLive\PluginHandler\Plugin
 						$countdown = Windows\CountDown::Create();
 						$countdown->start(new \DateTime('2 minutes'));
 						$countdown->show();
-						$this->connection->chatSendServerMessage(self::PREFIX.'Required number of players reached, competition should start soon!');
+						$this->connection->chatSendServerMessage(self::PREFIX.'Required number of players reached, competition will start soon!');
 					}
 					
 					++$waitTicks;

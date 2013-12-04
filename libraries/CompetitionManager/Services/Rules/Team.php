@@ -28,12 +28,6 @@ class Team extends \CompetitionManager\Services\Rules
 	public $mapsLimit = 2;
 	/** @setting bool Allow or forbid respawn */
 	public $disableRespawn = false;
-	private $title;
-	
-	function __construct($title)
-	{
-		$this->title = $title;
-	}
 	
 	function getName()
 	{
@@ -48,11 +42,6 @@ class Team extends \CompetitionManager\Services\Rules
 	function getIcon()
 	{
 		return array(Icon::Icons128x32_1, Icons128x32_1::RT_Team);
-	}
-	
-	function getTitle()
-	{
-		return $this->title;
 	}
 	
 	function getDefaultScore()

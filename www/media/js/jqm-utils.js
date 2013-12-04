@@ -13,7 +13,7 @@ $(document).bind('pageinit', function() {
 	$('.readonly-checkbox').parent().css('opacity', 1);
 	
 	// Readonly input should not be focusable
-	$('input, select, textarea').not(':jqmData(role="datetime-picker")').focus(function() {
+	$('input, select, textarea').focus(function() {
 		if(this.readOnly)
 			$(this).blur();
 	});

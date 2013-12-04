@@ -22,7 +22,8 @@ class Edit extends \DedicatedManager\Controllers\AbstractController
 	
 	function index()
 	{
-		
+		$this->session->set('error', _('Not available yet.'));
+		$this->request->redirectArgList('/');
 	}
 }
 

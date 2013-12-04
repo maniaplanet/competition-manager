@@ -240,7 +240,9 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 		
 		$rulesClass = $this->request->getPost('gamemode');
 		if(!class_exists($rulesClass))
+		{
 			$errors[] = _('Invalid game mode');
+		}
 		else
 		{
 			$this->stage->rules = new $rulesClass;
@@ -270,15 +272,17 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 	
 	function chooseMaps()
 	{
-		$environment = \CompetitionManager\Services\WebServicesProxy::getTitleEnvironment($this->stage->rules->getTitle());
+		$environment = \CompetitionManager\Services\WebServicesProxy::getTitleEnvironment($this->competition->title);
 
 		if($this->stage->rules->gameMode == GameInfos::GAMEMODE_SCRIPT)
 		{
 			$service = new \DedicatedManager\Services\MatchSettingsFileService();
-			$type = $service->getScriptMapType($this->stage->rules->name, $this->stage->rules->getTitle());
+			$type = $service->getScriptMapType($this->stage->rules->name, $this->competition->title);
 		}
 		else
+		{
 			$type = array('Race');
+		}
 
 		$service = new \DedicatedManager\Services\MapService();
 		$this->response->files = $service->getList('', true, $this->stage->rules->gameMode == GameInfos::GAMEMODE_LAPS, $type, $environment);
@@ -332,6 +336,27 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 		}
 	}
 	
+	/**
+	 * @param string $dateName
+	 * @return \DateTime|\DateTime[]
+	 */
+	protected function getFullDateTime($dateName)
+	{
+		if (is_array($this->request->getPost($dateName)))
+		{
+			$date = $this->request->getPost($dateName);
+			$time = $this->request->getPost(str_replace('Date', 'Time', $dateName));
+			for ($i=0; $i < count($date); $i++)
+			{
+				$date[$i] = new \DateTime($date[$i].' '.$time[$i]);
+			}
+			return $date;
+		}
+		else
+		{
+			return new \DateTime($this->request->getPost($dateName).' '.$this->request->getPost(str_replace('Date', 'Time', $dateName)));
+		}
+	}
 	function setSchedule()
 	{
 		if($this->stageIndex > 0)
@@ -347,26 +372,26 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 		$errors = array();
 		if($this->request->getPost('startTime'))
 		{
-			$this->stage->schedule->startTime = $this->request->getPost('startTime');
+			$this->stage->schedule->startTime = $this->getFullDateTime('startDate');
 			if(!$this->stage->schedule->startTime)
 				$errors[] = _('You have to set a start time.');
 			else if($minTime && $this->stage->schedule->startTime < $minTime)
 				$errors[] = _('This stage cannot start before the end of the previous one.');
 			if($this->request->getPost('endTime'))
 			{
-				$this->stage->schedule->endTime = $this->request->getPost('endTime');
+				$this->stage->schedule->endTime = $this->getFullDateTime('endDate');
 				if(!$this->stage->schedule->endTime)
 					$errors[] = _('You have to set an end time.');
 				else if($this->stage->schedule->startTime && $this->stage->schedule->endTime < $this->stage->schedule->startTime)
 					$errors[] = _('This stage cannot end before it starts.');
 				if($this->stage instanceof Stages\Registrations)
-					$this->stage->parameters['unregisterEndTime'] = $this->request->getPost('unregisterEndTime');
+					$this->stage->parameters['unregisterEndTime'] = \CompetitionManager\Utils\Date::getFullDate($this->getFullDateTime('unregisterEndDate')); //Should not be stored as object
 			}
 		}
 		else
 		{
 			$matchNames = $this->stage->getScheduleNames();
-			foreach($this->request->getPost('startTimes') as $i => $startTime)
+			foreach($this->getFullDateTime('startDates') as $i => $startTime)
 			{
 				$this->stage->schedule->startTimes[$i] = $startTime;
 				if(!$startTime)
@@ -388,7 +413,9 @@ class Create extends \DedicatedManager\Controllers\AbstractController
 			$this->request->redirectArgList('../choose-schedule', 's');
 		}
 		if(($this->stageIndex + 1) == count($this->competition->stages))
+		{
 			$this->request->redirectArgList('../preview');
+		}
 		else
 		{
 			$this->request->set('s', $this->stageIndex + 1);

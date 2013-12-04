@@ -33,7 +33,7 @@ class Cup extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 	
 	function _json_wakeup()
 	{
-		$this->scoringSystem = \CompetitionManager\Services\JSON::unserialize($this->scoringSystem);
+		$this->scoringSystem = \ManiaLivePlugins\CompetitionManager\Services\JSON::unserialize($this->scoringSystem);
 	}
 }
 

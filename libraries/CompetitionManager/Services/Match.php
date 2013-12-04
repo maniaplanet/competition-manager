@@ -107,6 +107,8 @@ class Match extends \CompetitionManager\Services\AbstractObject
 		$service = new \DedicatedManager\Services\ConfigFileService();
 		$stageService = new StageService();
 		$stage = $stageService->get($this->stageId);
+		$competitionService = new CompetitionService();
+		$competition = $competitionService->get($stage->competitionId);
 		$matchService = new MatchService();
 		$isLan = $matchService->isLAN($this->matchId);
 
@@ -131,7 +133,7 @@ class Match extends \CompetitionManager\Services\AbstractObject
 		$system->guestlistFilename = 'GuestLists/competition.match-'.$this->matchId.'.txt';
 		if($isLan)
 			$system->forceIpAddress = 'LAN';
-		$system->title = $this->rules->getTitle();
+		$system->title = $competition->title;
 
 		$filename = $service->save('competition.match-'.$this->matchId, $options, $account, $system);
 		

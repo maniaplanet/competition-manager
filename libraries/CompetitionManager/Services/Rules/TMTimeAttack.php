@@ -16,12 +16,6 @@ use ManiaLib\Gui\Elements\Icons128x32_1;
 abstract class TMTimeAttack extends \CompetitionManager\Services\Rules
 {
 	public $gameMode = GameInfos::GAMEMODE_TIMEATTACK;
-	private $title;
-	
-	function __construct($title)
-	{
-		$this->title = $title;
-	}
 	
 	function compare($scoreA, $scoreB)
 	{
@@ -35,11 +29,6 @@ abstract class TMTimeAttack extends \CompetitionManager\Services\Rules
 	function getIcon()
 	{
 		return array(Icon::Icons128x32_1, Icons128x32_1::RT_TimeAttack);
-	}
-	
-	function getTitle()
-	{
-		return $this->title;
 	}
 }
 

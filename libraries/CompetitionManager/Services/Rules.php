@@ -13,6 +13,7 @@ abstract class Rules
 {
 	private $id;
 	private $settings = array();
+	private $settingsFetched = false;
 	/** @var int */
 	public $gameMode;
 	/** @var int|null */
@@ -20,13 +21,15 @@ abstract class Rules
 	
 	static function GetList($title, $isTeam=false, $isLobby=false, $isOpen=false)
 	{
+		//TEAM MODES
 		if($isTeam)
 		{
 			switch($title)
 			{
-//				case 'TMCanyon':
-//				case 'TMStadium':
-//					return array(new Rules\Team($title));
+				case 'TMValley':
+				case 'TMCanyon':
+				case 'TMStadium':
+					return array(new Rules\Team($title));
 				case 'SMStorm':
 					return array(
 						new Rules\BattleWaves(),
@@ -38,15 +41,17 @@ abstract class Rules
 //					return array(new Rules\Heroes());
 			}
 		}
+		//LOBBY
 		else if($isLobby)
 		{
 			switch($title)
 			{
+				case 'TMValley':
 				case 'TMCanyon':
 				case 'TMStadium':
 					return array(
-						new Rules\LobbyTMTimeAttack($title),
-						new Rules\LobbyRounds($title)
+						new Rules\LobbyTMTimeAttack(),
+						new Rules\LobbyRounds()
 					);
 				case 'SMStorm':
 //				case 'SMStormElite@nadeolabs':
@@ -73,6 +78,7 @@ abstract class Rules
 //					return array(new Rules\AsynchronousSMTimeAttack());
 			}
 		}
+		// SOLO BELOW
 		else
 		{
 			switch($title)
@@ -81,12 +87,12 @@ abstract class Rules
 				case 'TMCanyon':
 				case 'TMStadium':
 					return array(
-//						new Rules\CumulativeTMTimeAttack($title),
-//						new Rules\TMTimeAttackDuel($title),
-//						new Rules\CumulativeRounds($title),
-//						new Rules\RoundsDuel($title),
-						new Rules\Laps($title),
-//						new Rules\Cup($title)
+						new Rules\CumulativeTMTimeAttack(),
+						new Rules\TMTimeAttackDuel(),
+						new Rules\CumulativeRounds(),
+						new Rules\RoundsDuel(),
+						new Rules\Laps(),
+						new Rules\Cup()
 					);
 				case 'SMStorm':
 					return array(
@@ -102,22 +108,6 @@ abstract class Rules
 		}
 		
 		return array();
-	}
-	
-	final function __construct()
-	{
-		$this->id = md5(get_class($this));
-		
-		$rc = new \ReflectionClass($this);
-		$properties = $rc->getProperties(\ReflectionProperty::IS_PUBLIC);
-		foreach($properties as $property)
-		{
-			$doc = $property->getDocComment();
-			if($doc && preg_match('/@setting\s+(.+?)\s+(.+)(?=\s+\*\/)/i', $doc, $matches))
-			{
-				$this->settings[$property->getName()] = array($matches[1] != 'none' ? $matches[1] : '', $matches[2]);
-			}
-		}
 	}
 	
 	function validate()
@@ -149,12 +139,32 @@ abstract class Rules
 	
 	final function getId()
 	{
+		$this->id = md5(get_class($this));
 		return $this->id;
 	}
 	
 	final function getSettings()
 	{
+		if (!$this->settingsFetched)
+		{
+			$this->fetchSettings();
+		}
 		return $this->settings;
+	}
+	
+	final function fetchSettings()
+	{
+		$rc = new \ReflectionClass($this);
+		$properties = $rc->getProperties(\ReflectionProperty::IS_PUBLIC);
+		foreach($properties as $property)
+		{
+			$doc = $property->getDocComment();
+			if($doc && preg_match('/@setting\s+(.+?)\s+(.+)(?=\s+\*\/)/i', $doc, $matches))
+			{
+				$this->settings[$property->getName()] = array($matches[1] != 'none' ? $matches[1] : '', $matches[2]);
+			}
+		}
+		$this->settingsFetched = true;
 	}
 	
 	function compare($scoreA, $scoreB)
@@ -165,7 +175,6 @@ abstract class Rules
 	abstract function getName();
 	abstract function getInfo();
 	abstract function getIcon();
-	abstract function getTitle();
 	
 	function getTeamSize()
 	{

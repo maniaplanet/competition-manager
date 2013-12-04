@@ -22,7 +22,7 @@ class Elite extends Script
 	/** @setting s How long it takes to capture a pole */
 	public $captureLimit = 1.5;
 	/** @setting none Rounds needed to win the map */
-	public $roundsLimit = 6;
+	public $roundsLimit = 9;
 	/** @setting none Max rounds */
 	public $roundsMax = 8;
 	/** @setting none Max rounds on decider map */
@@ -30,7 +30,7 @@ class Elite extends Script
 	/** @setting none Maps needed to win the match */
 	public $mapsLimit = 2;
 	/** @setting bool Use draft mode before match */
-	public $useDraft = false;
+	public $useDraft = true;
 	
 	function getName()
 	{
@@ -44,11 +44,6 @@ class Elite extends Script
 		$info[] = sprintf(ngettext('Best of %d map', 'Best of %d maps', $this->mapsLimit), $this->mapsLimit*2-1);
 		$info[] = sprintf(_('%d points to wins the map'), $this->roundsLimit);
 		return $info;
-	}
-	
-	function getTitle()
-	{
-		return 'SMStormElite@nadeolabs';
 	}
 	
 	function getTeamSize()

@@ -41,15 +41,19 @@ class NextUserEvent extends \ManiaLib\Application\AdvancedFilter
 			if($stage instanceof Stages\Registrations)
 			{
 				if($stage->endTime > new \DateTime())
+				{
 					$this->response->nextUserEvent->message = sprintf(
-							_('Registrations end %s, come back later for your first match!'),
+							_('Registrations end %s, refresh later for your first match!'),
 							'$<$o'.Formatting::timeIn($stage->endTime->getTimestamp()).'$>'
 						);
+				}
 				else
+				{
 					$this->response->nextUserEvent->message = sprintf(
 							_('Registrations ended, next stage is starting!'),
 							'$<$o'.Formatting::timeIn($stage->endTime->getTimestamp()).'$>'
 						);
+				}
 			}
 			else if($stage instanceof Stages\Lobby)
 			{
@@ -127,7 +131,7 @@ class _NextUserEventView extends \ManiaLib\Application\View
 	{
 		$frame = new Frame(Constants\UI::EVENT_WIDTH, Constants\UI::EVENT_HEIGHT);
 		$frame->setHalign('right');
-		$frame->setPosition(161, 84);
+		$frame->setPosition(25, 80);
 		
 		if(true /* $this->response->nextUserEvent->blink */)
 		{
@@ -154,7 +158,9 @@ class _NextUserEventView extends \ManiaLib\Application\View
 		$ui->highlight->setBgcolor('0008');
 		$ui->highlight->setBgcolorFocus('1148');
 		if($this->response->nextUserEvent->link)
+		{
 			$ui->highlight->setManialink($this->response->nextUserEvent->link);
+		}
 		$ui->label->setRelativeHalign('center');
 		$ui->label->setHalign('center');
 		$ui->label->setTextColor('8f0');

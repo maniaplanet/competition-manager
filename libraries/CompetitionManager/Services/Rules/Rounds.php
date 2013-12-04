@@ -16,21 +16,10 @@ use ManiaLib\Gui\Elements\Icons128x32_1;
 abstract class Rounds extends \CompetitionManager\Services\Rules
 {
 	public $gameMode = GameInfos::GAMEMODE_ROUNDS;
-	private $title;
-	
-	function __construct($title)
-	{
-		$this->title = $title;
-	}
 	
 	function getIcon()
-	{
+ 	{
 		return array(Icon::Icons128x32_1, Icons128x32_1::RT_Rounds);
-	}
-	
-	function getTitle()
-	{
-		return $this->title;
 	}
 }
 

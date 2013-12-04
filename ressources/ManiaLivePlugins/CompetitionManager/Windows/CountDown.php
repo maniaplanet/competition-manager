@@ -33,7 +33,7 @@ class CountDown extends \ManiaLive\Gui\Window implements TickListener
 	{
 		$this->setSize(20, 10);
 		$this->setHalign('right');
-		$this->setPosition(120-Constants\UI::PIXEL, -(55+Constants\UI::PIXEL));
+		$this->setPosition(120-Constants\UI::PIXEL, -(35+Constants\UI::PIXEL));
 		
 		$ui = new Quad(20, 10);
 		$ui->setBgcolor('0008');
@@ -110,6 +110,14 @@ class CountDown extends \ManiaLive\Gui\Window implements TickListener
 				}
 				else
 				{
+					if ($interval->s == 5)
+					{
+						\ManiaLib\Utils\Logger::info('countdown');
+						$countdown = AudioCountDown::Create();
+						$countdown->start(5);
+						$countdown->disableLabel();
+						$countdown->show();
+					}
 					$this->leftCountdown->setCounter(sprintf('$f00%02d', $interval->i));
 					$this->rightCountdown->setCounter(sprintf('$f00%02d', $interval->s));
 				}

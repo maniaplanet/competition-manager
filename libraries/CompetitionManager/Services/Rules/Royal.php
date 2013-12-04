@@ -38,11 +38,6 @@ class Royal extends Script
 		$info[] = sprintf(_('First to %d points wins the match'), $this->pointsLimit);
 		return $info;
 	}
-	
-	function getTitle()
-	{
-		return 'SMStormRoyal@nadeolabs';
-	}
 }
 
 ?>

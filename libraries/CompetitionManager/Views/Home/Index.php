@@ -24,35 +24,50 @@ class Index extends \ManiaLib\Application\View
 		$ui->save();
 		
 		\ManiaLib\Gui\Manialink::beginFrame(-75, 30, 0, null, new \ManiaLib\Gui\Layouts\Column());
-		foreach($this->response->competitions as $competition)
 		{
-			$ui = new Competition();
-			$ui->setName($competition->name);
-			$ui->setTitle(WebServicesProxy::getTitleName($competition->title));
-			if(reset($competition->stages)->maxSlots)
-				$ui->setNbParticipants($competition->nbParticipants.'/'.reset($competition->stages)->maxSlots, $competition->isTeam);
-			else
-				$ui->setNbParticipants($competition->nbParticipants, $competition->isTeam);
-			if($competition->isScheduled())
+			foreach($this->response->competitions as $competition)
 			{
-				$stage = reset($competition->stages);
-				if($stage instanceof \CompetitionManager\Services\Stages\Registrations)
-					$stage = $competition->stages[$stage->nextId];
-				$ui->setStart($stage->startTime->format('j F Y \a\t G:i T'));
+				/** @var \CompetitionManager\Services\Competition $competition */
+				$ui = new Competition();
+				$ui->setName($competition->name);
+				$ui->setTitle(WebServicesProxy::getTitleName($competition->title));
+				if(reset($competition->stages)->maxSlots)
+				{
+					$ui->setNbParticipants($competition->nbParticipants.'/'.reset($competition->stages)->maxSlots, $competition->isTeam);
+				}
+				else
+				{
+					$ui->setNbParticipants($competition->nbParticipants, $competition->isTeam);
+				}
+				if($competition->isScheduled())
+				{
+					$stage = reset($competition->stages);
+					if($stage instanceof \CompetitionManager\Services\Stages\Registrations)
+						$stage = $competition->stages[$stage->nextId];
+					$ui->setStart($stage->startTime);
+				}
+				else
+				{
+					$ui->setPickUp();
+				}
+				if($competition->state <= State::READY)
+				{
+					$ui->setUpcoming();
+				}
+				elseif ($competition->state <= State::STARTED)
+				{
+					$ui->setStatus($competition->getCurrentStage()->getName());
+				}
+				else if($competition->state >= State::OVER)
+				{
+					$ui->setFinished();
+				}
+				$this->request->set('c', $competition->competitionId);
+				$ui->setManialink($this->request->createLinkArgList('/competition', 'c', 'external'));
+				$ui->save();
 			}
-			else
-				$ui->setPickUp();
-			if($competition->state <= State::READY)
-			{
-				$ui->setUpcoming();
-			}
-			else if($competition->state >= State::OVER)
-				$ui->setFinished();
-			$this->request->set('c', $competition->competitionId);
-			$ui->setManialink($this->request->createLinkArgList('/competition', 'c', 'external'));
-			$ui->save();
+			$this->request->restore('c');
 		}
-		$this->request->restore('c');
 		\ManiaLib\Gui\Manialink::endFrame();
 		
 		$this->response->multipage->pageNavigator->setSize(9);

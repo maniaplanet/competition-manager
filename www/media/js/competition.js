@@ -1,3 +1,8 @@
+autoOpenTime = function (date, name) {
+	var timeInputName = name.replace('Date', 'Time');
+	$('#' + timeInputName).datebox('open');
+}
+
 $(document).bind('pageinit', function() {
 	$('select#isTeam').parent().find('.ui-slider-switch').css('width', '7em');
 	$('select#isLan').parent().find('.ui-slider-switch').css('width', '7em');

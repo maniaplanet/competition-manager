@@ -9,6 +9,7 @@ use CompetitionManager\Services\Stages;
 			<li data-role="list-divider"><?php echo _('General'); ?></li>
 			<li><span style="font-weight:normal"><?php echo _('Name:'); ?></span> <?php echo \ManiaLib\Utils\StyleParser::toHtml($competition->name); ?></li>
 			<li><span style="font-weight:normal"><?php echo _('Title:'); ?></span> <?php echo $competition->title; ?></li>
+			<li><span style="font-weight:normal"><?php echo _('Type:'); ?></span> <?php echo $competition->isTeam ? _('Team') : _('Solo'); ?></li>
 			<li data-role="list-divider" data-theme="d"><?php echo _('Restrictions'); ?></li>
 			<li><span style="font-weight:normal"><?php echo _('Registration cost:'); ?></span> <?php printf(_('%d Planets'), $competition->registrationCost); ?></li>
 		<?php foreach(array_slice($competition->stages, 0, $stageIndex) as $locStage): ?>

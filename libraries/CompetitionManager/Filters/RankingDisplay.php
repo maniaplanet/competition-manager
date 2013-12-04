@@ -125,15 +125,27 @@ class RankingDisplay extends \ManiaLib\Application\AdvancedFilter
 		$currentTime = new \DateTime();
 		$time = null;
 		if($obj->startTime > $currentTime)
+		{
 			$time = '$iStarts $o'.Formatting::timeIn($obj->startTime->getTimestamp());
+			$time2 = $obj->startTime->format('j F Y $\o\a\t$\o G:i T');
+		}
 		else if($obj->endTime > $currentTime)
+		{
 			$time = '$iEnds $o'.Formatting::timeIn($obj->endTime->getTimestamp());
+			$time2 = $obj->endTime->format('j F Y $\o\a\t$\o G:i T');
+		}
 		else if($obj->endTime)
+		{
 			$time = '$iEnded $o'.Formatting::timeAgo($obj->endTime->getTimestamp());
+			$time2 = $obj->endTime->format('j F Y $\o\a\t$\o G:i T');
+		}
 		else if($obj->startTime)
+		{
 			$time = '$iStarted on $o'.$obj->startTime->format('j F Y $\o\a\t$\o G:i T');
+			$time2 = $obj->startTime->format('j F Y $\o\a\t$\o G:i T');
+		}
 		
-		$this->card->setTime($time);
+		$this->card->setTime($time."  -  ".$time2);
 	}
 	
 	function autoButton($obj)

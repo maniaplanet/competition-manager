@@ -69,7 +69,7 @@ class RankingFull extends Shadowed
 	{
 		$this->time->label->setText($time);
 		$this->time->setVisibility((bool) $time);
-		$this->name->label->setTextSize($time ? 2 : 1);
+		$this->name->label->setTextSize($time ? 2 : 1);	
 	}
 	
 	function setState($state)

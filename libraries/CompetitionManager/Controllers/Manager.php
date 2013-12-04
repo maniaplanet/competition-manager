@@ -106,10 +106,18 @@ class Manager extends \DedicatedManager\Controllers\AbstractController
 		$header = \CompetitionManager\Helpers\Header::getInstance();
 		$header->leftLink = null;
 		
+		$serverService = new \CompetitionManager\Services\ServerService();
+		$servers = $serverService->getAllAccounts();
+		if (count($servers) == 0)
+		{
+			\CompetitionManager\Filters\NextPageMessage::error(_('No server account added'));
+		}
+		
 		$service = new CompetitionService();
 		$this->response->currentCompetitions = $service->getCurrent();
 		$this->response->upcomingCompetitions = $service->getUpcoming();
 		$this->response->finishedCompetitions = $service->getArchived();
+		$this->response->servers = $servers;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////

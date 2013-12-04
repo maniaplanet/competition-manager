@@ -57,9 +57,12 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	{
 		$this->enableDatabase();
 		
-		// FIXME last API doesn't handle well TM at the moment...
-		if(!($this->match->rules instanceof \ManiaLivePlugins\CompetitionManager\Services\Rules\Script))
-			$this->connection->setApiVersion('2011-10-06');
+//		// FIXME last API doesn't handle well TM at the moment...
+//		if(!($this->match->rules instanceof \ManiaLivePlugins\CompetitionManager\Services\Rules\Script))
+//			$this->connection->setApiVersion('2011-10-06');
+		
+		$manialink = new \ManiaLivePlugins\CompetitionManager\Views\QuitDialog(_('Do not leave until the status is OVER'));
+		$this->connection->customizeQuitDialog($manialink->display(), '', false, 0);
 		
 		$this->match->rules->configureWarmup($this->connection);
 		
@@ -429,7 +432,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	
 	private function waitCancel()
 	{
-		\ManiaLive\Utilities\Logger::debug('waitCancel');
+		\ManiaLive\Utilities\Logger::debug('waitCancel()');
 		switch($this->state)
 		{
 			case self::READY:
@@ -501,7 +504,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 	
 	function confirmForfeit($login)
 	{
-		\ManiaLive\Utilities\Logger::debug('confirmForfeit:'.$login);
+		\ManiaLive\Utilities\Logger::debug('confirmForfeit('.$login.')');
 		if(!isset($this->players[$login]))
 			return;
 		
@@ -607,6 +610,10 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 		}
 	}
 	
+	/**
+	 * Return array of logins
+	 * @return array
+	 */
 	private function getMissing()
 	{
 		if($this->match->stage->type == Constants\StageType::OPEN_STAGE)
@@ -625,7 +632,6 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 			
 			return $missing;
 		}
-		
 		return array_diff_key($this->match->participants, $this->players);
 	}
 	
@@ -649,7 +655,7 @@ class MatchControl extends \ManiaLive\PluginHandler\Plugin implements \ManiaLive
 				$status->set('Waiting', 'ff08', 'Waiting for the scheduled date');
 				break;
 			case self::PREPARE:
-				$status->set('Preparing', '08f8', 'Preparing the server for the next match');
+				$status->set('Preparing', '08f8', 'Match is starting soon');
 				break;
 			case self::READY:
 				$status->set('Preparing', '08f8');

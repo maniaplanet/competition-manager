@@ -75,28 +75,28 @@ class Index extends \ManiaLib\Application\View
 				break;
 			
 			case self::OPENED_REGISTERED_LOBBY:
-				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
+				$this->progressSetTitle(_('Current status: ').$this->response->competition->getCurrentStage()->getName());
 				$this->progressAddLabel($this->response->nextUserEvent->message);
 				$this->progressAddButton(_('Join'), $this->response->nextUserEvent->link);
 				break;
 			
 			case self::OPENED_REGISTERED_DEFAULT:
-				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
+				$this->progressSetTitle(_('Current status: ').$this->response->competition->getCurrentStage()->getName());
 				$this->progressAddLabel($this->response->nextUserEvent->message);
 				break;
 			
 			case self::OPENED_ALLOWED:
-				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
+				$this->progressSetTitle(_('Current status: ').$this->response->competition->getCurrentStage()->getName());
 				$this->progressAddLabel(_('Registrations are opened, don\'t wait!'));
 				break;
 				
 			case self::OPENED_FULL:
-				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
+				$this->progressSetTitle(_('Current status: ').$this->response->competition->getCurrentStage()->getName());
 				$this->progressAddLabel(_('All slots have already been taken'));
 				break;
 			
 			case self::OPENED_FORBIDDEN:
-				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
+				$this->progressSetTitle(_('Current status: ').$this->response->competition->getCurrentStage()->getName());
 				if($this->response->competition->isTeam)
 					$this->progressAddLabel(_('You cannot register, as you are not an administrator of any team'));
 				else
@@ -104,7 +104,7 @@ class Index extends \ManiaLib\Application\View
 				break;
 			
 			case self::CLOSED_PLAYER:
-				$this->progressSetTitle(_('Currently: ').$this->response->competition->getCurrentStage()->getName());
+				$this->progressSetTitle(_('Current status: ').$this->response->competition->getCurrentStage()->getName());
 				$this->progressAddLabel($this->response->nextUserEvent->message);
 				if($this->response->nextUserEvent->match)
 				{

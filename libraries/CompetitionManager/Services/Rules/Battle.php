@@ -9,9 +9,9 @@
 
 namespace CompetitionManager\Services\Rules;
 
-class BattleWaves extends Script
+class Battle extends Script
 {
-	public $name = 'BattleWaves.Script.txt';
+	public $name = 'Battle.Script.txt';
 	public $fixedSlots = 2;
 	/** @setting none Max players per team */
 	public $slotsPerTeam = 5;
@@ -36,11 +36,6 @@ class BattleWaves extends Script
 	function getInfo()
 	{
 		return _('First to capture all opponent\'s poles wins the round, first to "rounds limit" wins the map, first to "maps limit" wins the match');
-	}
-	
-	function getTitle()
-	{
-		return 'SMStorm';
 	}
 	
 	function getTeamSize()

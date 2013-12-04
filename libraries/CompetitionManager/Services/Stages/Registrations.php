@@ -41,7 +41,7 @@ class Registrations extends \CompetitionManager\Services\Stage implements FirstC
 	
 	function getScheduleNames()
 	{
-		return array(_('Opening Period'));
+		return array(_('Registration period'));
 	}
 	
 	function getIcon()

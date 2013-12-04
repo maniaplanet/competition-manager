@@ -42,11 +42,6 @@ class Heroes extends Script
 		return _('5on5, first to "rounds limit" wins the map, first to "maps limit" wins the match');
 	}
 	
-	function getTitle()
-	{
-		return 'SMStormHeroes@nadeolabs';
-	}
-	
 	function getTeamSize()
 	{
 		return 5;

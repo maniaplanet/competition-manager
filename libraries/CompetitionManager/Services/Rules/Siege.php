@@ -38,11 +38,6 @@ class Siege extends Script
 		return _('Attackers has to capture as many poles as possible, most poles or first to capture all poles wins the map, first to "maps limit" wins the match');
 	}
 	
-	function getTitle()
-	{
-		return 'SMStorm';
-	}
-	
 	function getTeamSize()
 	{
 		return $this->slotsPerTeam;

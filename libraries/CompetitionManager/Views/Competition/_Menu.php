@@ -32,7 +32,7 @@ class _Menu extends \ManiaLib\Application\View
 		else if($competition->state > State::STARTED)
 			$menu->subTitle->setText('Over, results available!');
 		else if(($current = $competition->getCurrentStage()))
-			$menu->subTitle->setText('Currently: '.$current->getName());
+			$menu->subTitle->setText('Phase: '.$current->getName());
 		$menu->logo->setStyle(Icon::Icons128x32_1);
 		$menu->logo->setSubStyle(Icons128x32_1::RT_Cup);
 		
@@ -41,6 +41,13 @@ class _Menu extends \ManiaLib\Application\View
 		$menu->lastItem->text->setText('Overview');
 		$menu->lastItem->setManialink($this->request->createLinkArgList('..', 'c', 'external'));
 		if($currentAction == 'index')
+			$menu->lastItem->setSelected();
+		
+		$menu->addItem();
+		$menu->lastItem->icon->setVisibility(false);
+		$menu->lastItem->text->setText('Rules');
+		$menu->lastItem->setManialink($this->request->createLinkArgList('../rules', 'c', 'external'));
+		if($currentAction == 'rules')
 			$menu->lastItem->setSelected();
 		
 		foreach($competition->stages as $stage)
@@ -62,7 +69,9 @@ class _Menu extends \ManiaLib\Application\View
 					$menu->lastItem->setManialink($stage->matches[0]->server->getLink('qjoin'));
 				}
 				else
+				{
 					$menu->lastItem->text->setText('$888$i'._('Lobby down...'));
+				}
 			}
 			else
 			{
@@ -126,13 +135,6 @@ class _Menu extends \ManiaLib\Application\View
 		}
 		else
 			$menu->lastItem->text->setText('$888Results');
-		
-		$menu->addItem(Menu::BUTTONS_BOTTOM);
-		$menu->lastItem->icon->setVisibility(false);
-		$menu->lastItem->text->setText('Rules');
-		$menu->lastItem->setManialink($this->request->createLinkArgList('../rules', 'c', 'external'));
-		if($currentAction == 'rules')
-			$menu->lastItem->setSelected();
 		
 		if($this->response->external)
 			$menu->quitButton->setAction(0);

@@ -19,16 +19,16 @@ class Progress extends \ManiaLive\Gui\Window
 	protected function onConstruct()
 	{
 		$this->setSize(60, 5);
-		$this->setPosition(160, -50);
+		$this->setPosition(160, -30);
 		
 		$matchObj = \ManiaLivePlugins\CompetitionManager\Services\Match::getInstance();
 		
-		$this->progress = new HighlightedLabel(60, 5);
+		$this->progress = new HighlightedLabel(40, 5);
 		$this->progress->setHalign('right');
 		$this->progress->highlight->setBgcolorFocus('000a');
 		$this->progress->highlight->setManialink($matchObj->getManialink());
 		$this->progress->label->setHalign('right');
-		$this->progress->label->setPosX(59);
+		$this->progress->label->setPosX(39);
 		$this->progress->label->setTextSize(3);
 		$this->progress->label->setText($matchObj->stage->competition->name.' » '.$matchObj->name);
 		$this->progress->setLabelMargin(1);

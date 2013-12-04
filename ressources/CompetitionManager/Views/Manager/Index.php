@@ -9,9 +9,13 @@ $r = ManiaLib\Application\Request::getInstance();
 	<div data-role="content">
 		<?php if(!$errors): ?>
 			<?php if($isAdmin): ?>
-				<a href="<?php echo $r->createLinkArgList('/create'); ?>" data-ajax="false" data-role="button" data-icon="plus"><?php echo _('Create a new competition'); ?></a>
-				<a href="<?php echo $r->createLinkArgList('/manager/servers'); ?>" data-ajax="false" data-role="button" data-icon="grid"><?php echo _('Servers'); ?></a>
-				<a href="<?php echo $r->createLinkArgList('/manager/maps'); ?>" data-ajax="false" data-role="button" data-icon="grid"><?php echo _('Maps'); ?></a>
+				<?php if (count($servers) != 0) : ?>
+					<a href="<?php echo $r->createLinkArgList('/create'); ?>" data-ajax="false" data-role="button" data-icon="plus"><?php echo _('Create a new competition'); ?></a>
+					<a href="<?php echo $r->createLinkArgList('/manager/servers'); ?>" data-ajax="false" data-role="button" data-icon="grid"><?php echo  _('Manage server accounts'); ?></a>
+				<?php else : ?>
+					<a href="<?php echo $r->createLinkArgList('/manager/servers'); ?>" data-ajax="false" data-role="button" data-icon="grid" data-theme="e"><?php echo _('Add some server accounts'); ?></a>
+				<?php endif; ?>
+				<a href="<?php echo $r->createLinkArgList('/manager/maps'); ?>" data-ajax="false" data-role="button" data-icon="grid"><?php echo _('Manage maps'); ?></a>
 			<?php endif; ?>
 		<?php endif; ?>
 		<ul data-role="listview" data-inset="true" data-x-filter="true" id="competitions-filter"></ul>

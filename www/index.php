@@ -1,5 +1,5 @@
 <?php
-define('COMPETITION_MANAGER_VERSION', '0.5');
+define('COMPETITION_MANAGER_VERSION', '0.5.1');
 require_once __DIR__.'/../functions.php';
 require_once __DIR__.'/../libraries/autoload.php';
 \ManiaLib\Application\Bootstrapper::run();

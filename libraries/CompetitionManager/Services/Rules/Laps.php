@@ -25,12 +25,6 @@ class Laps extends \CompetitionManager\Services\Rules
 	public $finishTimeLimit = 1;
 	/** @setting bool Allow or forbid respawn */
 	public $disableRespawn = false;
-	private $title;
-	
-	function __construct($title)
-	{
-		$this->title = $title;
-	}
 	
 	function getName()
 	{
@@ -50,11 +44,6 @@ class Laps extends \CompetitionManager\Services\Rules
 	function getIcon()
 	{
 		return array(Icon::Icons128x32_1, Icons128x32_1::RT_Rounds);
-	}
-	
-	function getTitle()
-	{
-		return $this->title;
 	}
 	
 	function getDefaultScore()

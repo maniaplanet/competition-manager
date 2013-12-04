@@ -42,11 +42,6 @@ class Joust extends Script
 		return $info;
 	}
 	
-	function getTitle()
-	{
-		return 'SMStormJoust@nadeolabs';
-	}
-	
 	function getDefaultScore()
 	{
 		$score = new Scores\Detailed();

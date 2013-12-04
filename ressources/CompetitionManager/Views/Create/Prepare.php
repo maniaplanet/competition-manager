@@ -45,15 +45,17 @@ $r = ManiaLib\Application\Request::getInstance();
 							<i><?php echo _('Select the ManiaPlanet title on which your competition will be played'); ?></i>
 						</label>
 						<select id="title" name="title" data-native-menu="false">
-							<optgroup label="<?php echo _('Official titles'); ?>">
+							<optgroup label="<?php echo _('Games'); ?>">
 								<option value="TMCanyon" <?php echo $competition->title == 'TMCanyon' ? 'selected="selected"' : ''; ?>
-										class="solo-compliant team-not-compliant openqualifiers-not-compliant">TrackMania Canyon</option>
+										class="solo-compliant team-compliant openqualifiers-not-compliant remote-compliant">TrackMania² Canyon</option>
+								<option value="TMValley" <?php echo $competition->title == 'TMValley' ? 'selected="selected"' : ''; ?>
+										class="solo-compliant team-compliant openqualifiers-not-compliant remote-compliant">TrackMania² Valley</option>
 								<option value="TMStadium" <?php echo $competition->title == 'TMStadium' ? 'selected="selected"' : ''; ?>
-										class="solo-compliant team-not-compliant openqualifiers-not-compliant">TrackMania Stadium</option>
+										class="solo-compliant team-compliant openqualifiers-not-compliant remote-compliant">TrackMania² Stadium</option>
 								<option value="SMStorm" <?php echo $competition->title == 'SMStorm' ? 'selected="selected"' : ''; ?>
-										class="solo-compliant team-not-compliant">ShootMania Storm</option>
+										class="solo-compliant team-compliant remote-compliant">ShootMania Storm</option>
 							</optgroup>
-							<optgroup label="<?php echo _('Custom titles'); ?>">
+							<optgroup label="<?php echo _('Titles'); ?>">
 								<option value="SMStormRoyal@nadeolabs" <?php echo $competition->title == 'SMStormRoyal@nadeolabs' ? 'selected="selected"' : ''; ?>
 										class="solo-compliant">ShootMania Storm Royal</option>
 								<option value="SMStormJoust@nadeolabs" <?php echo $competition->title == 'SMStormJoust@nadeolabs' ? 'selected="selected"' : ''; ?>

@@ -16,7 +16,7 @@ class CompetitionService extends \DedicatedManager\Services\AbstractService
 {
 	/**
 	 * @param int $competitionId
-	 * @return Competition
+	 * @return Competition 
 	 */
 	function get($competitionId)
 	{

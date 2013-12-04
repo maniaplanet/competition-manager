@@ -1,3 +1,13 @@
+0.5.1
+
+- Support TrackMania!
+- Fix UI
+- Fix cron (bugs with solo modes)
+- Adding sound at the end of the countdown
+- Adding warning to not leave the server on the quit dialog
+- Better help
+- Adding setup script
+
 0.5
 
 RELEASE NOTES: Only Elite has been tested right now. 

@@ -16,11 +16,12 @@ class Competition extends Bgs1
 {
 	private $name;
 	private $title;
+	private $status;
 	private $start;
 	private $nbParticipants;
 	private $participants;
 	
-	function __construct($sizeX=150, $sizeY=20)
+	function __construct($sizeX=150, $sizeY=25)
 	{
 		parent::__construct($sizeX, $sizeY);
 		$this->subStyle = Bgs1::BgCardBuddy;
@@ -33,6 +34,11 @@ class Competition extends Bgs1
 		$this->title->setStyle(Label::TextValueSmall);
 		$this->title->setValign('bottom');
 		$this->title->setPosX(3);
+		
+		$this->status = new Label(90, 0);
+		$this->status->setStyle(Label::TextValueSmall);
+		$this->status->setValign('bottom');
+		$this->status->setPosX(3);
 
 		$this->start = new Label(90, 0);
 		$this->start->setStyle(Label::TextValueSmall);
@@ -52,20 +58,33 @@ class Competition extends Bgs1
 		$this->participants->setManialink('');
 		
 		$this->addCardElement($this->name);
+		$this->addCardElement($this->status);
 		$this->addCardElement($this->title);
 		$this->addCardElement($this->start);
 		$this->addCardElement($this->nbParticipants);
 		$this->addCardElement($this->participants);
 	}
 	
+	function setStarted()
+	{
+		$this->setStatus(_('Started'));
+	}
+	
 	function setUpcoming()
 	{
 		$this->subStyle = Bgs1::BgCardChallenge;
+		$this->setStatus(_('Not started yet'));
+	}
+	
+	function setStatus($status)
+	{
+		$this->status->setText('$444'._('Status').': $111'.$status);
 	}
 	
 	function setFinished()
 	{
 		$this->subStyle = Bgs1::BgCardFolder;
+		$this->setStatus(_('Finished'));
 	}
 	
 	function setWithCurrentPlayer()
@@ -85,7 +104,7 @@ class Competition extends Bgs1
 	
 	function setStart($start)
 	{
-		$this->start->setText('$444'.sprintf(_('Starts on %s'), '$111'.$start));
+		$this->start->setText('$444'.sprintf(_('Starts on %s'), '$111'.$start->format('j F Y \a\t G:i T')));
 	}
 	
 	function setPickUp()
@@ -106,6 +125,7 @@ class Competition extends Bgs1
 	{
 		$this->name->setSizeX($this->sizeX - 30);
 		$this->title->setPosY(6.5 - $this->sizeY);
+		$this->status->setPosY(11.5 - $this->sizeY);
 		$this->start->setPosY(1.5 - $this->sizeY);
 		$this->nbParticipants->setPosition($this->sizeX - 20, -9);
 		$this->participants->setPosition($this->sizeX - 20, -3);

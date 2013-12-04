@@ -9,6 +9,9 @@
 
 namespace CompetitionManager\Services;
 
+/**
+ * Actual implentation are in \CompetitionManager\Services\Schedules namespace
+ */
 abstract class Schedule
 {
 	abstract function getTimesLimit();

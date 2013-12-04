@@ -20,6 +20,7 @@ class AudioCountDown extends \ManiaLive\Gui\Window implements Tick\Listener
 	private $counter;
 	/** @var Label */
 	private $label;
+	private $disableLabel = false;
 	
 	protected function onConstruct()
 	{
@@ -36,6 +37,20 @@ class AudioCountDown extends \ManiaLive\Gui\Window implements Tick\Listener
 		$sound->setPosition(200);
 		$sound->autoPlay();
 		$this->addComponent($sound);
+	}
+	
+	function disableLabel($disable = true)
+	{
+		$this->disableLabel = $disable;
+	}
+	
+	function onDraw()
+	{
+		parent::onDraw();
+		if ($this->disableLabel)
+		{
+			$this->removeComponent($this->label);
+		}
 	}
 	
 	function start($count)

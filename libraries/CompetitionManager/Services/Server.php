@@ -54,7 +54,7 @@ class Server extends \DedicatedManager\Services\Server
 		$config->wsapi->password = $wsConfig->password;
 		$config->config->logsPrefix = 'match-'.$this->matchId;
 
-		$config->plugins[] = $isLobby ? 'CompetitionManager\\LobbyControl' : 'CompetitionManager\\MatchControl';
+		$config->plugins[] = $isLobby ? '\ManiaLivePlugins\CompetitionManager\LobbyControl\LobbyControl' : '\ManiaLivePlugins\CompetitionManager\MatchControl\MatchControl';
 		$config->__other = <<<CONFIG
 alias competition = 'ManiaLivePlugins\CompetitionManager\Config'
 competition.matchId = $this->matchId

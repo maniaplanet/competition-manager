@@ -19,7 +19,8 @@
         "php": ">=5.3",
         "maniaplanet/manialib": "dev-master",
         "maniaplanet/maniaplanet-ws-sdk": "dev-master",
-        "maniaplanet/dedicated-manager": "dev-master"
+        "maniaplanet/dedicated-manager": "dev-master",
+        "maniaplanet/dedicated-server-api": "dev-master"
     },
     "minimum-stability": "dev"
 }

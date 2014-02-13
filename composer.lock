@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "e3b845a181a58c7aa3b75ba488676773",
+    "hash": "5307d926a8d2f41e85420916b8931188",
     "packages": [
         {
             "name": "maniaplanet/dedicated-manager",
@@ -49,6 +49,49 @@
                 "TrackMania"
             ],
             "time": "2014-02-13 13:06:08"
+        },
+        {
+            "name": "maniaplanet/dedicated-server-api",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/maniaplanet/dedicated-server-api.git",
+                "reference": "73f857cef30f8b177141f75dd44af5c10bb7c491"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/maniaplanet/dedicated-server-api/zipball/73f857cef30f8b177141f75dd44af5c10bb7c491",
+                "reference": "73f857cef30f8b177141f75dd44af5c10bb7c491",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Maniaplanet\\": "libraries/Maniaplanet"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "NadeoLive",
+                    "email": "livedev@nadeo.com",
+                    "homepage": "http://www.nadeo.com/"
+                }
+            ],
+            "description": "XML-RPC library to connect to ManiaPlanet server",
+            "homepage": "https://github.com/maniaplanet/dedicated-server-api",
+            "keywords": [
+                "ManiaPlanet",
+                "ShootMania",
+                "TrackMania"
+            ],
+            "time": "2014-02-04 08:05:28"
         },
         {
             "name": "maniaplanet/manialib",
@@ -153,7 +196,8 @@
     "stability-flags": {
         "maniaplanet/manialib": 20,
         "maniaplanet/maniaplanet-ws-sdk": 20,
-        "maniaplanet/dedicated-manager": 20
+        "maniaplanet/dedicated-manager": 20,
+        "maniaplanet/dedicated-server-api": 20
     },
     "platform": {
         "php": ">=5.3"

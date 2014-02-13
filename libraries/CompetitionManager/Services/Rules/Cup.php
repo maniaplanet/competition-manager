@@ -9,7 +9,7 @@
 
 namespace CompetitionManager\Services\Rules;
 
-use DedicatedApi\Structures\GameInfos;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLib\Gui\Elements\Icon;
 use ManiaLib\Gui\Elements\Icons128x32_1;
 use CompetitionManager\Services\Scores;

@@ -14,7 +14,7 @@ class LobbyRounds extends Rounds
 	public $pointsLimit = 100;
 	public $scoringSystem = null;
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		$dedicated->setRoundPointsLimit((int) $this->pointsLimit, true);
 		if($this->scoringSystem)

@@ -13,7 +13,7 @@ class LobbySMTimeAttack extends SMTimeAttack
 {
 	public $timeLimit = 360;
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		$settings = $dedicated->getModeScriptSettings();
 		$settings['S_TimeLimit'] = (int) $this->timeLimit;

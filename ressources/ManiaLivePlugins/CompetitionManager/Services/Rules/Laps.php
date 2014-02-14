@@ -20,7 +20,7 @@ class Laps extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 	public $finishTimeLimit = 1;
 	public $disableRespawn = false;
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		$dedicated->setNbLaps((int) $this->lapsLimit, true);
 		$dedicated->setLapsTimeLimit((int) $this->timeLimit, true);

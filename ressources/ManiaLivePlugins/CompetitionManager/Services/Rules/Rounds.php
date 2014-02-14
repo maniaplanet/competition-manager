@@ -9,7 +9,7 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
-use DedicatedApi\Structures\GameInfos;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 abstract class Rounds extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 {

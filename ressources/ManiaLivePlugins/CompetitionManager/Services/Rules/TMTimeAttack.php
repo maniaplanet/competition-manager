@@ -9,7 +9,7 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
-use DedicatedApi\Structures\GameInfos;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 abstract class TMTimeAttack extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 {

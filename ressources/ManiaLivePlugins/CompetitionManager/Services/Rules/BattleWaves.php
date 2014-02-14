@@ -29,7 +29,7 @@ class BattleWaves extends Script
 		return $this->slotsPerTeam;
 	}
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		$settings = $dedicated->getModeScriptSettings();
 		$settings['S_AutoBalance'] = false;

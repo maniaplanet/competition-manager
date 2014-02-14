@@ -9,6 +9,7 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
+use Maniaplanet\DedicatedServer\Connection;
 use ManiaLive\DedicatedApi\Callback;
 use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\CompetitionManager\Event;
@@ -16,11 +17,11 @@ use ManiaLivePlugins\CompetitionManager\Services\Scores;
 
 abstract class NadeoTeamScript extends Script
 {
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(Connection $dedicated)
 	{
 	}
 	
-	function configureWarmup(\DedicatedApi\Connection $dedicated)
+	function configureWarmup(Connection $dedicated)
 	{
 		$settings = $dedicated->getModeScriptSettings();
 		$settings['S_UseScriptCallbacks'] = true;

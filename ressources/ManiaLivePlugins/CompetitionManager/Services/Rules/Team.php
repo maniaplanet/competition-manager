@@ -21,7 +21,7 @@ class Team extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 	public $mapsLimit = 2;
 	public $disableRespawn = false;
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		$dedicated->setFinishTimeout((int) $this->finishTimeLimit, true);
 		$dedicated->setUseNewRulesTeam(true, true);

@@ -18,7 +18,7 @@ class CumulativeTMTimeAttack extends TMTimeAttack
 	
 	private $mapsDone = 0;
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		$dedicated->setTimeAttackLimit((int) $this->timeLimit);
 	}

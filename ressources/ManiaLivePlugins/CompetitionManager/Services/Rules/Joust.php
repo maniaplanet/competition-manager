@@ -24,7 +24,7 @@ class Joust extends Script
 	public $roundsLimit = 3;
 	public $mapsLimit = 2;
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer $dedicated)
 	{
 		$settings = $dedicated->getModeScriptSettings();
 		$settings['S_RoundTimeLimit'] = (int) $this->timeLimit;

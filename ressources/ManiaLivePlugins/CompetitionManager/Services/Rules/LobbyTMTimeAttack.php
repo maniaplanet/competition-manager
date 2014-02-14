@@ -13,7 +13,7 @@ class LobbyTMTimeAttack extends TMTimeAttack
 {
 	public $timeLimit = 300000;
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		$dedicated->setTimeAttackLimit((int) $this->timeLimit);
 	}

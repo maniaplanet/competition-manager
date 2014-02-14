@@ -30,7 +30,7 @@ class Heroes extends NadeoTeamScript
 		return 5;
 	}
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection\Connection $dedicated)
 	{
 		parent::configure($dedicated);
 		

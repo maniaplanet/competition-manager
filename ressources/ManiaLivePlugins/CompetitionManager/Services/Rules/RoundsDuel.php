@@ -19,7 +19,7 @@ class RoundsDuel extends Rounds
 	public $mapsLimit = 2;
 	public $disableRespawn = false;
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		$dedicated->setUseNewRulesRound(true, true);
 		$dedicated->setRoundPointsLimit((int) $this->roundsLimit, true);

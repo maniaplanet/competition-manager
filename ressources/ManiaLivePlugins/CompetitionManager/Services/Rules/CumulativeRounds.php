@@ -23,7 +23,7 @@ class CumulativeRounds extends Rounds
 	private $roundsDone = 0;
 	private $mapsDone = 0;
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		$dedicated->setFinishTimeout((int) $this->finishTimeLimit, true);
 		if($this->scoringSystem)

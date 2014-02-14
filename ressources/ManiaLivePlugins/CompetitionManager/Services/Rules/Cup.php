@@ -20,7 +20,7 @@ class Cup extends \ManiaLivePlugins\CompetitionManager\Services\Rules
 	public $scoringSystem = null;
 	public $disableRespawn = false;
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		$dedicated->setFinishTimeout((int) $this->finishTimeLimit, true);
 		$dedicated->setCupRoundsPerMap((int) $this->roundsLimit, true);

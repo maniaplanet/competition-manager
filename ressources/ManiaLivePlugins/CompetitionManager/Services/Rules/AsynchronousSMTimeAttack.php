@@ -13,7 +13,7 @@ class AsynchronousSMTimeAttack extends SMTimeAttack
 {
 	public $maxTries = 0;
 
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		
 	}

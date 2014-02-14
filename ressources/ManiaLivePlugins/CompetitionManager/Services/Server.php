@@ -36,7 +36,7 @@ class Server extends AbstractObject
 	
 	protected function onFetchObject()
 	{
-		$connection = \DedicatedApi\Connection::factory($this->rpcHost, $this->rpcPort, 5, 'SuperAdmin', $this->rpcPassword);
+		$connection = \Maniaplanet\DedicatedServer\Connection::factory($this->rpcHost, $this->rpcPort, 5, 'SuperAdmin', $this->rpcPassword);
 		$info = $connection->getSystemInfo();
 		$this->login = $info->serverLogin;
 		$this->titleId = $info->titleId;
@@ -45,7 +45,7 @@ class Server extends AbstractObject
 		$this->joinPassword = $connection->getServerPassword();
 		$this->specPassword = $connection->getServerPasswordForSpectator();
 		$this->isRelay = $connection->isRelayServer();
-		\DedicatedApi\Connection::delete($this->rpcHost, $this->rpcPort);
+		\Maniaplanet\DedicatedServer\Connection::delete($this->rpcHost, $this->rpcPort);
 	}
 	
 	/**

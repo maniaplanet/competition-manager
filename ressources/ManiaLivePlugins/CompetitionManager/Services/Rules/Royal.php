@@ -23,7 +23,7 @@ class Royal extends Script
 	public $earlyRespawn = true;
 	public $spawnWaveInterval = 5;
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		$settings = $dedicated->getModeScriptSettings();
 		$settings['S_MapPointsLimit'] = (int) $this->pointsLimit;

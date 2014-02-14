@@ -9,6 +9,7 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services\Rules;
 
+use Maniaplanet\DedicatedServer\Connection;
 use ManiaLive\DedicatedApi\Callback;
 use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\CompetitionManager\Event;
@@ -32,11 +33,11 @@ class Elite extends Script
 		return 3;
 	}
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(Connection $dedicated)
 	{
 	}
 	
-	function configureWarmup(\DedicatedApi\Connection $dedicated)
+	function configureWarmup(Connection $dedicated)
 	{
 		$settings = $dedicated->getModeScriptSettings();
 		$settings['S_TimeLimit'] = (int) $this->timeLimit;

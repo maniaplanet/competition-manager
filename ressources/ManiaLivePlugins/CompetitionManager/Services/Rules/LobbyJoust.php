@@ -13,7 +13,7 @@ class LobbyJoust extends Script
 {
 	public $name = 'Joust.Script.txt';
 	
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(\Maniaplanet\DedicatedServer\Connection $dedicated)
 	{
 		$settings = $dedicated->getModeScriptSettings();
 		$settings['S_UseLobby'] = true;

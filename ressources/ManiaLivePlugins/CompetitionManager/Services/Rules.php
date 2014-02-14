@@ -9,6 +9,7 @@
 
 namespace ManiaLivePlugins\CompetitionManager\Services;
 
+use Maniaplanet\DedicatedServer\Connection;
 use ManiaLive\DedicatedApi\Callback\Event;
 
 abstract class Rules
@@ -28,18 +29,18 @@ abstract class Rules
 	
 	/**
 	 * Called to configure the settings of the server
-	 * @param \DedicatedApi\Connection $dedicated
+	 * @param Connection $dedicated
 	 */
-	function configure(\DedicatedApi\Connection $dedicated)
+	function configure(Connection $dedicated)
 	{
 		// Often, it should be already configured in match settings
 	}
 	
 	/**
 	 * Called to configure the server before the match really starts
-	 * @param \DedicatedApi\Connection $dedicated
+	 * @param Connection $dedicated
 	 */
-	function configureWarmup(\DedicatedApi\Connection $dedicated)
+	function configureWarmup(Connection $dedicated)
 	{
 		
 	}
